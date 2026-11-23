@@ -1,3 +1,4 @@
+<!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Joc de les Bestioles</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&family=Bangers&display=swap">
@@ -530,7 +531,13 @@ function migrate(g){
     if(n.equip&&n.equip.anell){n.equip.anell1=n.equip.anell;delete n.equip.anell}return n}
   return newGame();
 }
-var G=migrate(load(S_KEY));
+var G=(function(){var raw=null,g=null;try{raw=localStorage.getItem(S_KEY)}catch(e){storageOk=false}
+  try{g=raw?JSON.parse(raw):null}catch(e){g=null}
+  if(raw&&(!g||typeof g!=='object'||(g.v!==1&&g.v!==2))){try{localStorage.setItem(S_KEY+'.bak-'+Date.now(),raw)}catch(e){}g=null}
+  g=migrate(g);var d=newGame();Object.keys(d).forEach(function(k){if(g[k]===undefined||g[k]===null)g[k]=d[k]});
+  if(!Array.isArray(g.owned))g.owned=[];g.owned=g.owned.filter(function(c){return c&&SPECIES[c.sp]});if(!g.owned.length)g.owned=d.owned;
+  if(!Array.isArray(g.items))g.items=[];['equip','built','food','runs','done','seen','tips'].forEach(function(k){if(typeof g[k]!=='object'||Array.isArray(g[k]))g[k]={}});
+  return g})();
 G.seen=G.seen||{};G.tips=G.tips||{};G.restClock=G.restClock||Date.now();
 if(!G.evoTree){G.owned.forEach(function(c){if(c.stage===1&&c.evo>0)c.stage=2});G.evoTree=1}
 function persist(){save(S_KEY,G)}
@@ -559,7 +566,7 @@ function pathL(w,path){return TIER[w]+(path==='llarg'?1:0)}
 function worldScenes(w){return Object.keys(SCENES).filter(function(id){var s=SCENES[id];return (s.pool==='gen'||s.pool==='land'||s.pool==='fork'||(s.pool==='sig'&&s.world===w))})}
 /* real-time rest: 1 point every 10 minutes at home (2 with the spa) */
 function applyRestClock(){
-  var now=Date.now(),steps=Math.floor((now-G.restClock)/600000);
+  var now=Date.now();if(!(G.restClock<=now))G.restClock=now;var steps=Math.floor((now-G.restClock)/600000);
   if(steps<=0)return;G.restClock+=steps*600000;
   var per=(G.built.spa?2:1)*Math.min(steps,20);
   G.owned.forEach(function(c){if(busyWorld(c))return;if(c.rest>0){c.rest=Math.max(0,c.rest-per);if(!c.rest)c.fat=0}else c.fat=Math.max(0,c.fat-per)});
@@ -1119,7 +1126,7 @@ function battleTick0(){
     b.warn=false;r.hp[tg.uid]=Math.max(0,r.hp[tg.uid]-d);var refl=0;
     if(b.tm.reflect[tg.uid]>0){refl=Math.max(1,Math.round(d*0.5));b.enemy.hp=Math.max(0,b.enemy.hp-refl)}
     ev.push({t:'ehit',tgt:tg.uid,n:d,after:r.hp[tg.uid],strong:strong,refl:refl,foeAfter:b.enemy.hp,txt:(strong?'COP FORT! ':'')+b.enemy.n+' ataca '+cName(tg)+(tank?' (el tanc es posa davant)':'')+': -'+d+(sh?' (l’escut para la meitat)':'')+(refl?'. El mirall li torna -'+refl:'')+(r.hp[tg.uid]===0?'. Queda fora de combat.':'')});
-    if(foeCheck(r,b,ev))return ev;
+    if(alive(r).length&&foeCheck(r,b,ev))return ev;
   }
   if(!alive(r).length){b.over='lose';ev.push({t:'teamDown',txt:'Tot l’equip ha caigut.'});return ev}
   if(b.turn%3===2&&!b.warn){b.warn=Math.random()<0.5?'area':'strong';ev.push({t:'warn',kind:b.warn,txt:b.enemy.n+(b.warn==='area'?' prepara un ATAC A TOTHOM!':' prepara un COP FORT!')})}
@@ -1871,7 +1878,7 @@ function doMega(x,r,b){var m=x.mega;b.megaUsed[m.id]=1;
 /* --- battle start and each turn --- */
 var V13_ADJ={boss:{atk:0.78,hp:0.85},guardian:{atk:0.85,hp:0.9},normal:{atk:0.92,hp:1}};
 function makeBattle(o){var bt=makeBattle1(o),en=bt.enemy,ad=V13_ADJ[en.boss?'boss':en.guardian?'guardian':'normal'];var rz=run();en.atk=Math.max(1,Math.round(en.atk*ad.atk*(en.boss&&rz&&!rz.zone&&!rz.cave?0.85:1)));en.max=en.hp=Math.round(en.hp*ad.hp);bt.P=powerOf(G.equip);if(bt.P.shield0)bt.shield=Math.min(6,bt.shield+bt.P.shield0);bt.megaUsed={};return bt}
-function battleTick(){
+function battleTick3(){
   var r=run(),b=r.event;if(!b.P)b.P=powerOf(G.equip);var P=b.P;b._procs=[];b._vamp=0;b._thorn=0;
   if(P.haste)r.team.forEach(function(u){(b.ch[u]||[]).forEach(function(v,i){if(v>1&&Math.random()*100<P.haste)b.ch[u][i]=v-1})});
   if(P.meter)b.meter=(b.meter||0)+P.meter;
@@ -1900,7 +1907,7 @@ function battleTick(){
   if(b._procs.length)ev.push({t:'proc',tags:b._procs.slice(),txt:'Efectes dels objectes: '+b._procs.map(function(k){return FX_N[k]}).join(', ')+'.'});
   ['slow','dist','dizzy'].forEach(function(k){if(b.st[k]>0)b.st[k]--});
   return ev}
-function battleWon(){var r=run(),b=r.event,en=b.enemy,P=b.P||emptyP();battleWon0();var ev=r.event;
+function battleWon3(){var r=run(),b=r.event,en=b.enemy,P=b.P||emptyP();battleWon0();var ev=r.event;
   if(ev&&ev.type==='card'&&ev.kind==='coins'&&P.coins)ev.n=Math.round(ev.n*(1+P.coins/100));
   var ch=en.boss?0.05:0;
   if(ch&&ev&&ev.type==='card'&&ev.kind==='item'&&Math.random()<ch){var miss=missingPieces(r.world);if(miss.length){ev.item=pickOne(miss);ev.why='Una peça d’un SET DE LLEGENDA! '+ev.why}}}
@@ -1984,6 +1991,12 @@ function evoDots(c,S){if(!c)return '';var col=ELS[S.el].c;
   var n=Math.min(5,c.mill||0),d='';for(var i=0;i<5;i++)d+='<span style="display:inline-block;width:8px;height:8px;margin:0 1.5px;border-radius:50%;border:1.5px solid '+col+';background:'+(i<n?col:'transparent')+'"></span>';
   return '<span style="display:block;line-height:1;margin-top:3px" aria-label="'+n+' de 5 per evolucionar a la forma '+(c.stage+2)+'">'+d+'<span class="small" style="margin-left:4px;font-weight:800">'+n+'/5</span></span>'}
 
+/* --- v13.4 safety: a battle never continues with the whole team down, and an error in a turn ends the battle instead of freezing the game --- */
+function battleTick(){var r=run(),b=r&&r.event;
+  if(b&&!b.over&&!alive(r).length){b.over='lose';return [{t:'teamDown',txt:'Tot l’equip ha caigut.'}]}
+  try{return battleTick3()}catch(e){if(b){b.over='lose'}return [{t:'teamDown',txt:'Alguna cosa ha fallat en aquest torn. La batalla s’acaba.'}]}}
+function battleWon(){battleWon3();var r=run();if(r&&r.team&&!r.team.some(function(u){return r.hp[u]>0}))r.team.forEach(function(u){r.hp[u]=1})}
+try{document.documentElement.style.touchAction='manipulation'}catch(e){}
 /* ================= COMMENTS ================= */
 var F=load(F_KEY)||{who:'',items:[]};
 var TYPES=["M’agrada","No m’agrada","Canviaria","Idea","No quadra"],curType=TYPES[0];
