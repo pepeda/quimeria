@@ -345,7 +345,7 @@ var SPECIES={
 var SP_ORDER=['espurnet','fumet','brasa','gotim','bufa','petxina','brotet','molsa','pinyol','arrel','xispa','trona','guspira','mentoli','somni','ullet'];
 var MONSTERS={foc:'Salamandra de lava',aigua:'Cranc gegant',planta:'Planta carnívora',llamp:'Núvol rabiós',psiquic:'Ombra que parla'};
 var FOOD={foc:'Baia picant',aigua:'Alga dolça',planta:'Fulla tendra',llamp:'Fruita elèctrica',psiquic:'Bolet somiador'};
-var SLOTS=[['casc','Casc'],['espasa','Espasa'],['escut','Escut'],['collaret','Collaret'],['anell1','Anell 1'],['anell2','Anell 2'],['capa','Capa'],['botes','Botes']];
+var SLOTS=[['casc','Casc'],['espasa','Arma'],['escut','Escut'],['collaret','Collaret'],['anell1','Anell 1'],['anell2','Anell 2'],['capa','Capa'],['botes','Botes']];
 var ITEMS={
   cascPetxina:{n:'Casc de petxina',slot:'casc',def:2,atk:0,hp:0,rar:'Comú'},
   cascCristall:{n:'Casc de cristall',slot:'casc',def:4,atk:0,hp:2,rar:'Rar'},
@@ -478,7 +478,7 @@ function elIcon(el,px,color){
   return '<svg width="'+px+'" height="'+px+'" viewBox="0 0 24 24" aria-hidden="true">'+(d[el]||'')+'</svg>';
 }
 var COIN='<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#F7C948" stroke="#C98A00" stroke-width="1.5"/><circle cx="10" cy="10" r="4" fill="none" stroke="#C98A00" stroke-width="1.5"/></svg>';
-function hero(px){return '<svg width="'+px+'" height="'+Math.round(px*1.2)+'" viewBox="0 0 50 60" aria-hidden="true"><circle cx="25" cy="17" r="11" fill="#F4C6A0"/><path d="M13 15 Q25 -2 37 15 Z" fill="#6B3E26"/><rect x="13" y="29" width="24" height="22" rx="8" fill="#4A3FB5"/><circle cx="21" cy="18" r="2" fill="#1E1B2E"/><circle cx="29" cy="18" r="2" fill="#1E1B2E"/><rect x="15" y="50" width="7" height="8" rx="2" fill="#6B3E26"/><rect x="28" y="50" width="7" height="8" rx="2" fill="#6B3E26"/></svg>'}
+function hero(px){return '<svg width="'+px+'" height="'+Math.round(px*1.2)+'" viewBox="0 0 50 60" aria-hidden="true"><circle cx="25" cy="17" r="11" fill="#F4C6A0"/><path d="M13 15 Q25 -2 37 15 Z" fill="#6B3E26"/><rect x="13" y="29" width="24" height="22" rx="8" fill="'+heroCol()+'"/><circle cx="21" cy="18" r="2" fill="#1E1B2E"/><circle cx="29" cy="18" r="2" fill="#1E1B2E"/><rect x="15" y="50" width="7" height="8" rx="2" fill="#6B3E26"/><rect x="28" y="50" width="7" height="8" rx="2" fill="#6B3E26"/></svg>'}
 var NAV_ICONS={casa:'M3 11 L12 4 L21 11 V20 H15 V14 H9 V20 H3 Z',explorar:'M3 6 L9 4 L15 6 L21 4 V18 L15 20 L9 18 L3 20 Z M9 4 V18 M15 6 V20',bestioles:'M8 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M16 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M5 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M19 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M12 20c-3 0-5-1.5-5-3.5S9.5 12 12 12s5 2.5 5 4.5-2 3.5-5 3.5Z',motxilla:'M7 8 H17 A2 2 0 0 1 19 10 V20 H5 V10 A2 2 0 0 1 7 8 Z M9 8 V6 A3 3 0 0 1 15 6 V8 M9 14 H15'};
 var NODE_ICON={gen:'·',fork:'Y',fork2:'Y',land:'⌂',spring:'≈',sig:'★',guardian:'♛'};
 
@@ -647,10 +647,9 @@ function scCasa(){
   var builds=BUILD.map(function(x){var n=G.built[x.k]||0,full=n>=x.max,poor=G.coins<x.price;
     return '<button type="button" class="tap" data-act="build" data-k="'+x.k+'"'+(full||poor?' disabled':'')+' style="min-height:110px"><span style="font-size:14px">'+esc(x.n)+(x.max>1&&n?' ('+n+')':'')+'</span><span class="muted small" style="text-align:center;font-weight:700">'+esc(x.what)+'</span><span class="tag mid">'+(full?'Fet':x.price+' monedes')+'</span></button>'}).join('');
   return tip('casa','Aquesta és la teva casa. Aquí descansen les bestioles. Toca <b>Explorar</b> (a baix) per sortir d’aventura!')+
-    '<h1>La teva casa</h1>'+svg+
+    '<h1>La teva casa</h1>'+svg+'<h2>Construir i decorar</h2><div class="grid3">'+builds+'</div>'+
     (none?'<div class="flat" style="background:#FFF1C2"><h3>Totes les bestioles estan cansades</h3><p>Feu una migdiada i tornaran a estar a punt.</p><button type="button" class="btn gold" data-act="nap">Fes la migdiada</button></div>':'')+
     '<div class="flat"><div class="row between"><h3>Places per a bestioles</h3><b>'+G.owned.length+' de '+cap()+'</b></div>'+bar(G.owned.length*100/cap(),'#3DAA5C')+'<p class="muted small">Les bestioles es cansen per expedicions. A casa descansen: 1 punt per cada expedició que no fan, i també 1 punt cada 10 minuts.</p>'+list+'</div>'+
-    '<h2>Construir i decorar</h2><div class="grid3">'+builds+'</div>'+
     '<div class="flat"><h3>Partida</h3><p class="muted">La partida es guarda en aquest mòbil o ordinador.</p><button type="button" class="btn light sm" data-act="reset">'+(resetArm?'Segur? Toca un altre cop':'Comença una partida nova')+'</button></div>';
 }
 var resetArm=false,abandonArm=null,restartArm=false;
@@ -1511,9 +1510,9 @@ function forgeOnceV9(id){var t=tierOf(id);if(t>=4)return false;var cnt=G.items.f
 function forgeAllV9(){var n=0,again=true,guard=0;while(again&&guard++<200){again=false;var gs=itemGroups();for(var i=0;i<gs.length;i++){if(gs[i].n>=4&&forgeOnce(gs[i].id)){n++;again=true;break}}}return n}
 function scMotxilla(){
   var q=bonusPct(G.equip);
-  var slots=SLOTS.map(function(x){var id=G.equip[x[0]],it=IT(id);return '<div class="box" style="min-height:96px;'+(it?'border:3px solid '+TIER_C[it.tier]:'border:2px dashed #B9B3C6')+'"><span class="muted small">'+x[1]+'</span>'+(it?'<b style="font-size:13px;text-align:center">'+esc(it.n)+'</b><span class="muted small" style="text-align:center">'+esc(itemStats(it))+'</span><button type="button" class="btn sm light" style="min-height:36px" data-act="unequip" data-slot="'+x[0]+'">Treu</button>':'<span class="muted small">buit</span>')+'</div>'}).join('');
+  var slots=SLOTS.filter(function(x){return x[0]!=='vestit'}).map(function(x){var id=G.equip[x[0]],it=IT(id);return '<div class="box" style="min-height:96px;'+(it?'border:3px solid '+TIER_C[it.tier]:'border:2px dashed #B9B3C6')+'"><span class="muted small">'+x[1]+'</span>'+(it?'<b style="font-size:13px;text-align:center">'+esc(it.n)+'</b><span class="muted small" style="text-align:center">'+esc(itemStats(it))+'</span><button type="button" class="btn sm light" style="min-height:36px" data-act="unequip" data-slot="'+x[0]+'">Treu</button>':'<span class="muted small">buit</span>')+'</div>'}).join('');
   var groups=itemGroups(),ready=forgeReady();
-  var forge='<div class="flat" style="gap:8px;background:#FFF1DA"><h2>Forja</h2><p class="small">Amb <b>4 objectes iguals</b> en fas <b>1 de la categoria següent</b>: Normal → Refinada → Màgica → Èpica → Superèpica. Cada categoria dona molt més (Refinada ×1,6 · Màgica ×2,4 · Èpica ×3,4 · Superèpica ×4,8). Costa '+FORGE_COST.join(', ')+' monedes segons la categoria. <b>Cada vegada que forges, l’objecte guanya un poder especial</b> (Xucla vida, Verí, Encanteri, Espines…).</p>'+
+  var forge='<div class="flat" style="gap:8px;background:#FFF1DA">'+qHead('Forja','4 objectes iguals → 1 de la categoria següent, amb un poder especial nou.','Normal → Refinada → Màgica → Èpica → Superèpica. Cada categoria dona molt més: Refinada ×1,6 · Màgica ×2,4 · Èpica ×3,4 · Superèpica ×4,8. Costa '+FORGE_COST.join(', ')+' monedes segons la categoria. Cada vegada que forges, l’objecte guanya un poder especial (Xucla vida, Verí, Encanteri, Espines…). Els 4 objectes han de ser de la mateixa mena i categoria.')+
     (ready.length?'<button type="button" class="btn gold" data-act="forgeAll">Forja-ho tot ('+ready.length+' grups a punt)</button>':'<p class="muted small">Ara no tens 4 objectes iguals de cap mena.</p>')+'</div>';
   var inv=groups.map(function(g){var it=IT(g.id),t=it.tier,sl=it.slot==='anell'?['anell1','anell2']:[it.slot],cost=t<4?FORGE_COST[t]:0;
     return '<div class="flat" style="background:var(--soft);gap:6px;outline:3px solid '+TIER_C[t]+'"><div class="row between"><b>'+esc(it.n)+(g.n>1?' ×'+g.n:'')+'</b><span class="tag" style="background:'+TIER_C[t]+';color:#fff">'+esc(it.rar)+'</span></div><span class="muted small">'+esc(itemStats(it))+'</span>'+
@@ -1522,7 +1521,7 @@ function scMotxilla(){
       (t<4?'<div class="row" style="gap:6px"><button type="button" class="btn sm gold" data-act="forge" data-id="'+esc(g.id)+'"'+(fcount(g.id)>=4&&G.coins>=cost?'':' disabled')+'>Forja 4 → 1 '+esc(TIER_N[t+1])+' ('+cost+' monedes)</button><span class="muted small">'+(fcount(g.id)>=4?(G.coins>=cost?'':'Et falten monedes'):'En tens '+fcount(g.id)+' de 4 d’aquesta categoria')+'</span></div>':'<span class="muted small">Ja és Superèpica: la millor categoria.</span>')+'</div>'}).join('');
   var food=Object.keys(ELS).map(function(k){return '<div class="box">'+elIcon(k,26,ELS[k].c)+'<span class="small" style="text-align:center">'+esc(FOOD[k])+'</span><b>'+(G.food[k]||0)+'</b></div>'}).join('');
   return '<h1>Motxilla</h1>'+tip('motxilla','Els objectes que portes fan més forta cada bestiola de l’equip. Abans d’equipar, mira les fletxes: ▲ verd vol dir que millora, ▼ vermell que empitjora. Amb 4 objectes iguals, a la Forja en fas un de millor.')+
-    '<div class="flat" style="align-items:center">'+hero(48)+'<div class="row" style="justify-content:center"><span class="tag">Atac +'+Math.round(q.atk)+'%</span><span class="tag">Defensa +'+Math.round(q.def)+'%</span><span class="tag">Vida +'+Math.round(q.hp)+'%</span></div></div>'+
+    '<div class="flat" style="align-items:center">'+heroOutfit()+'<div class="row" style="justify-content:center"><span class="tag">Atac +'+Math.round(q.atk)+'%</span><span class="tag">Defensa +'+Math.round(q.def)+'%</span><span class="tag">Vida +'+Math.round(q.hp)+'%</span></div></div>'+
     bestBlock()+'<div class="grid4">'+slots+'</div>'+forge+setsBlock()+'<h2>A la motxilla</h2>'+(inv||'<p class="muted">Encara no tens objectes. En trobaràs explorant.</p>')+'<h2>Menjar</h2><div class="grid3">'+food+'</div>';
 }
 /* who is acting: green for your team, red for the enemy; big enemy moves get their own cut-in */
@@ -1740,7 +1739,7 @@ var AFFIX={
 var AFF_KEYS=Object.keys(AFFIX);
 function affOf(id){var p=String(id).split('~')[1];return p?p.split('.').filter(function(a){return AFFIX[a]}):[]}
 /* --- legendary sets: 2 per element, 5 pieces each, always Superèpica --- */
-var SLOT_N={casc:'Casc',espasa:'Espasa',escut:'Escut',collaret:'Collaret',anell:'Anell',capa:'Capa',botes:'Botes'};
+var SLOT_N={casc:'Casc',espasa:'Arma',escut:'Escut',collaret:'Collaret',anell:'Anell',capa:'Capa',botes:'Botes'};
 var SLOT_BASE={casc:{def:2,hp:1,atk:0},espasa:{atk:3,def:0,hp:0},escut:{def:3,atk:0,hp:0},collaret:{hp:3,atk:1,def:0},anell:{atk:1,def:1,hp:1},capa:{def:1,hp:2,atk:0},botes:{hp:2,def:1,atk:0}};
 var SETS={
   drac:{n:'Armadura del Drac Roig',suf:'del Drac Roig',el:'foc',slots:['casc','espasa','escut','capa','botes'],b:[
@@ -1997,6 +1996,37 @@ function battleTick(){var r=run(),b=r&&r.event;
   try{return battleTick3()}catch(e){if(b){b.over='lose'}return [{t:'teamDown',txt:'Alguna cosa ha fallat en aquest torn. La batalla s’acaba.'}]}}
 function battleWon(){battleWon3();var r=run();if(r&&r.team&&!r.team.some(function(u){return r.hp[u]>0}))r.team.forEach(function(u){r.hp[u]=1})}
 try{document.documentElement.style.touchAction='manipulation'}catch(e){}
+/* --- v13.5: weapons of different kinds, outfits for the player character, short help with a "?" --- */
+(function(){
+  var W={arcCaca:{n:'Arc de caça',slot:'espasa',atk:3,def:0,hp:0,rar:'Comú'},bastoMagic:{n:'Bastó màgic',slot:'espasa',atk:2,def:0,hp:2,rar:'Comú'},
+    martellPedra:{n:'Martell de pedra',slot:'espasa',atk:5,def:0,hp:0,rar:'Rar'},dagaOmbra:{n:'Daga d’ombra',slot:'espasa',atk:4,def:0,hp:1,rar:'Rar'},
+    vestitExplorador:{n:'Vestit d’explorador',slot:'vestit',hp:3,def:1,atk:0,rar:'Comú',col:'#4E7A3A'},tunicaMag:{n:'Túnica de mag',slot:'vestit',atk:2,hp:1,def:0,rar:'Comú',col:'#6A3FB5'},
+    armaduraLleugera:{n:'Armadura lleugera',slot:'vestit',def:3,hp:1,atk:0,rar:'Rar',col:'#7A8496'},vestitNinja:{n:'Vestit de ninja',slot:'vestit',atk:3,def:1,hp:0,rar:'Rar',col:'#23202E'},
+    jaquetaFoc:{n:'Jaqueta de foc',slot:'vestit',atk:2,def:1,hp:1,rar:'Rar',col:'#C8462B'}};
+  Object.keys(W).forEach(function(k){ITEMS[k]=W[k];COMMON.push(k)});
+  // set weapons: each set has its own kind of weapon
+  var SW={drac:'Espasa',fenix:'Bastó',marea:'Arpó',levia:'Trident',bosc:'Arc',rosa:'Fuet',tro:'Martell',vent:'Daga',ull:'Vareta',somnia:'Ventall'};
+  SET_KEYS.forEach(function(k){var it=ITEMS['set_'+k+'_espasa'];if(it)it.n=(SW[k]||'Arma')+' '+SETS[k].suf});
+  SLOTS.push(['vestit','Vestit']);SLOT_N.vestit='Vestit';
+})();
+function heroCol(){var it=G&&G.equip&&ITEMS[baseOf(G.equip.vestit||'')];return it&&it.col?it.col:'#4A3FB5'}
+function heroOutfit(){var id=G.equip.vestit,it=IT(id);
+  return '<div class="row" style="gap:12px;align-items:center;justify-content:center">'+hero(64)+
+    '<div class="box" style="min-height:96px;min-width:130px;'+(it?'border:3px solid '+TIER_C[it.tier]:'border:2px dashed #B9B3C6')+'"><span class="muted small">Vestit</span>'+
+    (it?'<b style="font-size:13px;text-align:center">'+esc(it.n)+'</b><span class="muted small" style="text-align:center">'+esc(itemStats(it))+'</span><button type="button" class="btn sm light" style="min-height:40px" data-act="unequip" data-slot="vestit">Treu</button>':'<span class="muted small" style="text-align:center">Sense vestit. En trobaràs explorant.</span>')+'</div></div>'}
+/* a heading with a one-line explanation and a "?" that opens the full detail (tap on a phone, hover shows a tooltip on a computer) */
+function qHead(title,short,long){return '<div class="qhead"><h2 style="margin:0">'+esc(title)+'</h2><details class="qd"><summary title="'+esc(long)+'" aria-label="Més informació sobre '+esc(title)+'">?</summary><p class="small qdtxt">'+esc(long)+'</p></details></div><p class="small" style="margin:2px 0 0">'+esc(short)+'</p>'}
+(function(){try{var st=document.createElement('style');st.textContent='.qhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.qd{display:contents}.qd>summary{list-style:none;cursor:pointer;width:28px;height:28px;border-radius:50%;background:#1E1B2E;color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}.qd>summary::-webkit-details-marker{display:none}.qd .qdtxt{flex-basis:100%;margin:4px 0 0;background:#fff;border:2px solid #1E1B2E;border-radius:10px;padding:8px 10px}';document.head.appendChild(st)}catch(e){}})();
+/* legend sets: short text, details behind the "?" */
+var setsBlockV13=setsBlock;
+setsBlock=function(){var h=setsBlockV13();
+  var a=h.indexOf('<h2>Sets de llegenda</h2>'),b=h.indexOf('<p class="small"><b>Taller de llegendes</b>');
+  if(a<0||b<0)return h;
+  var long='Hi ha 10 sets (2 de cada element) de 5 peces Superèpiques. Amb 2 peces del mateix set posades tens 1 habilitat, amb 3 en tens 2, amb 4 en tens 3, i amb les 5 la super habilitat. Els caps en deixen caure una molt poques vegades (5%). Al Taller de llegendes en pots comprar una per '+LEGEND_COST+' monedes, però només quan has forjat un objecte fins a Superèpica.';
+  var total=(h.match(/Tens <b>(\d+) de 50<\/b>/)||[])[1]||'0';
+  return h.slice(0,a)+qHead('Sets de llegenda','Peces Superèpiques que, juntes, donen habilitats. Molt difícils d’aconseguir. En tens '+total+' de 50.',long)+
+    '<p class="small" style="margin-top:6px"><b>Taller de llegendes</b>'+(legendOpen()?' · '+LEGEND_COST+' monedes per peça':' · tancat fins que forgis una Superèpica')+'</p>'+h.slice(h.indexOf('<div class="row"',b))};
+
 /* ================= COMMENTS ================= */
 var F=load(F_KEY)||{who:'',items:[]};
 var TYPES=["M’agrada","No m’agrada","Canviaria","Idea","No quadra"],curType=TYPES[0];
