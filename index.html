@@ -276,6 +276,16 @@ nav.nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;paddi
 .st-btns{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .helpbtn{min-width:44px;min-height:40px;font-weight:900;font-size:18px}
 .st-art .sfx{position:relative;left:auto;top:auto;transform:rotate(-6deg);animation:none}
+/* First-expedition guide (js/27-guide.js) and the next-goal card */
+.coach{position:absolute;left:10px;right:10px;bottom:92px;z-index:55;background:#1E1B2E;color:#fff;border-radius:16px;padding:10px 14px;box-shadow:0 6px 20px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;pointer-events:auto}
+.coach p{margin:0;flex:1;font-weight:800;font-size:16px;line-height:1.3}
+.coach-skip{background:none;border:0;color:#C9C3E0;text-decoration:underline;font:inherit;font-size:13px;font-weight:700;min-height:44px;padding:0 4px;cursor:pointer;white-space:nowrap}
+.coach-on{outline:4px solid #FFD54A;outline-offset:3px;animation:coachPulse 1.1s ease-in-out infinite;position:relative;z-index:2}
+@keyframes coachPulse{0%,100%{outline-color:#FFD54A}50%{outline-color:#FF8A3D}}
+@media (prefers-reduced-motion: reduce){.coach-on{animation:none}}
+.goal{display:flex;align-items:center;gap:10px;background:#2A1F4A;color:#fff;border-radius:16px;padding:10px 12px;margin-bottom:10px;font-weight:800;font-size:15px;line-height:1.3}
+.goal span{flex:1}
+.has-coach #screen{padding-bottom:130px}
 @media (max-width:840px){
   .app{padding:0;display:block}
   .phone{width:100%;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));border-radius:0}
@@ -633,7 +643,7 @@ function mk(sp){return {uid:'c'+Date.now().toString(36)+Math.random().toString(3
 var SAVE_V=3;
 function newGame(){
   return {v:SAVE_V,niu:[],chest:null,megas:{},coins:150,built:{},owned:[mk('brotet'),mk('gotim'),mk('espurnet'),mk('xispa')],food:{planta:1,aigua:1},items:[],equip:{},runs:{},active:null,done:{},completed:0,psiquic:false,
-    screen:'explorar',world:null,path:null,pick:[],detail:null,summary:null,seen:{},tips:{},story:{},restClock:Date.now(),started:new Date().toISOString()};
+    screen:'explorar',world:null,path:null,pick:[],detail:null,summary:null,seen:{},tips:{explorar:1,mon:1,equip:1,run:1},story:{},tut:{done:0},restClock:Date.now(),started:new Date().toISOString()};
 }
 var G=(function(){var raw=null,g=null;try{raw=localStorage.getItem(S_KEY)}catch(e){storageOk=false}
   try{g=raw?JSON.parse(raw):null}catch(e){g=null}
@@ -644,9 +654,9 @@ var G=(function(){var raw=null,g=null;try{raw=localStorage.getItem(S_KEY)}catch(
   ['owned','niu'].forEach(function(k){if(!Array.isArray(g[k]))g[k]=[];g[k]=g[k].filter(function(c){return c&&typeof c==='object'&&c.sp});
     g[k].forEach(function(c){c.stage=Math.max(0,Math.min(3,c.stage|0));c.lvl=Math.max(1,Math.min(BAL.LEVEL_MAX,c.lvl|0||1));c.xp=Math.max(0,+c.xp||0);c.fat=c.fat|0;c.rest=c.rest|0})});
   if(!g.owned.length)g.owned=d.owned;
-  if(!Array.isArray(g.items))g.items=[];['equip','built','food','runs','done','seen','tips','story'].forEach(function(k){if(typeof g[k]!=='object'||Array.isArray(g[k]))g[k]={}});
+  if(!Array.isArray(g.items))g.items=[];['equip','built','food','runs','done','seen','tips','story','tut'].forEach(function(k){if(typeof g[k]!=='object'||Array.isArray(g[k]))g[k]={}});
   return g})();
-G.seen=G.seen||{};G.tips=G.tips||{};G.story=G.story||{};G.restClock=G.restClock||Date.now();
+G.seen=G.seen||{};G.tips=G.tips||{};G.story=G.story||{};if(!G.tut||typeof G.tut.done!=="number")G.tut={done:(G.completed>0||G.owned.length>4)?1:0};G.restClock=G.restClock||Date.now();
 function persist(){save(S_KEY,G)}
 
 function sp(c){return SPECIES[c.sp]}
@@ -784,6 +794,7 @@ function render(){
   if(s==='run'&&r&&r.event&&r.event.type==='battle'&&!r.event.over){updateAbilities();$('shield').classList.toggle('on',r.event.shield>0);$('warn').classList.toggle('on',!!r.event.warn);scheduleTick()}else stopBattle();
   persist();
   menuDots();
+  tutUpdate();
 }
 /* red dots on the menu: a critter can evolve, something can be forged, better gear is in the backpack */
 function menuDots(){try{var nav=$('nav');if(!nav||!nav.querySelector)return;
@@ -817,8 +828,8 @@ function act(a,d){
     case 'tip':G.tips[d.k]=1;break;
     case 'help':showHelp(false);return;
     case 'nav':G.screen=d.to;G.detail=null;break;
-    case 'world':if(!worldOpen(d.w)){toast('Aquest món encara és desconegut. Completa 3 expedicions.');break}G.world=d.w;G.screen='mon';break;
-    case 'path':G.zone=+d.p;G.pick=[];G.screen='equip';break;
+    case 'world':if(tutOn()&&d.w!=='aigua'){toast('Primer prova el món d’Aigua.');break}if(!worldOpen(d.w)){toast('Aquest món encara és desconegut. Completa 3 expedicions.');break}G.world=d.w;G.screen='mon';break;
+    case 'path':G.zone=+d.p;G.pick=tutOn()&&G.world==='aigua'&&!G.zone?tutPick():[];G.screen='equip';break;
     case 'pick':var i=G.pick.indexOf(d.u);if(i>=0)G.pick.splice(i,1);else if(G.pick.length<maxTeam())G.pick.push(d.u);else toast('Ara nom\u00e9s hi caben '+maxTeam()+' bestioles.');break;
     case 'go':if(G.pick.length&&needOk()){if(G.pick.length<2)toast('Amb poques bestioles és més difícil!');startRun()}break;
     case 'resume':G.active=d.w;G.screen='run';break;
@@ -952,7 +963,8 @@ function buildRoute(w,z){
 function startRun(){
   var w=G.world,z=G.zone||0,hp={};
   G.pick.forEach(function(u){hp[u]=stats(byUid(u)).hp});
-  G.runs[w]={world:w,zone:z,L:zoneL(w,z),i:0,slots:buildRoute(w,z),team:G.pick.slice(),hp:hp,coins:0,cave:null,scene:null,node:'a',event:null,reveal:0,bless:0};
+  var tu=tutOn()&&w==='aigua'&&!z;
+  G.runs[w]={world:w,zone:z,L:zoneL(w,z),i:0,slots:tu?TUT_ROUTE.map(function(k,i){return k==='gen'?{k:k,scene:pickScene('gen',w,[])}:k==='spring'?{k:k,scene:'font'}:k==='wild'?{k:k,sp:tutWild()}:{k:k}}):buildRoute(w,z),tut:tu?1:0,team:G.pick.slice(),hp:hp,coins:0,cave:null,scene:null,node:'a',event:null,reveal:0,bless:0};
   G.active=w;G.pick=[];G.screen='run';arrive();
 }
 function arrive(){
@@ -962,6 +974,8 @@ function arrive(){
   if(s.k==='fork'&&!s.scene){r.event={type:'fork'};return}
   if(s.k==='guardian'){r.event={type:'guardianPre'};return}
   if(s.k==='mini'){r.event={type:'miniPre'};return}
+  if(s.k==='wild'){r.event={type:'wild',sp:s.sp,rare:false};return}
+  if(s.k==='fight'){startBattle({el:r.world,L:Math.max(0.5,r.L-0.3)});return}
   if(s.k==='cave'){r.cave=newCave(1);enterScene(r.cave.list[0]);return}
   enterScene(s.scene);
 }
@@ -1110,7 +1124,7 @@ function makeBattle(o){
   bt.meter=0;
   if(k){en.boss=k;en.n=BOSS[k].n;en.bossD=BOSS[k].d;if(k==='tricap'){en.max=en.hp=Math.round(en.max*0.7);en.atk=Math.round(en.atk*0.85)}bt.minions=0;bt.mhp=Math.round(en.max*0.09);bt.mcur=0;bt.frozen={};bt.charging=0;bt.phase=0;bt.fallen=0;bt.heads=3}
   /* softer enemies (V13_ADJ; the first bosses even softer), and the powers of the equipped gear */
-  var ad=V13_ADJ[en.boss?'boss':en.guardian?'guardian':'normal'];en.atk=Math.max(1,Math.round(en.atk*ad.atk*(en.boss&&r&&!r.zone&&!r.cave?0.85:1)));en.max=en.hp=Math.round(en.hp*ad.hp);bt.P=powerOf(G.equip);if(bt.P.shield0)bt.shield=Math.min(6,bt.shield+bt.P.shield0);bt.megaUsed={};
+  var ad=V13_ADJ[en.boss?'boss':en.guardian?'guardian':'normal'];en.atk=Math.max(1,Math.round(en.atk*ad.atk*(en.boss&&r&&!r.zone&&!r.cave?0.85:1)));en.max=en.hp=Math.round(en.hp*ad.hp);if(r&&r.tut&&!en.wild){en.max=en.hp=Math.round(en.hp*TUT_GUARD_HP)}bt.P=powerOf(G.equip);if(bt.P.shield0)bt.shield=Math.min(6,bt.shield+bt.P.shield0);bt.megaUsed={};
   /* the first boss of the game was too hard for the starters: the zone-1 final guardian has 15% less life */
   if(o.final&&r&&(r.zone||0)===0&&!r.cave){en.hp=Math.round(en.hp*0.85);en.max=en.hp}
   if(curZone()>=3)en.hard=true;
@@ -1347,7 +1361,7 @@ function battleWon(){
   var r2=run();if(r2&&r2.team&&!r2.team.some(function(u){return r2.hp[u]>0}))r2.team.forEach(function(u){r2.hp[u]=1});
 }
 function finishRun(ok,keepAll){
-  var r=run();if(!r)return;
+  var r=run();if(!r)return;if(r.tut&&G.tut)G.tut.done=1;
   var team=r.team.slice(),c0=G.coins;stopBattle();
   var z=r.zone||0,bonus=ok?ZONE_BONUS[z]:0,coins=ok||keepAll?r.coins+bonus:Math.floor(r.coins/2);
   G.coins+=coins;
@@ -2642,7 +2656,7 @@ function scCasa(){
   var svg=houseSvg(b,home);
   var list=home.map(function(c){var left=c.rest>0?0:Math.round((maxFat(c)-c.fat)*100/maxFat(c));return '<div class="row" style="gap:10px">'+cArt(c,40)+'<div style="flex:1;min-width:0"><b>'+esc(cName(c))+'</b> '+roleTag(sp(c).role,true)+' <span class="muted small">forma '+form(c)+' · niv. '+lvl(c)+'</span>'+bar(left,hpColor(left))+'<div class="muted small">'+esc(fatigueText(c))+'</div></div></div>'}).join('');
   return tip('casa','Aquesta és la teva casa. Aquí descansen les bestioles. Toca <b>Explorar</b> (a baix) per sortir d’aventura!')+
-    '<h1>La teva casa</h1>'+svg+'<h2>Construir i decorar</h2><div class="h14builds">'+h14Builds()+'</div>'+
+    goalCard()+'<h1>La teva casa</h1>'+svg+'<h2>Construir i decorar</h2><div class="h14builds">'+h14Builds()+'</div>'+
     (none?'<div class="flat" style="background:#FFF1C2"><h3>Totes les bestioles estan cansades</h3><p>Feu una migdiada i tornaran a estar a punt.</p><button type="button" class="btn gold" data-act="nap">Fes la migdiada</button></div>':'')+
     '<div class="flat"><div class="row between"><h3>Places per a bestioles</h3><b>'+G.owned.length+' de '+cap()+'</b></div>'+bar(G.owned.length*100/cap(),'#3DAA5C')+'<p class="muted small">Les bestioles es cansen per expedicions. A casa descansen: 1 punt per cada expedició que no fan, i també 1 punt cada 10 minuts.</p>'+list+'</div>'+
     '<div class="flat"><div class="row between"><h3>Vibració</h3><button type="button" class="btn sm '+(G.mute?'light':'green')+'" data-act="mute" aria-pressed="'+(!G.mute)+'">'+(G.mute?'Apagat':'Encès')+'</button></div></div>'+
@@ -2657,7 +2671,7 @@ function scExplorar(){
   var house='<div style="position:absolute;left:145px;top:190px;width:100px;text-align:center"><svg width="100" height="80" viewBox="0 0 180 150" aria-hidden="true"><ellipse cx="90" cy="120" rx="86" ry="26" fill="#7CC46B"/><rect x="60" y="62" width="62" height="50" rx="4" fill="#FFF4E0" stroke="#8A5A3C" stroke-width="3"/><path d="M52 66 L91 32 L130 66 Z" fill="#E2574C" stroke="#A23A31" stroke-width="3"/></svg></div>';
   var paused=Object.keys(G.runs).map(function(w){var r=G.runs[w];return '<div class="row" style="gap:10px">'+elIcon(w,28,ELS[w].c)+'<div style="flex:1;min-width:0"><b>'+esc(ELS[w].mon)+'</b><div class="muted small">Pas '+(r.i+1)+' de '+r.slots.length+(r.cave?' · dins una cova':'')+'</div></div><button type="button" class="btn sm green" data-act="resume" data-w="'+w+'">Continua</button><button type="button" class="btn sm light" data-act="abandon" data-w="'+w+'">'+(abandonArm===w?'Segur?':'Deixa-la')+'</button></div>'}).join('');
   return tip('explorar','Toca un món per entrar-hi. El número % diu quant n’has explorat. Les estrelles ★ diuen com és de difícil.')+
-    (G.chest&&!G.chest.open?'<button type="button" class="btn gold" data-act="nav" data-to="resum">Tens un cofre per obrir!</button>':'')+
+    goalCard()+
     '<h1>Explorar</h1><p class="muted">Tria a quin món vols entrar.</p><div style="overflow-x:auto"><div class="map">'+lines+house+ws+'</div></div>'+
     (paused?'<div class="flat"><h3>Aventures a mitges</h3><p class="muted small">Les bestioles d’una aventura a mitges no poden anar enlloc més fins que l’acabis o la deixis.</p>'+paused+'</div>':'')+
     (G.psiquic?'':'<p class="muted">Completa 3 expedicions per descobrir el món desconegut ('+G.completed+' de 3).</p>');
@@ -2816,7 +2830,7 @@ function evoDots(c,S){if(!c)return '';var col=ELS[S.el].c,need=xpNeed(lvl(c)),x=
   return '<span class="small" style="display:block;font-weight:800;margin-top:2px" aria-label="Forma '+form(c)+', nivell '+lvl(c)+'">F'+form(c)+' · niv. '+lvl(c)+'</span>'+
     '<span style="display:block;width:100%;height:5px;border-radius:3px;background:#E6E1D6;overflow:hidden"><span style="display:block;height:100%;width:'+Math.round(x*100/need)+'%;background:'+col+'"></span></span>'}
 /* --- the Niu: critters that do not fit in the house wait here, without limit. They are copies for evolving --- */
-function niuBlock(){var N=G.niu||[],room=G.owned.length<cap();
+function niuBlock(){var N=G.niu||[],room=G.owned.length<cap();if(!N.length)return '';
   var rows=N.map(function(c){var sel=G.niuSwap===c.uid;
     var swap=sel?'<div class="flat" style="background:#fff;gap:6px;width:100%"><b class="small">Quina bestiola de casa va al Niu?</b>'+G.owned.filter(function(h){return !busyWorld(h)}).map(function(h){
         return '<button type="button" class="btn sm light" style="text-align:left" data-act="niuSwap" data-u="'+c.uid+'" data-h="'+h.uid+'">'+esc(cName(h))+' · forma '+form(h)+' · niv. '+lvl(h)+'</button>'}).join('')+'<button type="button" class="btn sm" data-act="niuPick" data-u="'+c.uid+'">Cancel·la</button></div>':'';
@@ -2844,10 +2858,11 @@ function scMotxilla(){
   tabs.obj=forge;tabs.eq+=powersBlock();tabs.sets=setsBlock();
   tabs.obj+='<h2>A la motxilla</h2>'+(inv||'<p class="muted">Encara no tens objectes. En trobaràs explorant.</p>');
   tabs.menjar='<h2>Menjar</h2><div class="grid3">'+food+'</div>';
-  var t=tabs[G.mtab]?G.mtab:'eq';
+  var show={eq:1,menjar:1,obj:G.items.length>0||!!G.forgeChoice,sets:legendOpen()};
+  var t=tabs[G.mtab]&&show[G.mtab]?G.mtab:'eq';
   /* red dots on the tabs: something can be forged, a legend piece can be bought, better gear is in the backpack */
   var dot={obj:forgeReady().length>0,sets:legendOpen()&&G.coins>=LEGEND_COST&&ORDER.filter(worldOpen).some(function(el){return missingPieces(el).length}),eq:betterGear()};
-  var bar='<div class="mtabs" role="tablist">'+[['eq','Equip'],['obj','Objectes i forja'],['sets','Sets'],['menjar','Menjar']].map(function(x){return '<button type="button" role="tab" class="mtab'+(t===x[0]?' on':'')+'" aria-selected="'+(t===x[0])+'" data-act="mtab" data-k="'+x[0]+'">'+x[1]+(dot[x[0]]?'<span class="rdot" aria-label="hi ha novetats"></span>':'')+'</button>'}).join('')+'</div>';
+  var bar='<div class="mtabs" role="tablist">'+[['eq','Equip'],['obj','Objectes i forja'],['sets','Sets'],['menjar','Menjar']].filter(function(x){return show[x[0]]}).map(function(x){return '<button type="button" role="tab" class="mtab'+(t===x[0]?' on':'')+'" aria-selected="'+(t===x[0])+'" data-act="mtab" data-k="'+x[0]+'">'+x[1]+(dot[x[0]]?'<span class="rdot" aria-label="hi ha novetats"></span>':'')+'</button>'}).join('')+'</div>';
   return '<h1>Motxilla</h1>'+bar+(t==='obj'?forgeChoiceBlock():'')+tabs[t];
 }
 function heroOutfit(){var id=G.equip.vestit,it=IT(id);
@@ -3047,6 +3062,75 @@ function showHelp(fromTitle){
     else if(k==='intro')showIntro(0);
     else if(k==='close'){if(fromTitle)showTitle();else{closeStory();render()}}});
 }
+/* ================= FIRST-EXPEDITION GUIDE AND NEXT GOAL =================
+   A new game has G.tut.done = 0. Until the first expedition ends (or the player taps "Salta la guia"),
+   a one-line bubble says what to do and the button to tap gets a moving yellow frame.
+   The first expedition is in the Water world, zone 1, with the team already chosen, a short route
+   (scene, a wild critter that can be fed, easy battle, spring, guardian) and softer enemies.
+   Saves from before the guide (anything finished, or more than 4 critters) count as done. */
+var TUT_TEAM=['brotet','gotim','xispa'];
+var TUT_TIPS=['explorar','mon','equip','run'];
+var TUT_ROUTE=['gen','wild','fight','spring','guardian'];
+var TUT_GUARD_HP=0.7; /* the enemies of the guided expedition have 70% of their life */
+function tutOn(){return !!(G.tut&&!G.tut.done&&!G.completed)}
+function tutEnd(skipped){if(!G.tut)G.tut={};G.tut.done=1;
+  if(skipped)TUT_TIPS.forEach(function(k){delete G.tips[k]});
+  var c=$('coach');if(c)c.remove();var ph=$('phone');if(ph&&ph.classList)ph.classList.remove('has-coach');persist()}
+/* the team for the guided expedition: the first critter of each starter species that can go */
+function tutPick(){return TUT_TEAM.map(function(s){var c=G.owned.filter(function(x){return x.sp===s&&!busyWorld(x)&&!x.rest})[0];return c&&c.uid}).filter(Boolean)}
+/* the wild critter of the guided expedition: a Water species the player does not have yet */
+function tutWild(){var l=speciesOf('aigua').filter(function(s){return !ownsSp(s)});return l.length?pickOne(l):pickOne(speciesOf('aigua'))}
+/* what the bubble says now, and which button it points at */
+function tutStep(){
+  var r=G.screen==='run'&&run(),e=r&&r.event;
+  if(G.detail)return null;
+  if(G.screen==='explorar'&&!G.active)return {sel:'[data-act="world"][data-w="aigua"]',t:'Toca el món d’Aigua per començar.'};
+  if(G.screen==='mon')return G.world==='aigua'?{sel:'[data-act="path"][data-p="0"]',t:'Toca la Zona 1. Al final hi ha un guardià.'}:{sel:'[data-act="world"][data-w="aigua"]',t:'Primer prova el món d’Aigua.'};
+  if(G.screen==='equip')return {sel:'[data-act="go"]',t:'L’equip ja està triat: un ataca, un protegeix i un cura. Toca Surt a explorar.'};
+  if(!r||!e)return null;
+  if(e.type==='scene')return {sel:'.opt:not([disabled])',t:'Tria què fas en aquest lloc del camí.'};
+  if(e.type==='fork')return {sel:'[data-act="fork"]',t:'El camí es divideix. Tria per on vas.'};
+  if(e.type==='battle'){if(e.over==='win')return {sel:'[data-act="bwin"]',t:'Heu guanyat! Toca Continua.'};
+    if(e.over==='lose')return {sel:'[data-act="restartNow"]',t:'No passa res: torna-ho a provar amb tota la vida.'};
+    return {sel:null,t:'Les teves bestioles lluiten soles. Tu només mires.'}}
+  if(e.type==='wild')return (G.food[SPECIES[e.sp].el]||0)>0?{sel:'[data-act="wfeed"]',t:'Una bestiola nova! Dona-li menjar i vindrà amb tu.'}:{sel:'[data-act="wfight"]',t:'Una bestiola nova! Guanya-la i vindrà amb tu.'};
+  if(e.type==='card'&&e.kind==='critter')return document.querySelector('[data-act="join"]')?{sel:'[data-act="join"]',t:'És teva! Afegeix-la a l’equip.'}:{sel:'[data-act="claim"]',t:'És teva! Viurà a la teva casa. Toca Envia-la a casa.'};
+  if(e.type==='card')return {sel:'[data-act="claim"]',t:(e.kind==='item'?'Un objecte per a la motxilla.':e.kind==='food'?'Menjar per a les bestioles.':e.kind==='coins'?'Monedes per construir a la casa.':'')+' Toca Continua.'};
+  if(e.type==='note')return {sel:'[data-act="next"]',t:'Toca Continua.'};
+  if(e.type==='guardianPre')return {sel:'[data-act="gfight"]',t:'El guardià tanca la zona. Guanya’l!'};
+  return null;
+}
+/* after every render: draw the bubble and frame the button */
+function tutUpdate(){try{tutDraw()}catch(x){}}
+function tutDraw(){
+  var old=document.querySelectorAll('.coach-on');for(var i=0;i<old.length;i++)old[i].classList.remove('coach-on');
+  var c=$('coach'),ph=$('phone');
+  var s=tutOn()?tutStep():null;
+  if(ph&&ph.classList)ph.classList.toggle('has-coach',!!s);
+  if(!s){if(c)c.remove();return}
+  if(!c){c=document.createElement('div');c.id='coach';c.className='coach';c.setAttribute('role','status');if(!ph)return;ph.appendChild(c);
+    c.addEventListener('click',function(ev){if(ev.target.closest('[data-tut="skip"]')){tutEnd(true);render()}})}
+  c.innerHTML='<p>'+esc(s.t)+'</p><button type="button" class="coach-skip" data-tut="skip">Salta la guia</button>';
+  if(s.sel){var t=document.querySelector('#screen '+s.sel)||document.querySelector(s.sel);
+    if(t){t.classList.add('coach-on');try{t.scrollIntoView({block:'center',behavior:RM?'auto':'smooth'})}catch(x){}}}
+}
+
+/* ---- the "next goal" card at the top of Explorar and Casa ---- */
+function nextGoal(){
+  if(tutOn())return null;
+  if(G.chest&&!G.chest.open)return {t:'Tens un cofre per obrir.',b:'Obre’l',a:'nav',d:'resum'};
+  var ws=Object.keys(G.runs);if(ws.length)return {t:'Tens una aventura a mitges a '+ELS[ws[0]].mon+'.',b:'Continua',a:'resume',d:ws[0]};
+  var ev=G.owned.filter(function(c){var k=evoCheck(c);return k&&k.ok})[0];if(ev)return {t:cName(ev)+' ja pot evolucionar.',b:'Mira-la',a:'detail',d:ev.sp};
+  if(!G.owned.some(function(c){return !c.rest&&!busyWorld(c)}))return {t:'Les bestioles estan cansades. Deixa-les descansar una estona.',b:'Casa',a:'nav',d:'casa'};
+  if(G.completed<4&&G.owned.some(function(c){return (G.food[sp(c).el]||0)>0&&canXp(c)}))return {t:'Tens menjar: dona’l a una bestiola perquè pugi de nivell.',b:'Bestioles',a:'nav',d:'bestioles'};
+  var best=null;ORDER.forEach(function(w){if(!worldOpen(w))return;for(var z=0;z<ZONES[w].length;z++){if(G.done[w+':z'+z])continue;if(!zoneOpen(w,z))break;
+    var v=z*10+TIER[w];if(!best||v<best.v)best={w:w,z:z,v:v};break}});
+  if(best)return {t:'Objectiu: guanya el guardià de '+ZONES[best.w][best.z]+' ('+ELS[best.w].mon+').',b:'Som-hi',a:'world',d:best.w};
+  return null;
+}
+function goalCard(){var g=nextGoal();if(!g)return '';
+  var attr=g.a==='nav'?'data-to="'+g.d+'"':g.a==='detail'?'data-s="'+g.d+'"':'data-w="'+g.d+'"';
+  return '<div class="goal"><span>'+esc(g.t)+'</span><button type="button" class="btn sm gold" data-act="'+g.a+'" '+attr+'>'+esc(g.b)+'</button></div>'}
 /* drop critters of unknown species only now, after every species file has run (doing it at load lost the later species).
    Keep this here, at the very end: the save is read in 04-state.js, before 13-more-critters-and-talents.js adds species. */
 G.owned=G.owned.filter(function(c){return SPECIES[c.sp]});G.niu=G.niu.filter(function(c){return SPECIES[c.sp]});if(!G.owned.length)G.owned=newGame().owned;
