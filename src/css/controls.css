@@ -27,6 +27,7 @@
 .stars{color:#C98A00;letter-spacing:1px;font-size:15px}
 .tip{background:#2F2780;color:#fff;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .tip .btn{align-self:flex-start;min-height:40px;background:#fff;color:var(--ink);box-shadow:0 3px 0 #9C93F5}
+nav.nav[hidden]{display:none}
 nav.nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:8px 8px 10px;background:var(--paper);border-radius:22px 22px 0 0;box-shadow:0 -4px 18px rgba(30,27,46,.1)}
 .navb{border:none;background:none;border-radius:14px;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:12px;color:#5E5A72}
 .navb.on{background:#FFE08A;color:var(--ink)}

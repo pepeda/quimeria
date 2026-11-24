@@ -77,7 +77,7 @@ function h14Folded(a){var f=G.hFold&&G.hFold[a];if(f!==undefined)return !!f;
 function h14Btn(x){
   var n=G.built[x.k]||0,full=n>=x.max,lock=!h14Open(x),poor=G.coins<x.price,
     stripe=x.el?' border-top:6px solid '+ELS[x.el].c+';':'';
-  var tag=full?'<span class="tag good">Fet</span>':lock?'<span class="tag">Tancada</span>':'<span class="tag mid">'+x.price+' monedes</span>';
+  var tag=full?'<span class="tag good">Fet</span>':lock?'<span class="tag">Tancada</span>':buildArm===x.k?'<span class="tag bad">Segur? Toca un altre cop</span>':'<span class="tag mid">'+x.price+' monedes</span>';
   var what=lock?'Cal acabar: '+ELS[x.el].mon:x.what;
   return '<button type="button" class="tap'+(lock?' h14lock':'')+'" data-act="build" data-k="'+x.k+'"'+(full||poor||lock?' disabled':'')+' style="'+stripe+'"'+(lock?' aria-label="'+esc(x.n+': tancada. '+what)+'"':'')+'>'+
     '<span style="font-size:14px;text-align:center;line-height:1.15">'+esc(x.n)+(x.max>1&&n?' ('+n+')':'')+'</span><span class="muted small" style="text-align:center;font-weight:700">'+esc(what)+'</span>'+tag+'</button>';

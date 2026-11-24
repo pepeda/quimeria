@@ -278,7 +278,7 @@ function play(game, emit) {
   // a richer game: coins, food, items, many critters
   exec("G.coins=20000;G.food={foc:6,aigua:6,planta:6,llamp:6,psiquic:6};G.psiquic=true;['petxina','arrel','trona','mentoli','somni','fantasmet','cranquet','boleto'].forEach(function(s){if(SPECIES[s])G.owned.push(mk(s))});G.owned.forEach(function(c){c.rest=0;c.fat=0});Object.keys(G.runs).forEach(abandonRun)", 'rich');
   ['habitacio', 'habitacio', 'jardi', 'piscina', 'spa', 'tennis', 'mobles', 'mobles', 'llit', 'neo', 'posters', 'hamaca', 'consola', 'pufs', 'pingpong', 'trofeus', 'peixera',
-    'cuina', 'forja', 'lab', 'salaFoc', 'skate', 'arbre', 'foguera', 'hort', 'antena', 'portal'].forEach(k => step('build', { k }));
+    'cuina', 'forja', 'lab', 'salaFoc', 'skate', 'arbre', 'foguera', 'hort', 'antena', 'portal'].forEach(k => { step('build', { k }); step('build', { k }); });
   ['dorm', 'sala', 'ext', 'dorm'].forEach(k => step('hfold', { k }));
   step('nav', { to: 'casa' });
   // adopt, feed, evolve along both branches

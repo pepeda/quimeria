@@ -1,4 +1,4 @@
-resist shown across 20 renders of the same guardian screen: [ 'Psíquic', 'Planta' ]
+resist shown across 20 renders of the same guardian screen: [ 'Psíquic' ]
 restClock 24h in future -> rest after applyRestClock: 3 (stays until real time catches up)
 maxTeam= 6 team= 3 join button shown: false
 

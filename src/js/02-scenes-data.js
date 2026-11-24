@@ -39,7 +39,7 @@ var SCENES={
     b:{t:'Sota el pont hi havia un niu amagat!',secret:1,ch:[{l:'Mira-t’ho',d:'Una bestiola rara.',risk:0,out:{wild:1,rare:1}}]}}},
   castell:{n:'Castell vell',art:'castle',pool:'land',nodes:{
     a:{t:'Un castell vell amb la porta tancada. Hi ha llum a dalt de tot.',ch:[
-      {l:'Truca a la porta',d:'Algu obrirà… i potser no és amable.',risk:1,out:{fight:1,win:{go:'sala'}}},
+      {l:'Truca a la porta',d:'Algú obrirà… i potser no és amable.',risk:1,out:{fight:1,win:{go:'sala'}}},
       {l:'Il·lumina les finestres',d:'Una bestiola de Llamp obre la porta.',risk:0,req:{el:'llamp'},out:{go:'sala'}},
       {l:'Un Defensa empeny la porta',d:'Entreu sense lluitar.',risk:0,req:{role:'Defensa'},out:{go:'sala'}},
       {l:'Fes la volta',d:'No entres.',risk:0,out:{coins:5}}]},

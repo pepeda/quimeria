@@ -17,7 +17,7 @@ function makeBattle(o){
   if(o.wild){var s=SPECIES[o.wild],base=ROLE[s.role],k=0.8+0.3*L;b={n:s.n+' salvatge',el:s.el,hp:Math.round(base.hp*k*1.8),atk:Math.round(base.atk*k),def:Math.round(base.def*k),wild:o.wild}}
   else{var es=enemyStats(L,o.guardian,ts);b={n:o.n||MONSTERS[o.el],el:o.el,hp:es.hp,atk:es.atk,def:es.def}}
   b.max=b.hp;b.L=L;b.guardian=!!o.guardian;b.final=!!o.final;
-  if(o.guardian){var others=ORDER.filter(function(e){return e!==b.el&&BEATS[e].indexOf(b.el)<0});b.resist=pickOne(others)}
+  if(o.guardian){var others=ORDER.filter(function(e){return e!==b.el&&BEATS[e].indexOf(b.el)<0});/* chosen once per place on the path and kept in the run, so the preview and the battle show the same element */var rk=r?(r.cave?'c'+r.cave.i:'')+'@'+r.i+b.el:null;if(r&&r.gres&&r.gres.k===rk)b.resist=r.gres.v;else{b.resist=pickOne(others);if(r)r.gres={k:rk,v:b.resist}}}
   var ch={};if(r)r.team.forEach(function(u,idx){var c=byUid(u);ch[u]=c?abilities(c).map(function(a){return a.cd+(idx%3)}):[]});
   var bt={type:'battle',enemy:b,waves:o.waves||1,wavesTotal:o.waves||1,turn:0,ch:ch,shield:0,warn:false,over:null,rare:!!o.rare,win:o.win||null,caption:'Comença la batalla!',
     st:{burn:null,poison:null,stun:0,soak:0,weak:0},tm:{buff:0,regen:null,reflect:{}},syn:r?synergies(r.team.map(byUid)):{},aura:r?teamAura(r.team.map(byUid)):{}};

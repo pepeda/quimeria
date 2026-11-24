@@ -2,8 +2,8 @@ casa ms/render(node)= # html chars= 204981 svgs= 105 elements~ 3060
 explorar ms/render(node)= # html chars= 3564 svgs= 7 elements~ 50
 bestioles ms/render(node)= # html chars= 129693 svgs= 83 elements~ 1715
 motxilla ms/render(node)= # html chars= 3648 svgs= 1 elements~ 62
-detail sheet chars 32388
+detail sheet chars 32387
 save size bytes 6258
-battle screen chars 14879 svgs 9
+battle screen chars 14432 svgs 9
 
 [exit 0]

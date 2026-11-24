@@ -7,6 +7,8 @@ function fatigueText(c){
   if(c.rest>0)return 'Cansada: ha de descansar '+c.rest+' expedici'+(c.rest>1?'ons':'ó')+' (o una estona)';
   var left=maxFat(c)-c.fat;return 'Pot fer '+left+' expedici'+(left>1?'ons':'ó')+' més';
 }
+/* "de" before a name: d’Aigua, de Foc */
+function deNom(s){return (/^[AEIOUÀÈÉÍÒÓÚaeiouàèéíòóú]/.test(s)?'d’':'de ')+s}
 function tip(key,text){if(G.tips[key])return '';return '<div class="tip"><p>'+text+'</p><button type="button" class="btn sm" data-act="tip" data-k="'+key+'">Entesos</button></div>'}
 function riskHtml(n){var s='<span class="risk" aria-label="Risc '+n+' de 2">';for(var i=0;i<2;i++)s+='<i class="'+(i<n?'on':'')+'"></i>';return s+' '+(n===0?'Segur':n===1?'Una mica arriscat':'Arriscat')+'</span>'}
 function topBar(){
@@ -44,4 +46,4 @@ function menuDots(){try{var nav=$('nav');if(!nav||!nav.querySelector)return;
   var dots={bestioles:allCr().some(function(c){return evoCheck(c).ok}),motxilla:forgeReady().length>0||betterGear()};
   Object.keys(dots).forEach(function(k){if(!dots[k])return;var b=nav.querySelector('[data-to="'+k+'"]');if(b&&!b.querySelector('.rdot')){var s=document.createElement('span');s.className='rdot';s.setAttribute('aria-label','hi ha novetats');b.appendChild(s)}})}catch(e){}}
 
-var resetArm=false,abandonArm=null,restartArm=false;
+var resetArm=false,abandonArm=null,restartArm=false,buildArm=null;

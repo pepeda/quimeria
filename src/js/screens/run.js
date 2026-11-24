@@ -32,7 +32,7 @@ function scRun(){
   else if(e.type==='note')body='<div class="event"><h2>'+esc(e.title||'D’acord')+'</h2><p>'+esc(e.text)+'</p><button type="button" class="btn green" data-act="next">Continua</button></div>';
   else if(e.type==='card'){body=bigCard(e);showTeam=false}
   var leave=e&&e.type==='battle'?'':'<div class="row"><button type="button" class="btn light sm" data-act="pause">Surt i guarda</button><button type="button" class="btn light sm" data-act="restart">'+(restartArm?'Segur? Toca un altre cop':'Torna a començar la zona')+'</button><button type="button" class="btn light sm" data-act="abandon" data-w="'+r.world+'">'+(abandonArm===r.world?'Segur? Toca un altre cop':'Abandona')+'</button></div>';
-  return head+tip('run','Les boles de dalt són el camí: la que es mou és on ets. Les opcions amb fletxa ▸ es poden tocar. Els punts vermells diuen el risc.')+body+(showTeam?teamMini(r):'')+leave;
+  return head+(e&&e.type==='battle'?'':tip('run','Les boles de dalt són el camí: la que es mou és on ets. Les opcions amb fletxa ▸ es poden tocar. Els punts vermells diuen el risc.'))+body+(showTeam?teamMini(r):'')+leave;
 }
 function routeStrip(r){
   return '<div class="route" aria-label="El camí: lloc '+(r.i+1)+' de '+r.slots.length+'">'+r.slots.map(function(s,i){
@@ -55,8 +55,8 @@ function bigCard(e){
     sub=itemStats(it)+' · per a la motxilla';}
   else if(e.kind==='food'){art=elIcon(e.el,100,ELS[e.el].c);title=FOOD[e.el]+' ×'+e.n;sub='Menjar per a bestioles de '+ELS[e.el].n.toLowerCase();bg=ELS[e.el].soft;border=ELS[e.el].c}
   else if(e.kind==='coins'){art='<svg class="cr" width="100" height="100" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#F7C948" stroke="#C98A00" stroke-width="1.5"/><circle cx="10" cy="10" r="4" fill="none" stroke="#C98A00" stroke-width="1.5"/></svg>';title='+'+e.n+' monedes';border='#C98A00'}
-  var head=e.kind==='critter'?'Bestiola nova!':e.kind==='item'?(IT(e.item).relic?'Tresor rar!':'Has trobat un objecte!'):e.kind==='food'?'Menjar!':e.kind==='coins'?'Monedes!':e.kind==='niu'?'Al Niu!':'Vaja…';
+  var head=e.kind==='critter'?'Bestiola nova!':e.kind==='item'?(IT(e.item).relic?'Tresor del guardià!':'Has trobat un objecte!'):e.kind==='food'?'Menjar!':e.kind==='coins'?'Monedes!':e.kind==='niu'?'Al Niu!':'Vaja…';
   return '<div class="reveal'+(muted?' muted-panel':'')+'"><h2>'+esc(head)+'</h2>'+
-    '<div class="bigcard" style="border-color:'+border+'"><div class="art" style="background:'+bg+'"><span class="sfx stay">'+(e.kind==='critter'?'NOVA!':e.kind==='item'?'TXAN!':e.kind==='coins'?'DING!':e.kind==='food'?'ÑAM!':e.kind==='niu'?'NIU!':'OH!')+'</span>'+(rar?'<span class="rar" style="background:'+border+'">'+esc(rar)+'</span>':'')+art+'</div><h2 style="color:var(--ink)">'+esc(title)+'</h2><div class="muted" style="text-align:center;padding:0 12px">'+esc(sub)+'</div><div class="muted" style="text-align:center;padding:0 12px">'+esc(e.why||'')+'</div></div>'+
+    '<div class="bigcard" style="border-color:'+border+'"><div class="art" style="background:'+bg+'"><span class="sfx stay">'+(e.kind==='critter'?'NOVA!':e.kind==='item'?'TXAN!':e.kind==='coins'?'DING!':e.kind==='food'?'NYAM!':e.kind==='niu'?'NIU!':'OH!')+'</span>'+(rar?'<span class="rar" style="background:'+border+'">'+esc(rar)+'</span>':'')+art+'</div><h2 style="color:var(--ink)">'+esc(title)+'</h2><div class="muted" style="text-align:center;padding:0 12px">'+esc(sub)+'</div><div class="muted" style="text-align:center;padding:0 12px">'+esc(e.why||'')+'</div></div>'+
     '<div style="display:flex;flex-direction:column;gap:10px;width:min(300px,100%)">'+btns+'</div></div>';
 }

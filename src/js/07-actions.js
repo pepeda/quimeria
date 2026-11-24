@@ -19,7 +19,7 @@ function act(a,d){
   if(a==='chestTap'){chestTap();persist();render();return}
   /* every other action changes the game, then the screen is drawn again */
   var r=run();
-  if(a!=='reset')resetArm=false;if(a!=='abandon')abandonArm=null;if(a!=='restart')restartArm=false;
+  if(a!=='reset')resetArm=false;if(a!=='abandon')abandonArm=null;if(a!=='restart')restartArm=false;if(a!=='build')buildArm=null;
   if(a==='chat'){$('chat').classList.add('open');$('fbText').focus();return}
   switch(a){
     case 'tip':G.tips[d.k]=1;break;
@@ -47,7 +47,7 @@ function act(a,d){
     case 'claim':claimCard();if(r.event.last){r.i=r.slots.length;finishRun(true)}else advance();break;
     case 'join':var nu=r.event.uid;if(r.team.length<3){r.team.push(nu)}else{var kou=r.team.filter(function(u){return r.hp[u]<=0})[0];if(kou){r.team[r.team.indexOf(kou)]=nu;delete r.hp[kou]}}if(r.team.indexOf(nu)>=0)r.hp[nu]=stats(byUid(nu)).hp;advance();break;
     case 'nap':G.owned.forEach(function(c){if(!busyWorld(c)){c.rest=0;c.fat=0}});toast('Han fet la migdiada. Ja estan a punt!');break;
-    case 'build':var bd=BUILD.filter(function(x){return x.k===d.k})[0];if(bd&&G.coins>=bd.price&&(G.built[bd.k]||0)<bd.max){G.coins-=bd.price;G.built[bd.k]=(G.built[bd.k]||0)+1;toast(bd.n+': fet!')}break;
+    case 'build':if(buildArm!==d.k){buildArm=d.k;break}buildArm=null;var bd=BUILD.filter(function(x){return x.k===d.k})[0];if(bd&&G.coins>=bd.price&&(G.built[bd.k]||0)<bd.max){G.coins-=bd.price;G.built[bd.k]=(G.built[bd.k]||0)+1;toast(bd.n+': fet!')}break;
     case 'detail':G.detail=d.s;break;
     case 'close':G.detail=null;break;
     case 'adopt':var Sp=SPECIES[d.s];if(G.coins>=Sp.price&&G.owned.length<cap()&&worldOpen(Sp.el)){G.coins-=Sp.price;G.owned.push(mk(d.s));toast(Sp.n+' viu ara a casa teva!')}break;

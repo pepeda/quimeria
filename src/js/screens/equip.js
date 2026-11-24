@@ -11,7 +11,7 @@ function teamSummary(){
 function scEquip(){
   var w=G.world,z=G.zone||0,mx=maxTeam(),nx=nextTeamAt();
   var rows=G.owned.map(function(c){
-    var bw=busyWorld(c),blocked=!!bw||c.rest>0,on=G.pick.indexOf(c.uid)>=0,m=mult(sp(c).el,w),adv=m>1?'<span class="tag good">Avantatge aquí</span>':m<1?'<span class="tag bad">'+(m===0.75?'Resisteixen el seu element':'Desavantatge aquí')+'</span>':'';
+    var bw=busyWorld(c),blocked=!!bw||c.rest>0,on=G.pick.indexOf(c.uid)>=0,m=mult(sp(c).el,w),adv=m>1?'<span class="tag good">Avantatge aquí</span>':m<1?'<span class="tag bad">'+(m===0.75?'Aquí li costarà':'Desavantatge aquí')+'</span>':'';
     var left=c.rest>0?0:Math.round((maxFat(c)-c.fat)*100/maxFat(c));
     return '<button type="button" class="tap'+(on?' sel':'')+'" data-act="pick" data-u="'+c.uid+'"'+(blocked?' disabled':'')+' aria-pressed="'+on+'" style="flex-direction:row;justify-content:flex-start;gap:10px;padding:8px">'+cArt(c,48)+
       '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;text-align:left"><span class="row" style="gap:6px"><b style="font-size:15px">'+esc(cName(c))+'</b>'+adv+'</span><span class="row" style="gap:6px">'+roleTag(sp(c).role)+'<span class="muted small">'+esc(ELS[sp(c).el].n+' · forma '+form(c)+' · nivell '+lvl(c)+' · '+abilities(c).length+' habilitats')+'</span>'+talentTag(sp(c).talent)+'</span>'+bar(left,hpColor(left))+'<span class="muted small">'+esc(fatigueText(c))+'</span></span>'+(on?'<b style="color:var(--accent)">✓</b>':'')+'</button>'}).join('');
