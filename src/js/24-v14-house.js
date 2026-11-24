@@ -106,10 +106,6 @@ function h14Builds(){
     return '<button type="button" class="h14head" data-act="hfold" data-k="'+A[0]+'" aria-expanded="'+(!fold)+'"><span>'+esc(A[1])+'</span><span class="h14n">'+done+' de '+items.length+' fets</span><span aria-hidden="true">'+(fold?'▸':'▾')+'</span></button>'+
       (fold?'':'<div class="grid3">'+items.map(h14Btn).join('')+'</div>')}).join('');
 }
-var h14ScCasa=scCasa;
-scCasa=function(){var h=h14ScCasa.apply(this,arguments),a=h.indexOf('<h2>Construir i decorar</h2>');if(a<0)return h;
-  var g=h.indexOf('<div class="grid3">',a),e=g<0?-1:h.indexOf('</div>',g);if(e<0)return h;
-  return h.slice(0,g)+'<div class="h14builds">'+h14Builds()+'</div>'+h.slice(e+6)};
 
 /* ---------- house drawing ---------- */
 /* the drawing keeps the 366-wide coordinates; it grows downwards: a second garden strip and an underground floor */
