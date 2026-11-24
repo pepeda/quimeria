@@ -14,6 +14,6 @@ ok   boss renamed
 ok   renamed cave king still triggers the three-headed boss
 ok   team power does not change enemy hp
 ok   sound call is safe without audio
-ok   sound switch in the house
+ok   vibration switch in the house
 
 [exit 0]

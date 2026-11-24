@@ -18,4 +18,4 @@ const b=ev("(function(){G.pick=[G.owned[0].uid];G.world='planta';G.zone=1;startR
 // balance: enemy strength is fixed per world and zone (the team power no longer counts)
 ok(ev("(function(){var a=enemyStats(3,false,3,4).hp,c=enemyStats(3,false,3,1).hp;return a===c})()")===true,'team power does not change enemy hp');
 ok(ev("snd('tap'),true")===true,'sound call is safe without audio');
-ok(ev("scCasa()").indexOf('So i vibració')>=0,'sound switch in the house');
+ok(ev("scCasa()").indexOf('<h3>Vibració')>=0,'vibration switch in the house');
