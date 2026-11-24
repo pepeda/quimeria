@@ -325,17 +325,21 @@ dormilega:function(p){var s=p.st,o='';
   return {b:o,ce:aL('M11 39 Q13.5 41.5 16 39 M20 39 Q22.5 41.5 25 39','#2A1F3D',1.8)+aL('M10 37.5 H16 M20 37.5 H26','#2A1F3D',1.2),m:[18,47],h:[[34,44],[46,48]],t:[20,22]}}
 };
 function artDraw(sp,st,el2,locked,px){
-  var S=SPECIES[sp]||SPECIES.espurnet,A=ELS[S.el]||ELS.foc,f=ART[sp]||ART.espurnet;st=Math.max(0,Math.min(2,st||0));
+  var S=SPECIES[sp]||SPECIES.espurnet,A=ELS[S.el]||ELS.foc,f=ART[sp]||ART.espurnet,f4=(st||0)>=3;st=Math.max(0,Math.min(2,st||0));
   var r=f({c:A.c,L:A.belly,D:ART_DK[S.el],H:ART_AC[S.el],st:st,role:S.role}),o=r.b;
   if(r.ce)o+=r.ce;else if(r.e)o+=aEye(r.e[0],r.e[2],r.e[3],S.role,-1,A.c)+aEye(r.e[1],r.e[2],r.e[3],S.role,1,A.c);
   if(r.m)o+=aMouth(S.role,r.m[0],r.m[1]);
   if(r.f)o+=r.f;
   if(S.role==='Curador'&&st>0&&r.t)o+=aE(r.t[0],r.t[1]-1,8,2.4,'none',' stroke="#FFD54A" stroke-width="2.2"');
   if(el2&&ELS[el2]&&st>0&&r.h)o+=r.h.map(function(h,i){return aHy(el2,h[0],h[1],i?.8:1)}).join('');
-  var sc=[.8,.9,1][st];
-  return '<svg class="cr" width="'+px+'" height="'+px+'" viewBox="0 0 64 64" aria-hidden="true"'+(locked?' style="filter:brightness(0) opacity(.22)"':'')+'><g transform="translate(32 63) scale('+sc+') translate(-32 -63)" stroke="#2A1F3D" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">'+o+'</g></svg>';
+  var sc=[.8,.9,1][st],aura='';
+  if(f4){var B2=el2&&ELS[el2],an=RM?'':'<animate attributeName="opacity" values=".55;.25;.55" dur="2.4s" repeatCount="indefinite"/>';
+    aura=B2?'<circle cx="18" cy="38" r="19" fill="'+A.c+'" opacity=".4">'+an+'</circle><circle cx="46" cy="38" r="19" fill="'+B2.c+'" opacity=".4">'+an+'</circle>'
+      :'<circle cx="32" cy="37" r="29" fill="'+A.c+'" opacity=".4">'+an+'</circle>';
+    o+='<path d="M52 4 l2.2 5.3 5.3 2.2 -5.3 2.2 -2.2 5.3 -2.2 -5.3 -5.3 -2.2 5.3 -2.2 Z" fill="#FFD54A" stroke="#B8860B" stroke-width="1.2"/>'}
+  return '<svg class="cr" width="'+px+'" height="'+px+'" viewBox="0 0 64 64" aria-hidden="true"'+(locked?' style="filter:brightness(0) opacity(.22)"':'')+'>'+aura+'<g transform="translate(32 63) scale('+sc+') translate(-32 -63)" stroke="#2A1F3D" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">'+o+'</g></svg>';
 }
-/* a critter drawing: species s at a form 0, 1 or 2 (or true/false for an evolved form), or the critter c as it is now */
+/* a critter drawing: species s at a stage 0-3 (forma 1-4; or true/false for an evolved form), or the critter c as it is now */
 function spArt(s,el2,px,locked,evolved){return artDraw(s,typeof evolved==='number'?evolved:evolved?(el2?2:1):0,el2,locked,px)}
 function cArt(c,px,locked){return artDraw(c.sp,c.stage||0,cEl2(c),locked,px)}
 

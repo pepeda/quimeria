@@ -32,6 +32,8 @@ function bestEquipSet(){
 }
 function specName(c){return SPECIAL[c.sp]+(c.stage?' '+'★'.repeat(c.stage):'')}
 function E(n,el2){return {n:n,el2:el2||''}}
+/* forma 4 is called like its forma 3 plus this word */
+var FORM4_WORD='Astral';
 var SPECIES={
   espurnet:{n:'Espurnet',el:'foc',role:'Atac',price:300,evos:[E('Flamarada'),E('Caliu'),E('Vapor','aigua')]},
   fumet:{n:'Fumet',el:'foc',role:'Curador',price:320,evos:[E('Fogueró'),E('Cendra','psiquic'),E('Brasot')]},
@@ -77,7 +79,7 @@ var BUILD=[
   {k:'jardi',n:'Jardí',what:'+3 places',price:400,max:1,cap:3},
   {k:'piscina',n:'Piscina',what:'+2 places',price:500,max:1,cap:2},
   {k:'spa',n:'Spa',what:'A casa descansen el doble',price:700,max:1,cap:0},
-  {k:'tennis',n:'Pista de tennis',what:'Una bestiola de casa guanya 1 estrella de força a cada expedició',price:350,max:1,cap:0},
+  {k:'tennis',n:'Pista de tennis',what:'Una bestiola de casa guanya experiència a cada expedició',price:350,max:1,cap:0},
   {k:'mobles',n:'Mobles',what:'Decoració',price:80,max:5,cap:0}
 ];
 

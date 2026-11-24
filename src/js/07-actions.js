@@ -15,6 +15,8 @@ function act(a,d){
   if(a==='mute'){G.mute=!G.mute;persist();render();if(!G.mute)snd('tap');return}
   if(a==='sortB'){G.sortB=d.k;persist();render();return}
   if(a==='legend'){buyLegend(d.el);persist();render();return}
+  /* the chest after a won expedition */
+  if(a==='chestTap'){chestTap();persist();render();return}
   /* every other action changes the game, then the screen is drawn again */
   var r=run();
   if(a!=='reset')resetArm=false;if(a!=='abandon')abandonArm=null;if(a!=='restart')restartArm=false;
@@ -49,8 +51,15 @@ function act(a,d){
     case 'detail':G.detail=d.s;break;
     case 'close':G.detail=null;break;
     case 'adopt':var Sp=SPECIES[d.s];if(G.coins>=Sp.price&&G.owned.length<cap()&&worldOpen(Sp.el)){G.coins-=Sp.price;G.owned.push(mk(d.s));toast(Sp.n+' viu ara a casa teva!')}break;
-    case 'feed':var c=byUid(d.u);if(c&&G.food[d.el]>0&&c.mill<5){G.food[d.el]--;c.mill=Math.min(5,c.mill+(d.el===sp(c).el?2:1));toast(cName(c)+' ha menjat: '+c.mill+' de 5 estrelles.')}break;
-    case 'evolve':var c2=byUid(d.u),ei=+d.i;if(c2&&c2.stage<2&&c2.mill>=5&&((c2.stage===0&&ei===0)||(c2.stage===1&&ei>0))){c2.stage++;c2.evo=ei;c2.mill=0;toast('Ara és '+cName(c2)+'!');snd('evolve');buzz([40,40,80])}break;
+    case 'feed':var c=anyByUid(d.u);if(c&&G.food[d.el]>0&&canXp(c)){G.food[d.el]--;var fx=d.el===sp(c).el?BAL.XP_FOOD_OWN:BAL.XP_FOOD,fup=addXp(c,fx);toast(cName(c)+' ha menjat: +'+fx+' XP'+(fup?'. Puja al nivell '+lvl(c)+'!':'.'))}break;
+    /* evolve: needs the level and the copies (evoCheck); the copies are used up. Forma 3 chooses a branch, forma 4 keeps it */
+    case 'evolve':var c2=anyByUid(d.u),ei=+d.i,chk=c2&&evoCheck(c2);if(chk&&chk.ok&&((c2.stage===0&&ei===0)||(c2.stage===1&&ei>0)||(c2.stage===2&&ei===c2.evo))){
+      chk.copies.forEach(removeCritter);c2.stage++;c2.evo=ei;addXp(c2,0);toast('Ara és '+cName(c2)+'! ('+chk.copies.length+(chk.copies.length>1?' còpies fetes servir)':' còpia feta servir)'));snd('evolve');buzz([40,40,80])}break;
+    /* the Niu: bring a critter home, send one to the Niu, or swap one of the Niu with one of the house */
+    case 'niuHome':var nh=anyByUid(d.u);if(nh&&inNiu(nh)&&G.owned.length<cap()){G.niu.splice(G.niu.indexOf(nh),1);G.owned.push(nh);G.niuSwap=null;toast(cName(nh)+' ja és a casa.')}break;
+    case 'toNiu':var tn=byUid(d.u);if(tn&&!busyWorld(tn)&&G.owned.length>1){G.owned.splice(G.owned.indexOf(tn),1);var pk=G.pick.indexOf(tn.uid);if(pk>=0)G.pick.splice(pk,1);tn.fat=0;tn.rest=0;G.niu.push(tn);toast(cName(tn)+' descansa al Niu.')}break;
+    case 'niuPick':G.niuSwap=G.niuSwap===d.u?null:d.u;break;
+    case 'niuSwap':var na=anyByUid(d.u),hb=byUid(d.h);if(na&&inNiu(na)&&hb&&!busyWorld(hb)){G.niu[G.niu.indexOf(na)]=hb;G.owned[G.owned.indexOf(hb)]=na;var pk2=G.pick.indexOf(hb.uid);if(pk2>=0)G.pick.splice(pk2,1);hb.fat=0;hb.rest=0;G.niuSwap=null;toast(cName(na)+' va a casa i '+cName(hb)+' al Niu.')}break;
     case 'equip':var ix=G.items.indexOf(d.id);if(ix<0||!IT(d.id))break;var sl=d.slot;G.items.splice(ix,1);if(G.equip[sl])G.items.push(G.equip[sl]);G.equip[sl]=d.id;toast(IT(d.id).n+' equipat.');break;
     case 'bestEquip':var be=bestEquipSet();G.equip=be.equip;G.items=be.items;toast('Ara portes el millor equipament.');break;
     case 'unequip':if(G.equip[d.slot]){G.items.push(G.equip[d.slot]);delete G.equip[d.slot]}break;

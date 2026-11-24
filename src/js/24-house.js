@@ -18,7 +18,7 @@ BUILD.push(
   {k:'peixera',n:'Peixera',what:'Les d’Aigua descansen +1 per expedició',price:150,max:1,cap:0,area:'sala'},
   {k:'cuina',n:'Cuina de bestioles',what:'+1 menjar del món on acabes un camí',price:400,max:1,cap:0,area:'taller'},
   {k:'forja',n:'Taller de forja',what:'Forjar costa un 20% menys',price:500,max:1,cap:0,area:'taller'},
-  {k:'lab',n:'Laboratori',what:'Una de casa guanya +1 estrella per expedició',price:600,max:1,cap:0,area:'taller'},
+  {k:'lab',n:'Laboratori',what:'Una de casa guanya experiència a cada expedició',price:600,max:1,cap:0,area:'taller'},
   {k:'salaFoc',n:'Forja de lava',what:'Les de Foc descansen +1 per expedició',price:450,max:1,cap:0,area:'elem',el:'foc'},
   {k:'salaLlamp',n:'Sala de bobines',what:'+10% de monedes per expedició',price:450,max:1,cap:0,area:'elem',el:'llamp'},
   {k:'salaAigua',n:'Aquari gegant',what:'+2 places',price:450,max:1,cap:2,area:'elem',el:'aigua'},
@@ -58,7 +58,7 @@ function houseAfterRun(ok,team,w,c0){
     if(B.salaPsiquic)food('psiquic','Observatori');
     if(B.hort)food(pickOne(ORDER),'Hort de baies');
   }
-  if(B.lab){var cand=home.filter(function(c){return c.mill<5&&cName(c)!==s.tennis});if(cand.length){var t=pickOne(cand);t.mill++;notes.push(cName(t)+' ha fet experiments al laboratori: +1 estrella de força.')}}
+  if(B.lab){var cand=home.filter(function(c){return canXp(c)&&cName(c)!==s.tennis});if(cand.length){var t=pickOne(cand);var up=addXp(t,BAL.XP_LAB);notes.push(cName(t)+' ha fet experiments al laboratori: +'+BAL.XP_LAB+' d’experiència'+(up?' i puja al nivell '+lvl(t):'')+'.')}}
   s.house=notes;
 }
 

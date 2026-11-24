@@ -1,15 +1,7 @@
 'use strict';
-/* ================= ZONE 4, SOUNDS AND VIBRATION ================= */
+/* ================= SOUNDS AND VIBRATION ================= */
 try{document.title='Quimèria'}catch(e){}
 function curZone(){var r=run();return r?(r.zone||0):-1}
-/* --- zone 4: enemies assume at least a team of level-3 critters with Epic gear (team power per world, used by enemyStats) --- */
-var HARD_TP={foc:3.8,aigua:3.8,planta:3.1,llamp:2.9,psiquic:2.7};
-/* --- zone 4 in every world: very hard, opens after zone 3 --- */
-(function(){var Z4={foc:'Forja prohibida',aigua:'Abisme sense fons',planta:'Bosc maleït',llamp:'Ull de la tempesta',psiquic:'Malson etern'};
-  Object.keys(Z4).forEach(function(w){if(ZONES[w]&&ZONES[w].length===3)ZONES[w].push(Z4[w])});
-  if(ZONE_ROUTES.length===3)ZONE_ROUTES.push(['gen','fork','mini','gen','land','sig','gen','cave','mini','gen','fork2','spring','gen','land','mini','guardian']);
-  if(ZONE_BONUS.length===3)ZONE_BONUS.push(260);
-  if(ZONE_INFO.length===3)ZONE_INFO.push('MOLT DIFÍCIL. Els enemics no s’adapten al teu equip: calen bestioles de nivell 3 i equip Èpic o millor. Tres campaments, una cova i el guardià més fort del món.');})();
 /* --- forge: choose 1 power out of 3 --- */
 function scrollTop0(){try{var sc=$('screen');if(sc&&sc.scrollTo)sc.scrollTo(0,0);window.scrollTo&&window.scrollTo(0,0)}catch(e){}}
 /* --- short sounds (WebAudio, under 0.2 s), vibration on big moments, a switch to turn them off --- */

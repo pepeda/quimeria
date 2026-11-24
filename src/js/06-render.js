@@ -41,7 +41,7 @@ function render(){
 }
 /* red dots on the menu: a critter can evolve, something can be forged, better gear is in the backpack */
 function menuDots(){try{var nav=$('nav');if(!nav||!nav.querySelector)return;
-  var dots={bestioles:G.owned.some(function(c){return c.stage<2&&c.mill>=5}),motxilla:forgeReady().length>0||betterGear()};
+  var dots={bestioles:allCr().some(function(c){return evoCheck(c).ok}),motxilla:forgeReady().length>0||betterGear()};
   Object.keys(dots).forEach(function(k){if(!dots[k])return;var b=nav.querySelector('[data-to="'+k+'"]');if(b&&!b.querySelector('.rdot')){var s=document.createElement('span');s.className='rdot';s.setAttribute('aria-label','hi ha novetats');b.appendChild(s)}})}catch(e){}}
 
 var resetArm=false,abandonArm=null,restartArm=false;

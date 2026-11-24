@@ -12,12 +12,12 @@ function floatNum(host,text,cls){if(!host)return;var s=document.createElement('s
 function anim(el,cls){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);setTimeout(function(){el.classList.remove(cls)},400)}
 function setBar(id,cur,max){var p=Math.max(0,Math.round(cur*100/max));var e=$(id);if(e){var i=e.querySelector('i:not(.ghost)'),g=e.querySelector('i.ghost');if(i){i.style.width=p+'%';i.style.background=hpColor(p)}if(g)g.style.width=p+'%'}var t=$(id+'t');if(t)t.textContent=cur+'/'+max}
 /* automatic special attacks: each species has its own named move */
+/* a new friend: it goes home, or to the Niu if the house is full. Another one of a species you have is a copy for evolving */
 function recruitCard(s,rare){
-  var r=run(),have=G.owned.filter(function(c){return c.sp===s}),young=have.filter(function(c){return c.stage<2&&c.mill<5})[0];
-  if(young){young.mill=Math.min(5,young.mill+2);r.event={type:'card',kind:'dup',sp:s,why:'Ja tenies '+cName(young)+': guanya 2 estrelles de força.'};return}
-  if(G.owned.length>=cap()){r.coins+=20;r.event={type:'card',kind:'full',sp:s,why:'La casa és plena, així que torna al bosc i et deixa 20 monedes. Amplia la casa per tenir-ne més.'};return}
-  var n=mk(s);G.owned.push(n);
-  r.event={type:'card',kind:'critter',sp:s,uid:n.uid,rare:rare,why:have.length?'Una altra '+SPECIES[s].n+'! Aquesta podrà evolucionar d’una altra manera.':rare?'L’has trobada en un lloc amagat.':'Ara és amiga teva.'};
+  var r=run(),have=allCr().filter(function(c){return c.sp===s}).length,n=mk(s),home=addCritter(n);
+  var why=have?'Ja en tenies '+have+'. Les còpies serveixen per fer evolucionar les bestioles de la mateixa espècie.':rare?'L’has trobada en un lloc amagat.':'Ara és amiga teva.';
+  if(!home)why='La casa és plena: va al Niu, on espera sense límit. '+(have?'Pots fer-la servir com a còpia per evolucionar.':'Pots portar-la a casa quan hi hagi lloc.');
+  r.event={type:'card',kind:home?'critter':'niu',sp:s,uid:n.uid,rare:rare,why:why};
 }
 function claimCard(){
   var r=run(),e=r.event;

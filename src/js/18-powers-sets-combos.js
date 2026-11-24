@@ -218,7 +218,5 @@ function forgeOnce(id,pw){var t=tierOf(id),it=IT(id);if(!it||it.set||t>=4||fcoun
   var i=G.items.indexOf(id);G.items.splice(i,1);for(var n=0;n<3;n++){for(var j=0;j<G.items.length;j++)if(fkey(G.items[j])===k){G.items.splice(j,1);break}}
   G.coins-=FORGE_COST[t];aff.push(pw&&AFFIX[pw]?pw:pickOne(AFF_KEYS));var nid=baseOf(id)+'#'+(t+1)+'~'+aff.join('.');G.items.push(nid);G.lastForge=nid;if(t+1>=4&&!G.superForged){G.superForged=1;setTimeout(function(){toast('Has forjat la teva primera Superèpica! El Taller de llegendes ja és obert.')},1600)}return true}
 function forgeAll(){var n=0,guard=0,l;while(guard++<200&&(l=forgeReady()).length){if(!forgeOnce(l[0]))break;n++}return n}
-(function(){if(!G||G.v13)return;function up(id){var t=tierOf(id);if(!t||affOf(id).length||!ITEMS[baseOf(id)]||ITEMS[baseOf(id)].set)return id;var a=[];for(var i=0;i<t;i++)a.push(pickOne(AFF_KEYS));return baseOf(id)+'#'+t+'~'+a.join('.')}
-  G.items=G.items.map(up);Object.keys(G.equip).forEach(function(s){if(G.equip[s])G.equip[s]=up(G.equip[s])});G.megas=G.megas||{};G.v13=1;persist()})();
 
 

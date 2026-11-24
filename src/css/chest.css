@@ -1,0 +1,8 @@
+/* end-of-run chest: a tap that raises the tier shakes and glows it; the open chest pops */
+.chest{border:none;background:none;padding:0;cursor:pointer;line-height:0;align-self:center;min-height:48px}
+.chest.up svg{animation:chestUp .45s ease-out}
+.chest.opened svg{animation:chestOpen .55s ease-out}
+.chestgot{margin:0;padding-left:18px;font-weight:700;display:flex;flex-direction:column;gap:3px;align-self:stretch}
+@keyframes chestUp{0%{transform:scale(1) rotate(0)}25%{transform:scale(1.08) rotate(-7deg)}55%{transform:scale(1.14) rotate(6deg);filter:drop-shadow(0 0 14px #FFE27A)}100%{transform:scale(1) rotate(0)}}
+@keyframes chestOpen{0%{transform:scale(.7);opacity:.3}70%{transform:scale(1.1);opacity:1;filter:drop-shadow(0 0 18px #FFE27A)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.chest.up svg,.chest.opened svg{animation:none}}

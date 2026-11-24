@@ -4,20 +4,24 @@ function mult(a,d){if(!a||!d)return 1;if(a===d)return 0.75;if(BEATS[a].indexOf(d
 function maxTeam(){return 3+(G.completed>=2?1:0)+(G.completed>=5?1:0)+(G.completed>=9?1:0)}
 function nextTeamAt(){return G.completed<2?2:G.completed<5?5:G.completed<9?9:0}
 var ZONES={
-  foc:['Camp de cendres','Rius de lava','Cor del volcà'],
-  aigua:['Platja dels corals','Llacuna boirosa','Fossa profunda'],
-  planta:['Bosc del brot','Pantà de les arrels','Cor de l’arbre gegant'],
-  llamp:['Prats elèctrics','Muntanyes de tempesta','Ciutat dels núvols'],
-  psiquic:['Jardí dels somnis','Laberint de miralls','Palau de la ment']};
+  foc:['Camp de cendres','Rius de lava','Cor del volcà','Forja prohibida','Tron de Cendra'],
+  aigua:['Platja dels corals','Llacuna boirosa','Fossa profunda','Abisme sense fons','Fossa de l’Oblit'],
+  planta:['Bosc del brot','Pantà de les arrels','Cor de l’arbre gegant','Bosc maleït','Arrels del Món'],
+  llamp:['Prats elèctrics','Muntanyes de tempesta','Ciutat dels núvols','Ull de la tempesta','Corona de Llamps'],
+  psiquic:['Jardí dels somnis','Laberint de miralls','Palau de la ment','Malson etern','Ment Primordial']};
 var ZONE_ROUTES=[
   ['gen','fork','gen','spring','land','gen','sig','gen','mini','guardian'],
   ['gen','fork','gen','land','gen','spring','mini','gen','fork2','sig','gen','land','gen','guardian'],
-  ['gen','fork','gen','land','gen','spring','gen','mini','fork2','gen','land','sig','gen','cave','spring','gen','land','guardian']];
-var ZONE_BONUS=[40,70,110];
-var ZONE_INFO=['Una cruïla, una font, llocs especials, un campament de monstres i un guardià.','Més llocs, dues cruïlles, un campament i un guardià més fort.','Una cova profunda, molts llocs i el guardià més fort.'];
-function zoneL(w,z){return TIER[w]+z*0.8}
+  ['gen','fork','gen','land','gen','spring','gen','mini','fork2','gen','land','sig','gen','cave','spring','gen','land','guardian'],
+  ['gen','fork','mini','gen','land','sig','gen','cave','mini','gen','fork2','spring','gen','land','mini','guardian'],
+  ['gen','fork','mini','gen','land','sig','gen','cave','mini','gen','fork2','spring','gen','cave','land','mini','gen','spring','guardian']];
+var ZONE_BONUS=BAL.ZONE_BONUS;
+var ZONE_INFO=['Una cruïla, una font, llocs especials, un campament de monstres i un guardià.','Més llocs, dues cruïlles, un campament i un guardià més fort.','Una cova profunda, molts llocs i el guardià més fort.',
+  'MOLT DIFÍCIL. Calen bestioles de forma 3 i equip Èpic o millor. Tres campaments, una cova i un guardià terrible.',
+  'LLEGENDÀRIA. El cor fosc del món: només hi entren equips amb diverses bestioles de forma 4 i el millor equip. Tres campaments, dues coves i el guardià més fort de tots.'];
+/* difficulty of zone z of world w (the enemies' level); the zone multipliers are in BAL.ZONE */
+function zoneL(w,z){return TIER[w]+BAL.ZONE_L[z]}
 function zoneOpen(w,z){return z===0||!!G.done[w+':z'+(z-1)]}
-if(!G.zonesV){Object.keys(G.done).forEach(function(k){if(/:curt$/.test(k))G.done[k.replace(':curt',':z0')]=true;if(/:llarg$/.test(k))G.done[k.replace(':llarg',':z1')]=true});G.runs={};G.active=null;if(G.screen==='run')G.screen='explorar';G.zonesV=1}
 NODE_ICON.mini='!';NODE_ICON.cave='∩';
 
 /* abilities: [name, charge turns, kind, power] */

@@ -9,7 +9,7 @@ function scMon(){
     return '<button type="button" class="opt" data-act="path" data-p="'+i+'"'+(open?'':' disabled')+'><b>Zona '+(i+1)+': '+esc(zn)+(done?' ✓':'')+'</b><span class="d">'+starStr(starsN(zoneL(w,i)))+' · '+ZONE_ROUTES[i].length+' llocs</span><span class="d">'+esc(ZONE_INFO[i])+'</span>'+(i===2?'<span class="need">Cal portar: '+esc(TALENT[ZONE_NEED[w]].n)+'</span>':i===1?'<span class="d">Recomanat: '+esc(TALENT[ZONE_REC[w]].n)+'</span>':'')+(open?'':'<span class="need">Tancada: acaba primer la zona '+i+'</span>')+'</button>'}).join('');
   return '<div class="flat" style="background:'+A.c+';color:'+(w==='llamp'?'#1E1B2E':'#fff')+'"><div class="row"><button type="button" class="btn sm light" data-act="nav" data-to="explorar">Enrere</button><h1>'+esc(A.mon)+'</h1></div>'+
     '<p>Explorat: <b>'+pct+'%</b> · Llocs vistos '+seen+' de '+sc.length+' · Bestioles '+sps.filter(ownsSp).length+' de '+sps.length+'</p><p>Aquí hi viuen bestioles de '+esc(A.n.toLowerCase())+'. Els monstres resisteixen el seu propi element. Consell: porta bestioles de '+esc(goodAgainst(w))+'.</p></div>'+
-    tip('mon','Cada món té 3 zones. Quan acabes una zona, s’obre la següent. Les estrelles ★ diuen com és de difícil.')+
+    tip('mon','Cada món té 5 zones. Quan acabes una zona, s’obre la següent. Les estrelles ★ diuen com és de difícil.')+
     '<h3>Bestioles d’aquest món</h3><div class="grid4">'+spsH+'</div>'+body;
 }
 function goodAgainst(w){return Object.keys(BEATS).filter(function(k){return BEATS[k].indexOf(w)>=0}).map(function(k){return ELS[k].n}).join(' o ')}
