@@ -26,18 +26,6 @@ function forgeChoiceBlock(){var fc=G.forgeChoice;if(!fc)return '';var it=IT(fc.i
   return '<div class="flat" style="gap:8px;background:#1E1B2E;color:#fff;outline:3px solid #F2B705"><h2 style="color:#fff">Tria el poder nou</h2><p class="small">'+esc(it.n)+' → '+esc(TIER_N[it.tier+1])+' · '+FORGE_COST[it.tier]+' monedes</p>'+
     fc.opts.map(function(k){return '<button type="button" class="btn gold" style="text-align:left;display:block" data-act="forgePick" data-k="'+k+'"><b>'+esc(AFFIX[k].n)+'</b>'+(AFFIX[k].d?'<span class="small" style="display:block;font-weight:600">'+esc(AFFIX[k].d)+'</span>':'')+'</button>'}).join('')+
     '<button type="button" class="btn light sm" data-act="forgeCancel">Encara no</button></div>'}
-/* --- backpack in 4 tabs: Equip, Objectes i forja, Sets, Menjar --- */
-var scMotxillaV13=scMotxilla;
-scMotxilla=function(){var h=scMotxillaV13();
-  var iF=h.indexOf('<div class="flat" style="gap:8px;background:#FFF1DA">'),iP=h.indexOf('<div class="flat" style="gap:6px;background:#F3ECFF">'),iS=h.indexOf('<div class="flat" style="gap:6px;background:#FFF6D6">'),iI=h.indexOf('<h2>A la motxilla</h2>'),iM=h.indexOf('<h2>Menjar</h2>');
-  if(iF<0||iP<0||iS<0||iI<0||iM<0||!(iF<iP&&iP<iS&&iS<iI&&iI<iM))return forgeChoiceBlock()+h;
-  var head=h.slice(0,iF),tabs={eq:head+h.slice(iP,iS),obj:h.slice(iF,iP)+h.slice(iI,iM),sets:h.slice(iS,iI),menjar:h.slice(iM)};
-  var t=tabs[G.mtab]?G.mtab:'eq',h1='<h1>Motxilla</h1>';
-  if(t!=='eq')tabs[t]=h1+tabs[t];
-  var dot={obj:forgeReady().length>0,sets:legendOpen()&&G.coins>=LEGEND_COST&&ORDER.filter(worldOpen).some(function(el){return missingPieces(el).length}),eq:betterGear()};
-  var bar='<div class="mtabs" role="tablist">'+[['eq','Equip'],['obj','Objectes i forja'],['sets','Sets'],['menjar','Menjar']].map(function(x){return '<button type="button" role="tab" class="mtab'+(t===x[0]?' on':'')+'" aria-selected="'+(t===x[0])+'" data-act="mtab" data-k="'+x[0]+'">'+x[1]+(dot[x[0]]?'<span class="rdot" aria-label="hi ha novetats"></span>':'')+'</button>'}).join('')+'</div>';
-  var body=tabs[t],k=body.indexOf(h1);if(k>=0)body=body.slice(0,k+h1.length)+bar+(t==='obj'?forgeChoiceBlock():'')+body.slice(k+h1.length);else body=bar+body;
-  return body};
 function betterGear(){try{var b=bestEquipSet().equip;return SLOTS.some(function(x){return (b[x[0]]||'')!==(G.equip[x[0]]||'')&&itemScore(b[x[0]]||'')>itemScore(G.equip[x[0]]||'')})}catch(e){return false}}
 /* --- short sounds (WebAudio, under 0.2 s), vibration on big moments, a switch to turn them off --- */
 var AC=null;

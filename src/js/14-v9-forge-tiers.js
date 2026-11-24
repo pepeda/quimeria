@@ -26,9 +26,17 @@ function scMotxilla(){
         return '<div class="row" style="gap:6px"><button type="button" class="btn sm" data-act="equip" data-id="'+esc(g.id)+'" data-slot="'+s+'">'+(cur?'Canvia per aquest':'Equipa')+(sl.length>1?' ('+(s==='anell1'?'Anell 1':'Anell 2')+')':'')+'</button></div><div class="row" style="gap:4px">'+deltaChips(eqNew)+'</div>'}).join('')+
       (t<4?'<div class="row" style="gap:6px"><button type="button" class="btn sm gold" data-act="forge" data-id="'+esc(g.id)+'"'+(fcount(g.id)>=4&&G.coins>=cost?'':' disabled')+'>Forja 4 → 1 '+esc(TIER_N[t+1])+' ('+cost+' monedes)</button><span class="muted small">'+(fcount(g.id)>=4?(G.coins>=cost?'':'Et falten monedes'):'En tens '+fcount(g.id)+' de 4 d’aquesta categoria')+'</span></div>':'<span class="muted small">Ja és Superèpica: la millor categoria.</span>')+'</div>'}).join('');
   var food=Object.keys(ELS).map(function(k){return '<div class="box">'+elIcon(k,26,ELS[k].c)+'<span class="small" style="text-align:center">'+esc(FOOD[k])+'</span><b>'+(G.food[k]||0)+'</b></div>'}).join('');
-  return '<h1>Motxilla</h1>'+tip('motxilla','Els objectes que portes fan més forta cada bestiola de l’equip. Abans d’equipar, mira les fletxes: ▲ verd vol dir que millora, ▼ vermell que empitjora. Amb 4 objectes iguals, a la Forja en fas un de millor.')+
-    '<div class="flat" style="align-items:center">'+heroOutfit()+'<div class="row" style="justify-content:center"><span class="tag">Atac +'+Math.round(q.atk)+'%</span><span class="tag">Defensa +'+Math.round(q.def)+'%</span><span class="tag">Vida +'+Math.round(q.hp)+'%</span></div></div>'+
-    bestBlock()+'<div class="grid4">'+slots+'</div>'+forge+setsBlock()+'<h2>A la motxilla</h2>'+(inv||'<p class="muted">Encara no tens objectes. En trobaràs explorant.</p>')+'<h2>Menjar</h2><div class="grid3">'+food+'</div>';
+  /* the backpack has 4 tabs: Equip, Objectes i forja, Sets, Menjar */
+  var tabs={eq:tip('motxilla','Els objectes que portes fan més forta cada bestiola de l’equip. Abans d’equipar, mira les fletxes: ▲ verd vol dir que millora, ▼ vermell que empitjora. Amb 4 objectes iguals, a la Forja en fas un de millor.')+'<div class="flat" style="align-items:center">'+heroOutfit()+'<div class="row" style="justify-content:center"><span class="tag">Atac +'+Math.round(q.atk)+'%</span><span class="tag">Defensa +'+Math.round(q.def)+'%</span><span class="tag">Vida +'+Math.round(q.hp)+'%</span></div></div>'+
+    bestBlock()+'<div class="grid4">'+slots+'</div>'};
+  tabs.obj=forge;tabs.eq+=powersBlock();tabs.sets=setsBlock();
+  tabs.obj+='<h2>A la motxilla</h2>'+(inv||'<p class="muted">Encara no tens objectes. En trobaràs explorant.</p>');
+  tabs.menjar='<h2>Menjar</h2><div class="grid3">'+food+'</div>';
+  var t=tabs[G.mtab]?G.mtab:'eq';
+  /* red dots on the tabs: something can be forged, a legend piece can be bought, better gear is in the backpack */
+  var dot={obj:forgeReady().length>0,sets:legendOpen()&&G.coins>=LEGEND_COST&&ORDER.filter(worldOpen).some(function(el){return missingPieces(el).length}),eq:betterGear()};
+  var bar='<div class="mtabs" role="tablist">'+[['eq','Equip'],['obj','Objectes i forja'],['sets','Sets'],['menjar','Menjar']].map(function(x){return '<button type="button" role="tab" class="mtab'+(t===x[0]?' on':'')+'" aria-selected="'+(t===x[0])+'" data-act="mtab" data-k="'+x[0]+'">'+x[1]+(dot[x[0]]?'<span class="rdot" aria-label="hi ha novetats"></span>':'')+'</button>'}).join('')+'</div>';
+  return '<h1>Motxilla</h1>'+bar+(t==='obj'?forgeChoiceBlock():'')+tabs[t];
 }
 /* who is acting: green for your team, red for the enemy; big enemy moves get their own cut-in */
 var US_EV=['hit','heal','regen','special','combo','dot','stunned','foeDown'],THEM_EV=['ehit','aoe','warn','enrage','wave','teamDown','boss','minion'];

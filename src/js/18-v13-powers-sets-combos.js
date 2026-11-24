@@ -193,6 +193,12 @@ function battleWon3(){var r=run(),b=r.event,en=b.enemy,P=b.P||emptyP();battleWon
 function buyLegend(el){var miss=missingPieces(el);if(!miss.length){toast('Ja tens totes les peces de '+ELS[el].n+'.');return}
   if(!legendOpen()){toast('Primer has de forjar un objecte fins a Superèpica.');return}if(G.coins<LEGEND_COST){toast('Necessites '+LEGEND_COST+' monedes.');return}
   G.coins-=LEGEND_COST;var id=pickOne(miss);G.items.push(id);toast('Nova peça de llegenda: '+IT(id).n+'!')}
+/* special powers of the gear that is equipped */
+function powersBlock(){
+  var P=powerOf(G.equip),pw=powerText(P);
+  return '<div class="flat" style="gap:6px;background:#F3ECFF"><h2>Poders especials</h2>'+(pw.length?'<p class="small">'+esc(pw.join(' · '))+'</p>':'<p class="muted small">Encara cap. Els objectes forjats i els sets de llegenda en donen.</p>')+'</div>';
+}
+/* legend sets: what you have, what each set does, and the legend workshop. Short text; the details are behind the "?" */
 function setsBlock(){
   var mine={},n=setCounts(G.equip),total=0;allMine().forEach(function(id){var b=ITEMS[baseOf(id)];if(b&&b.set){mine[b.set]=mine[b.set]||{};mine[b.set][b.slot]=1}});
   Object.keys(mine).forEach(function(k){total+=Object.keys(mine[k]).length});
@@ -202,11 +208,10 @@ function setsBlock(){
       S.b.map(function(x,i){var act=on>=i+2;return '<span class="small" style="'+(act?'font-weight:800;color:#1E7B3A':'opacity:.65')+'">'+(i===3?'5 peces · SUPER: ':(i+2)+' peces: ')+esc(x.d)+(act?' ✓':'')+'</span>'}).join('')+'</div>'}).join('');
   var shop=ORDER.filter(worldOpen).map(function(el){var m=missingPieces(el).length;
     return '<button type="button" class="btn sm" style="background:'+ELS[el].c+';color:#fff" data-act="legend" data-el="'+el+'"'+(m&&legendOpen()&&G.coins>=LEGEND_COST?'':' disabled')+'>'+esc(ELS[el].n)+(m?'':' (complet)')+'</button>'}).join(' ');
-  var P=powerOf(G.equip),pw=powerText(P);
-  return '<div class="flat" style="gap:6px;background:#F3ECFF"><h2>Poders especials</h2>'+(pw.length?'<p class="small">'+esc(pw.join(' · '))+'</p>':'<p class="muted small">Encara cap. Els objectes forjats i els sets de llegenda en donen.</p>')+'</div>'+
-    '<div class="flat" style="gap:6px;background:#FFF6D6"><h2>Sets de llegenda</h2><p class="small">Hi ha <b>10 sets</b> (2 de cada element) de 5 peces Superèpiques. Amb 2 peces del mateix set posades s’obre 1 habilitat, amb 3 n’hi ha 2, amb 4 n’hi ha 3, i amb les 5 tens la <b>super habilitat</b>.</p>'+
-    '<p class="small">Tens <b>'+total+' de 50</b> peces. Són molt difícils d’aconseguir: els caps en deixen caure una molt poques vegades (5%), i el Taller de llegendes només s’obre quan has forjat un objecte fins a <b>Superèpica</b>.</p>'+
-    '<p class="small"><b>Taller de llegendes</b>: una peça a l’atzar de l’element que triïs, que encara no tinguis. Costa <b>'+LEGEND_COST+' monedes</b>.'+(legendOpen()?'':' <b>Tancat:</b> primer forja una Superèpica.')+'</p><div class="row" style="gap:6px;flex-wrap:wrap">'+shop+'</div></div>'+list}
+  var long='Hi ha 10 sets (2 de cada element) de 5 peces Superèpiques. Amb 2 peces del mateix set posades tens 1 habilitat, amb 3 en tens 2, amb 4 en tens 3, i amb les 5 la super habilitat. Els caps en deixen caure una molt poques vegades (5%). Al Taller de llegendes en pots comprar una per '+LEGEND_COST+' monedes, però només quan has forjat un objecte fins a Superèpica.';
+  return '<div class="flat" style="gap:6px;background:#FFF6D6">'+qHead('Sets de llegenda','Peces Superèpiques que, juntes, donen habilitats. Molt difícils d’aconseguir. En tens '+total+' de 50.',long)+
+    '<p class="small" style="margin-top:6px"><b>Taller de llegendes</b>'+(legendOpen()?' · '+LEGEND_COST+' monedes per peça':' · tancat fins que forgis una Superèpica')+'</p><div class="row" style="gap:6px;flex-wrap:wrap">'+shop+'</div></div>'+list;
+}
 function megaBlock(s){var mine=MEGA.filter(function(m){return m.sp.indexOf(s)>=0});if(!mine.length)return '';var found=G.megas||{},nf=mine.filter(function(m){return found[m.id]}).length;
   return '<h3>Combos secrets ('+nf+' de '+mine.length+')</h3><div class="flat" style="background:var(--soft);gap:8px">'+mine.map(function(m){
     if(found[m.id])return '<div style="display:flex;flex-direction:column;gap:2px"><b>'+esc(m.n)+'</b><div class="row" style="gap:4px">'+m.sp.map(function(x){return spArt(x,'',30,false)}).join('')+'</div><span class="small">'+esc(m.sp.map(function(x){return SPECIES[x].n}).join(' + '))+'</span><span class="small">'+esc(m.d)+'</span></div>';
