@@ -1,6 +1,5 @@
 'use strict';
 /* ================= V14 ART: one drawing per species and per form (stage 0/1/2) ================= */
-/* Overrides critter(), spArt(), cArt() and patches the evolution tree in detailSheet() so each form is drawn apart. */
 var ART_DK={foc:'#B8431F',aigua:'#1B5FA8',planta:'#24753C',llamp:'#B5850A',psiquic:'#5E2A9E'};
 var ART_AC={foc:'#FFB238',aigua:'#9ED3FF',planta:'#8FE09C',llamp:'#FFE27A',psiquic:'#F0C3FF'};
 var NS=' stroke="none"';
@@ -336,13 +335,7 @@ function artDraw(sp,st,el2,locked,px){
   var sc=[.8,.9,1][st];
   return '<svg class="cr" width="'+px+'" height="'+px+'" viewBox="0 0 64 64" aria-hidden="true"'+(locked?' style="filter:brightness(0) opacity(.22)"':'')+'><g transform="translate(32 63) scale('+sc+') translate(-32 -63)" stroke="#2A1F3D" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">'+o+'</g></svg>';
 }
-critter=function(el,el2,px,locked,evolved,shape){
-  var sp=SP_ORDER.filter(function(s){return SPECIES[s].el===el&&SPECIES[s].shape===shape})[0]||SP_ORDER.filter(function(s){return SPECIES[s].el===el})[0]||'espurnet';
-  return artDraw(sp,typeof evolved==='number'?evolved:evolved?(el2?2:1):0,el2,locked,px);
-};
-spArt=function(s,el2,px,locked,evolved){return artDraw(s,typeof evolved==='number'?evolved:evolved?(el2?2:1):0,el2,locked,px)};
-cArt=function(c,px,locked){return artDraw(c.sp,c.stage||0,cEl2(c),locked,px)};
-/* the evolution tree only passes evolved=true/false: give it the real stage (0, 1 or 2) */
-(function(){try{var src=detailSheet.toString(),n=src.replace('spArt(s,e.el2,52,!ok,i>=0)','spArt(s,e.el2,52,!ok,i<0?0:i===0?1:2)').replace('spArt(s,e.el2,52,false,true)','spArt(s,e.el2,52,false,i===0?1:2)');
-  if(n!==src)detailSheet=eval('('+n+')')}catch(e){}})();
+/* a critter drawing: species s at a form 0, 1 or 2 (or true/false for an evolved form), or the critter c as it is now */
+function spArt(s,el2,px,locked,evolved){return artDraw(s,typeof evolved==='number'?evolved:evolved?(el2?2:1):0,el2,locked,px)}
+function cArt(c,px,locked){return artDraw(c.sp,c.stage||0,cEl2(c),locked,px)}
 

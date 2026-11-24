@@ -1,34 +1,5 @@
 'use strict';
 /* ================= V8: 40 critters, shapes, explorer talents ================= */
-function critter(el,el2,px,locked,evolved,shape){
-  var A=ELS[el]||ELS.foc,B=ELS[el2];
-  function on(k){return k===el||k===el2}
-  var o='',ex1=25,ex2=39,ey=38,er=5.5,pr=2.8,body,mouth;
-  if(evolved)o+='<ellipse cx="32" cy="41" rx="29" ry="24" fill="none" stroke="#FFD54A" stroke-width="2.5" stroke-dasharray="3 4"/>';
-  if(on('foc'))o+='<path d="M22 24 C19 14 27 12 26 3 C33 8 35 12 34 17 C37 13 41 13 41 7 C47 15 45 21 41 25 Z" fill="#FFB238"/>';
-  if(on('aigua'))o+='<path d="M24 25 Q32 3 42 25 Z" fill="#7CC0FF"/>';
-  if(on('planta'))o+='<path d="M32 24 L32 11" stroke="#2E7D45" stroke-width="3" stroke-linecap="round"/><path d="M32 13 Q21 4 18 12 Q25 18 32 13 Z" fill="#7BD389"/><path d="M32 13 Q43 4 46 12 Q39 18 32 13 Z" fill="#7BD389"/>';
-  if(on('llamp'))o+='<path d="M17 30 L11 9 L20 17 L22 6 L29 24 Z" fill="#E09A00"/><path d="M47 30 L53 9 L44 17 L42 6 L35 24 Z" fill="#E09A00"/>';
-  if(on('psiquic'))o+='<path d="M32 24 L32 10" stroke="#6B2FB3" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="8" r="5" fill="#F0C3FF" stroke="#6B2FB3" stroke-width="2"/>';
-  var round='<ellipse cx="32" cy="41" rx="23" ry="19" fill="'+A.c+'"/><ellipse cx="32" cy="48" rx="13" ry="9" fill="'+A.belly+'"/>';
-  switch(shape){
-    case 'tall':body='<ellipse cx="32" cy="40" rx="17" ry="23" fill="'+A.c+'"/><ellipse cx="32" cy="51" rx="10" ry="9" fill="'+A.belly+'"/>';ex1=26;ex2=38;ey=34;break;
-    case 'long':body='<path d="M52 48 Q63 40 60 28" stroke="'+A.c+'" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="30" cy="46" rx="26" ry="14" fill="'+A.c+'"/><ellipse cx="30" cy="52" rx="15" ry="6" fill="'+A.belly+'"/>';ex1=20;ex2=33;ey=42;break;
-    case 'spiky':body='<path d="M9 42 L3 31 L14 33 L11 20 L22 26 L25 13 L32 23 L39 13 L42 26 L53 20 L50 33 L61 31 L55 42 Z" fill="'+A.c+'" stroke="#2A1F3D" stroke-width="1.5" opacity=".8"/>'+round;break;
-    case 'tiny':body='<ellipse cx="32" cy="46" rx="17" ry="15" fill="'+A.c+'"/><ellipse cx="32" cy="52" rx="9" ry="6" fill="'+A.belly+'"/>';ex1=25;ex2=39;ey=43;er=7;pr=3.6;break;
-    case 'blocky':body='<rect x="10" y="22" width="44" height="38" rx="11" fill="'+A.c+'"/><rect x="20" y="44" width="24" height="12" rx="6" fill="'+A.belly+'"/>';break;
-    case 'wing':body='<ellipse cx="10" cy="36" rx="10" ry="17" fill="'+A.belly+'" stroke="'+A.c+'" stroke-width="2" transform="rotate(-25 10 36)"/><ellipse cx="54" cy="36" rx="10" ry="17" fill="'+A.belly+'" stroke="'+A.c+'" stroke-width="2" transform="rotate(25 54 36)"/>'+round;break;
-    case 'snail':body='<ellipse cx="28" cy="52" rx="24" ry="9" fill="'+A.c+'"/><circle cx="40" cy="36" r="16" fill="'+A.belly+'" stroke="'+A.c+'" stroke-width="3"/><path d="M40 36 m-2 0 a2 2 0 1 1 4 0 a5 5 0 1 1 -9 0 a8 8 0 1 1 16 0" stroke="'+A.c+'" stroke-width="2.5" fill="none"/><path d="M14 46 L10 32 M22 46 L22 31" stroke="'+A.c+'" stroke-width="3" stroke-linecap="round"/>';ex1=10;ex2=22;ey=31;er=4.5;pr=2.3;break;
-    default:body=round;
-  }
-  var spots=B?'<circle cx="14" cy="38" r="4" fill="'+B.c+'"/><circle cx="50" cy="44" r="4.5" fill="'+B.c+'"/><circle cx="45" cy="29" r="3" fill="'+B.c+'"/>':'';
-  var horns=evolved?'<path d="M16 30 L10 22 L20 27 Z M48 30 L54 22 L44 27 Z" fill="'+A.c+'"/>':'';
-  var mx=(ex1+ex2)/2;mouth='<path d="M'+(mx-3)+' '+(ey+8)+' Q'+mx+' '+(ey+11)+' '+(mx+3)+' '+(ey+8)+'" stroke="#1E1B2E" stroke-width="2" fill="none" stroke-linecap="round"/>';
-  return '<svg class="cr" width="'+px+'" height="'+px+'" viewBox="0 0 64 64" aria-hidden="true"'+(locked?' style="filter:brightness(0) opacity(.22)"':'')+'>'+(shape==='snail'?'':o)+horns+body+spots+
-    '<circle cx="'+ex1+'" cy="'+ey+'" r="'+er+'" fill="#fff"/><circle cx="'+ex2+'" cy="'+ey+'" r="'+er+'" fill="#fff"/><circle cx="'+(ex1+1)+'" cy="'+(ey+1)+'" r="'+pr+'" fill="#1E1B2E"/><circle cx="'+(ex2+1)+'" cy="'+(ey+1)+'" r="'+pr+'" fill="#1E1B2E"/>'+mouth+'</svg>';
-}
-function cArt(c,px,locked){return critter(sp(c).el,cEl2(c),px,locked,!!c.stage,sp(c).shape)}
-function spArt(s,el2,px,locked,evolved){var S=SPECIES[s];return critter(S.el,el2,px,locked,evolved,S.shape)}
 
 Object.assign(SPECIES,{
   xurrufet:{n:'Xurrufet',el:'foc',role:'Atac',price:340,shape:'tiny',talent:'tresor',evos:[E('Petardet'),E('Traca'),E('Bengala','llamp')]},
