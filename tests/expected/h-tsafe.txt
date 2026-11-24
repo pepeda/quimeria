@@ -1,0 +1,4 @@
+coins 150 owned 4 items true bak keys 0
+render ok
+
+[exit 0]

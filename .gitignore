@@ -1,1 +1,4 @@
 node_modules/
+dist/
+tests/sim14z-run.js
+tests/*.actual.txt

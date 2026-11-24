@@ -1,0 +1,19 @@
+ok   council names applied
+ok   zone 4 exists
+ok   zone 4 locked until zone 3 done
+ok   zone 4 opens after zone 3
+ok   forge offers 3 powers
+ok   choice panel shown
+ok   chosen power applied: rosada
+ok   tab eq renders
+ok   tab obj renders
+ok   tab sets renders
+ok   tab menjar renders
+ok   better gear check runs
+ok   boss renamed
+ok   renamed cave king still triggers the three-headed boss
+ok   team power x4 doubles enemy hp (sqrt)
+ok   sound call is safe without audio
+ok   sound switch in the house
+
+[exit 0]

@@ -1,0 +1,44 @@
+== HARD_TP 2.2
+foc guard, lvl2 team, Magica gear                    win 0% turns 23.0
+foc guard, lvl3 team, Magica gear                    win 100% turns 18.0
+foc guard, lvl3 team, Epica gear                     win 100% turns 14.6
+foc guard, lvl3 team, Superepica gear                win 100% turns 13.6
+aigua guard, lvl2 team, Magica gear                  win 0% turns 34.0
+aigua guard, lvl3 team, Magica gear                  win 100% turns 28.8
+aigua guard, lvl3 team, Epica gear                   win 100% turns 23.1
+aigua guard, lvl3 team, Superepica gear              win 100% turns 19.9
+planta guard, lvl2 team, Magica gear                 win 0% turns 22.5
+planta guard, lvl3 team, Magica gear                 win 0% turns 21.2
+planta guard, lvl3 team, Epica gear                  win 100% turns 23.7
+planta guard, lvl3 team, Superepica gear             win 100% turns 20.6
+llamp guard, lvl2 team, Magica gear                  win 0% turns 32.4
+llamp guard, lvl3 team, Magica gear                  win 0% turns 31.8
+llamp guard, lvl3 team, Epica gear                   win 65% turns 35.8
+llamp guard, lvl3 team, Superepica gear              win 100% turns 28.2
+psiquic guard, lvl2 team, Magica gear                win 0% turns 28.9
+psiquic guard, lvl3 team, Magica gear                win 0% turns 27.6
+psiquic guard, lvl3 team, Epica gear                 win 34% turns 33.4
+psiquic guard, lvl3 team, Superepica gear            win 100% turns 28.0
+== HARD_TP 2.6
+foc guard, lvl2 team, Magica gear                    win 0% turns 22.7
+foc guard, lvl3 team, Magica gear                    win 100% turns 17.7
+foc guard, lvl3 team, Epica gear                     win 100% turns 14.6
+foc guard, lvl3 team, Superepica gear                win 100% turns 13.6
+aigua guard, lvl2 team, Magica gear                  win 0% turns 34.0
+aigua guard, lvl3 team, Magica gear                  win 100% turns 28.5
+aigua guard, lvl3 team, Epica gear                   win 100% turns 22.9
+aigua guard, lvl3 team, Superepica gear              win 100% turns 19.9
+planta guard, lvl2 team, Magica gear                 win 0% turns 22.6
+planta guard, lvl3 team, Magica gear                 win 0% turns 21.1
+planta guard, lvl3 team, Epica gear                  win 100% turns 23.8
+planta guard, lvl3 team, Superepica gear             win 100% turns 20.6
+llamp guard, lvl2 team, Magica gear                  win 0% turns 32.4
+llamp guard, lvl3 team, Magica gear                  win 0% turns 31.8
+llamp guard, lvl3 team, Epica gear                   win 58% turns 35.7
+llamp guard, lvl3 team, Superepica gear              win 100% turns 28.1
+psiquic guard, lvl2 team, Magica gear                win 0% turns 28.9
+psiquic guard, lvl3 team, Magica gear                win 0% turns 27.1
+psiquic guard, lvl3 team, Epica gear                 win 31% turns 33.6
+psiquic guard, lvl3 team, Superepica gear            win 100% turns 28.0
+
+[exit 0]

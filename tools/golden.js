@@ -10,6 +10,9 @@
  *   node tools/golden.js compare <a.html> <b.html>          play both and report the first difference
  *   node tools/golden.js hash    <game.html>                print one hash of the whole transcript
  *
+ * <game.html> is a built single file (dist/index.html) or src/index.html, whose scripts are then
+ * loaded one by one as separate classic scripts, as a browser does.
+ *
  * Math.random is a seeded generator, Date/Date.now follow a virtual clock and setTimeout runs on
  * virtual time, so the same file always gives the same transcript (run `hash` twice to check).
  */
@@ -32,6 +35,18 @@ function mulberry32(seed) {
   };
 }
 
+/* the game's scripts: [name, code] pairs, run in order; the last one exposes an eval hook */
+function gameScripts(file) {
+  const html = fs.readFileSync(file, 'utf8');
+  if (html.indexOf('<!-- build:js -->') >= 0) {
+    const dir = require('path').dirname(file), out = [];
+    const re = /<script src="([^"]+)"><\/script>/g; let m;
+    while ((m = re.exec(html))) out.push([m[1], fs.readFileSync(require('path').join(dir, m[1]), 'utf8')]);
+    out.push(['hook', 'globalThis.__ev=function(s){return (0,eval)(s)};']);
+    return out;
+  }
+  return [['game.js', extractJs(html)]];
+}
 function extractJs(html) {
   const a = html.indexOf('<script>') + 8, b = html.lastIndexOf('</script>');
   let js = html.slice(a, b);
@@ -44,7 +59,7 @@ function extractJs(html) {
 const STATIC_IDS = ['phone', 'top', 'screen', 'nav', 'overlay', 'toastSlot', 'chat', 'chatClose', 'who', 'types', 'fbList',
   'fbForm', 'fbText', 'fbCtx', 'fbCopy', 'fbWa', 'fbOut', 'fbMsg', 'fbClear'];
 
-function makeSession(html, opts) {
+function makeSession(scripts, opts) {
   opts = opts || {};
   const log = [];            // DOM side effects since the last snapshot
   const sounds = [];
@@ -150,7 +165,7 @@ function makeSession(html, opts) {
     D.now=function(){return __clock.now};D.UTC=R.UTC;D.parse=R.parse;D.prototype=R.prototype;globalThis.Date=D;Math.random=function(){return __rand()};})();`, ctx);
 
   const errors = [];
-  try { vm.runInContext(extractJs(html), ctx, { filename: 'game.js' }); } catch (e) { errors.push('load: ' + e.message); }
+  for (const [name, code] of scripts) { try { vm.runInContext(code, ctx, { filename: name }); } catch (e) { errors.push('load ' + name + ': ' + e.message); } }
   const ev = ctx.__ev || (() => { throw new Error('game did not load'); });
 
   function flush(limit) {
@@ -188,9 +203,9 @@ function makeSession(html, opts) {
 }
 
 /* ---------------- the scripted play ---------------- */
-function play(html, emit) {
+function play(game, emit) {
   const pick = mulberry32(777); // decisions of the player (independent from the game's own randomness)
-  let S = makeSession(html, { seed: 1001 });
+  let S = makeSession(game, { seed: 1001 });
   let n = 0;
   function rec(label) { emit(S.snap((++n) + ' ' + label)); }
   function step(act, data, label) { S.click(act, data); S.flush(); rec(label || (act + (data ? ' ' + JSON.stringify(data) : ''))); }
@@ -319,7 +334,7 @@ function play(html, emit) {
   // save and load again
   const saved = Object.assign({}, S.store);
   const before = E('JSON.stringify(G)');
-  S = makeSession(html, { seed: 2002, store: saved, now: S.clock.now }); rec('reloaded');
+  S = makeSession(game, { seed: 2002, store: saved, now: S.clock.now }); rec('reloaded');
   emit({ step: 'reload round trip', same: S.ev('JSON.stringify(G)') === before });
   ['casa', 'explorar', 'bestioles', 'motxilla'].forEach(to => step('nav', { to }));
   // reset
@@ -330,25 +345,25 @@ function play(html, emit) {
     old: JSON.stringify({ v: 1, coins: 77, equip: { anell: 'anellFoc' }, owned: [{ uid: 'a1', sp: 'brotet', stage: 1, evo: 1, mill: 0, fat: 0, rest: 0 }] }),
     partial: JSON.stringify({ v: 2, coins: 'x', owned: [{ uid: 'z', sp: 'nope' }], items: 'no', equip: [] })
   };
-  Object.keys(cases).forEach(k => { S = makeSession(html, { seed: 3003, store: { 'bestioles-joc-v1': cases[k] } }); rec('load ' + k); step('nav', { to: 'casa' }); });
-  S = makeSession(html, { seed: 4004, full: true }); rec('storage full'); step('nav', { to: 'casa' });
+  Object.keys(cases).forEach(k => { S = makeSession(game, { seed: 3003, store: { 'bestioles-joc-v1': cases[k] } }); rec('load ' + k); step('nav', { to: 'casa' }); });
+  S = makeSession(game, { seed: 4004, full: true }); rec('storage full'); step('nav', { to: 'casa' });
 }
 
-function transcript(html) { const out = []; play(html, s => out.push(s)); return out; }
+function transcript(game) { const out = []; play(game, s => out.push(s)); return out; }
 function hashOf(list) { const h = crypto.createHash('sha256'); list.forEach(s => h.update(JSON.stringify(s) + '\n')); return h.digest('hex'); }
 
 function main() {
   const [cmd, a, b] = process.argv.slice(2);
   if (cmd === 'record') {
-    const t = transcript(fs.readFileSync(a, 'utf8'));
+    const t = transcript(gameScripts(a));
     fs.writeFileSync(b, t.map(s => JSON.stringify(s)).join('\n') + '\n');
     console.log(t.length + ' steps, sha256 ' + hashOf(t));
   } else if (cmd === 'hash') {
-    const t = transcript(fs.readFileSync(a, 'utf8'));
+    const t = transcript(gameScripts(a));
     const errs = t.reduce((n, s) => n + (s.errors ? s.errors.length : 0), 0);
     console.log(t.length + ' steps, ' + errs + ' errors, sha256 ' + hashOf(t));
   } else if (cmd === 'compare') {
-    const A = transcript(fs.readFileSync(a, 'utf8')), B = transcript(fs.readFileSync(b, 'utf8'));
+    const A = transcript(gameScripts(a)), B = transcript(gameScripts(b));
     let diffs = 0;
     for (let i = 0; i < Math.max(A.length, B.length); i++) {
       const x = A[i] || {}, y = B[i] || {};
@@ -374,4 +389,4 @@ function main() {
   }
 }
 if (require.main === module) main();
-module.exports = { transcript, hashOf, makeSession };
+module.exports = { transcript, hashOf, makeSession, gameScripts };

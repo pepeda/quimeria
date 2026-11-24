@@ -1,0 +1,38 @@
+/* Everything tappable is raised; everything else is flat. */
+.btn{border:none;border-radius:14px;min-height:48px;padding:8px 16px;font-weight:800;font-size:16px;background:var(--ink);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 0 #000;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #000}
+.btn.light{background:#fff;color:var(--ink);border:2px solid var(--ink);box-shadow:0 4px 0 var(--ink)}
+.btn.green{background:var(--good);box-shadow:0 4px 0 var(--good-d)}
+.btn.gold{background:var(--gold);color:var(--ink);box-shadow:0 4px 0 var(--gold-d)}
+.btn.sm{min-height:42px;font-size:14px;padding:6px 12px}
+.btn:disabled,.opt:disabled,.tap:disabled{opacity:1;background:#E3E0EA;color:#5E5A72;box-shadow:none;border-color:#CFCAD9;cursor:default;transform:none}
+.opt{border:2px solid var(--ink);background:#fff;border-radius:16px;padding:10px 40px 10px 12px;text-align:left;display:flex;flex-direction:column;gap:3px;min-height:56px;position:relative;box-shadow:0 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.opt::after{content:"";position:absolute;right:14px;top:50%;width:11px;height:11px;border-right:3px solid currentColor;border-top:3px solid currentColor;transform:translateY(-50%) rotate(45deg)}
+.opt:disabled::after{display:none}
+.opt b{font-size:16px}.opt .d{font-size:14px;color:var(--muted)}
+.opt .need{font-size:13px;font-weight:800;color:#5E5A72}
+.tap{border:2px solid var(--ink);background:#fff;border-radius:16px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:800;font-size:13px;box-shadow:0 4px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.tap:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.tap.sel{background:#EEEBFF;border-color:var(--accent);box-shadow:0 4px 0 var(--accent)}
+.tap.off{background:#ECE9F2}
+.box{background:#fff;border-radius:16px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:800;font-size:13px}
+.box.off{background:#ECE9F2;color:#5E5A72}
+.btn:focus-visible,.opt:focus-visible,.tap:focus-visible,.navb:focus-visible,textarea:focus-visible,input:focus-visible,.chip:focus-visible,.world:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.bar{height:10px;border-radius:999px;background:#E6E1D6;overflow:hidden;position:relative}
+.bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;transition:width .35s ease-out}
+.bar>i.ghost{background:#F5B7B1;transition:width .6s ease-out .3s}
+.tag{font-size:13px;font-weight:800;border-radius:999px;padding:1px 9px;background:var(--soft);color:var(--muted)}
+.tag.good{background:#DDF3E2;color:#1F6B35}.tag.mid{background:#FFF1C2;color:#6B4A00}.tag.bad{background:#FDE2DE;color:#9E2B1F}
+.stars{color:#C98A00;letter-spacing:1px;font-size:15px}
+.tip{background:#2F2780;color:#fff;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.tip .btn{align-self:flex-start;min-height:40px;background:#fff;color:var(--ink);box-shadow:0 3px 0 #9C93F5}
+nav.nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:8px 8px 10px;background:var(--paper);border-radius:22px 22px 0 0;box-shadow:0 -4px 18px rgba(30,27,46,.1)}
+.navb{border:none;background:none;border-radius:14px;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:12px;color:#5E5A72}
+.navb.on{background:#FFE08A;color:var(--ink)}
+.navb.hint{animation:pulse 1.4s ease-in-out infinite;background:#EEEBFF;color:var(--accent)}
+.map{position:relative;height:460px;width:390px;margin:0 auto;max-width:100%}
+.world{position:absolute;width:100px;border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:800;font-size:14px;padding:0}
+.ring{width:94px;height:94px;border-radius:50%;padding:5px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.world .ball{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
+.badge{position:absolute;right:-10px;top:-8px;background:var(--ink);color:#fff;font-size:12px;border-radius:999px;padding:2px 7px;border:2px solid #fff}

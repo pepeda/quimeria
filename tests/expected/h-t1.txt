@@ -1,0 +1,5 @@
+events: hit,ehit,teamDown over= lose teamHP= {"cmwuiwxs06m9zx":0}
+after win event: card coins
+next tick OK, over= lose
+
+[exit 0]
