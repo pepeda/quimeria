@@ -2159,7 +2159,7 @@ brasa:function(p){var s=p.st,o='';
   if(s>1)o+=aP('M20 24 L22 8 L28 18 L32 4 L36 18 L42 8 L44 24 Z',p.H);
   o+=aP(s?'M8 58 L7 38 L16 24 L32 18 L48 24 L57 38 L56 58 Z':'M12 58 L10 40 L20 26 L36 22 L50 30 L54 44 L50 58 Z',p.D);
   if(s)o+=aP('M7 38 L2 30 L14 28 Z M57 38 L62 30 L50 28 Z',p.D);
-  o+=aL('M16 32 L22 38 L18 46 M48 32 L42 40 L47 48',p.H,2);
+  o+=aL('M13 34 L17 40 L14 48 M51 34 L47 42 L50 50',p.H,2);
   o+=aP('M22 58 L24 46 L40 46 L42 58 Z',p.c,' stroke-width="1.5"')+aL('M24 52 H40',p.D,1.5);
   return {b:o,e:[26,38,36,4.6],m:[32,42],h:[[14,50],[50,50]],t:[32,18]}},
 xurrufet:function(p){var s=p.st,o='';var top=s>1?20:26;
@@ -2178,7 +2178,7 @@ cremallot:function(p){var s=p.st,o='';
   return {b:o,ce:aEye(10,30,3.6,'Defensa',-1,p.c)+aEye(21,28,3.6,'Defensa',1,p.c),m:[15,53],h:[[30,40],[46,40]],t:[16,22]}},
 fogonet:function(p){var s=p.st,o='';var hy=s>1?6:12;
   o+=aE(32,46,15,14,p.c);
-  if(s>1)o+=aP('M22 40 H42 L44 58 H20 Z','#fff',' stroke-width="1.5"');
+  if(s>1)o+=aP('M23 50 H41 L43 59 H21 Z','#fff',' stroke-width="1.5"');
   o+=aB([[24,hy+8,6],[32,hy+5,7],[40,hy+8,6]],'#fff')+'<rect x="23" y="'+(hy+10)+'" width="18" height="'+(22-hy+4)+'" fill="#fff"/>';
   o+=aP('M32 '+(hy+12)+' c2 3 3 5 0 7 c-3 -2 -2 -4 0 -7 Z',p.c,NS);
   if(s>0)o+=aE(52,48,7,3,'#4A4660')+aL('M46 48 L40 50','#4A4660',3);
@@ -2188,7 +2188,7 @@ dragonet:function(p){var s=p.st,o='';var k=.75+.17*s;
   o+=w+aM(w);
   o+=aT('M42 52 Q56 58 58 44',p.c,4)+aP('M56 44 L62 36 L54 40 Z',p.D);
   o+=aE(32,48,12,11,p.c)+aE(32,51,6.5,6.5,p.L,NS)+aL('M28 48 H36 M28 52 H36',p.D,1);
-  o+=aP('M22 24 L'+(18-s*2)+' '+(10-s*3)+' L28 20 Z',p.L)+aM(aP('M22 24 L'+(18-s*2)+' '+(10-s*3)+' L28 20 Z',p.L));
+  o+=aP('M22 24 L'+(18-s*2)+' '+(10-s*3)+' L28 20 Z',p.H)+aM(aP('M22 24 L'+(18-s*2)+' '+(10-s*3)+' L28 20 Z',p.H));
   o+=aE(32,30,13,11,p.c)+aE(32,36,7,4.5,p.L,NS)+aC(29.5,35,.9,'#2A1F3D',NS)+aC(34.5,35,.9,'#2A1F3D',NS);
   if(s>1)o+=aP('M26 20 L28 15 L31 19 L34 14 L36 20 Z',p.D);
   return {b:o,e:[26.5,37.5,28,4],m:[32,39],h:[[10,30],[54,30]],t:[32,14]}},
@@ -2205,17 +2205,23 @@ gotim:function(p){var s=p.st,o='';
   if(s>0)o+=aP('M32 12 C38 4 48 6 46 14 C44 10 38 10 36 16 Z',p.H);
   if(s>1)o+=aP('M14 40 C6 38 6 30 10 26 C10 32 14 34 16 34 Z M50 40 C58 38 58 30 54 26 C54 32 50 34 48 34 Z',p.H);
   return {b:o,e:[26,38,42,4.5],m:[32,49],h:[[20,50],[44,50]],t:[32,10]}},
-bufa:function(p){var s=p.st,o='',r=14+s*1.5,sp=[];
-  for(var i=0;i<10;i++){var a=-Math.PI+i*Math.PI/9*1.2-0.15,x=32+Math.cos(a)*r,y=40+Math.sin(a)*r;sp.push('M'+(x-2.5)+' '+y.toFixed(1)+' L'+(32+Math.cos(a)*(r+4+s*2)).toFixed(1)+' '+(40+Math.sin(a)*(r+4+s*2)).toFixed(1)+' L'+(x+2.5)+' '+(y+1).toFixed(1)+' Z')}
-  o+=aP(sp.join(' '),s>1?p.D:p.H)+aP('M46 40 L60 30 L58 40 L60 50 Z',p.H);
-  o+=aC(32,40,r,p.c)+aE(32,48,r*.6,r*.4,p.L,NS);
-  if(s>0)o+=aP('M'+(32-r)+' 36 A'+r+' '+r+' 0 0 1 '+(32+r)+' 36 Q32 '+(28-s*2)+' '+(32-r)+' 36 Z',p.D,' stroke-width="1.5"');
-  return {b:o,e:[26,37,41,4.4],m:[31,48],h:[[18,46],[46,46]],t:[32,22]}},
+bufa:function(p){var s=p.st,o='',W=20+s*2;
+  var fl=aE(13,54,8,4,p.c,' transform="rotate(-25 13 54)"');o+=fl+aM(fl);
+  o+=aP('M'+(32-W)+' 48 Q'+(32-W)+' '+(22-s*2)+' 32 '+(22-s*2)+' Q'+(32+W)+' '+(22-s*2)+' '+(32+W)+' 48 Z',p.D);
+  o+=aP('M26 '+(30-s)+' L32 '+(26-s)+' L38 '+(30-s)+' L36 36 L28 36 Z M16 42 L20 34 L26 38 L24 44 Z M48 42 L44 34 L38 38 L40 44 Z',p.c,' stroke-width="1.4"');
+  if(s>0)o+=aP('M24 '+(25-s*2)+' L26 '+(16-s*4)+' L30 '+(23-s*2)+' Z M34 '+(23-s*2)+' L38 '+(15-s*4)+' L40 '+(25-s*2)+' Z'+(s>1?' M14 34 L6 28 L14 30 Z M50 34 L58 28 L50 30 Z':''),p.H);
+  o+=aE(32,56,13,5,p.L)+aE(32,45,11,10,p.c)+aE(32,50,5,2.5,p.L,NS);
+  return {b:o,e:[27,37,43,4],m:[32,49],h:[[18,40],[46,40]],t:[32,18]}},
 petxina:function(p){var s=p.st,o='';
-  if(s===1)o+=aT('M18 20 L14 8 M14 14 L8 10 M46 20 L50 8 M50 14 L56 10','#FF7F8E',2.5);
-  o+=aP(s>1?'M8 52 L4 36 L10 34 L8 22 L16 22 L18 10 L26 14 L32 4 L38 14 L46 10 L48 22 L56 22 L54 34 L60 36 L56 52 Z':'M10 52 Q6 18 32 12 Q58 18 54 52 Z',p.L)+aL('M32 50 V16 M32 50 L18 20 M32 50 L46 20 M32 50 L11 36 M32 50 L53 36',p.D,1.2);
-  o+=aE(32,50,13,9,p.c);
-  return {b:o,e:[27,37,48,4],m:[32,54],h:[[16,30],[48,30]],t:[32,12]}},
+  o+=aP('M44 52 L40 62 L46 58 L50 63 L52 56 L58 60 L54 50 Z',p.H);
+  o+=aL('M24 40 L20 50 M30 40 L28 50 M36 40 L36 49','#2A1F3D',2);
+  [[50,44,6],[50,36,7.5],[45,28,8.5],[36,24,9]].forEach(function(c){o+=aC(c[0],c[1],c[2],p.c)});
+  if(s>1)o+=aP('M34 15 L36 8 L40 15 Z M44 19 L48 12 L50 21 Z M52 27 L58 23 L57 31 Z',p.D);
+  if(s>0){var cl=aT('M18 40 L10 44',p.c,3)+aC(8,46,5,p.c)+aP('M4 44 Q0 36 6 34 Q7 39 8 42 Z',p.c)+aP('M11 43 Q14 37 9 34 Q8 39 8 42 Z',p.c);o+=s>1?'<g transform="translate(8 44) scale(1.3) translate(-8 -44)">'+cl+'</g>':cl}
+  o+=aL('M14 24 Q6 8 0 10 M18 22 Q16 6 8 2','#2A1F3D',1.6);
+  o+=aP(s>1?'M12 30 L-2 26 L12 34 Z':'M12 30 L4 27 L12 34 Z','#fff',' stroke-width="1.5"');
+  o+=aC(22,32,11,p.c)+aE(24,37,6,3.5,p.L,NS);
+  return {b:o,e:[18,27,30,3.8],m:[23,38],h:[[45,28],[50,40]],t:[22,20]}},
 nedet:function(p){var s=p.st,o='';
   o+=aT('M46 50 Q60 52 60 38',p.c,6);
   if(s>1)o+=aP('M28 38 L36 24 L42 38 Z',p.D);
@@ -2228,7 +2234,7 @@ medusina:function(p){var s=p.st,o='',n=s?6:4;
   if(s>1)o+=aP('M24 36 q-2 10 4 18 q2 -10 0 -18 Z M40 36 q2 10 -4 18 q-2 -10 0 -18 Z',p.L);
   o+=aP('M10 37 Q10 12 32 12 Q54 12 54 37 Q48 34 43 38 Q38 34 32 38 Q26 34 21 38 Q16 34 10 37 Z',p.c)+aE(24,20,5,3,'#fff',NS+' opacity=".45"');
   if(s>1)o+=aC(20,17,1.6,'#FFD54A',' stroke-width="1"')+aC(32,13,1.8,'#FFD54A',' stroke-width="1"')+aC(44,17,1.6,'#FFD54A',' stroke-width="1"');
-  return {b:o,e:[26,38,26,4.2],m:[32,32],h:[[14,26],[50,26]],t:[32,8]}},
+  return {b:o,e:[26,38,26,4.2],m:[32,32],h:[[12,32],[52,32]],t:[32,8]}},
 cranquet:function(p){var s=p.st,o='',k=1+s*.12;
   o+=aL('M18 48 L8 56 M20 52 L12 60 M46 48 L56 56 M44 52 L52 60','#2A1F3D',2.5);
   var cl='<g transform="translate(10 32) scale('+k+') translate(-10 -32)">'+aT('M20 44 L12 36',p.c,3)+aC(10,32,6.5,p.c)+aP('M5 29 Q1 20 8 16 Q9 23 11 27 Z',p.c)+aP('M14 28 Q18 20 13 17 Q12 23 11 27 Z',p.c)+'</g>';
@@ -2322,7 +2328,7 @@ trona:function(p){var s=p.st,o='';
   if(s>1)o+=aP('M18 24 l-2 -8 l4 3 l1 -5 l3 8 Z',p.H);
   return {b:o,e:[17.5,26.5,33,3.5],m:[22,42],h:[[34,44],[44,44]],t:[22,20]}},
 guspira:function(p){var s=p.st,o='',R=20+s*2,r=10+s;
-  if(s>0)o+=aL('M32 '+(42-R-6)+' v-4 M'+(32+R+4)+' 36 h4 M'+(32-R-4)+' 36 h-4',p.D,2);
+  if(s>0)o+=aP('M8 22 l1.2 3 l3 1.2 l-3 1.2 l-1.2 3 l-1.2 -3 l-3 -1.2 l3 -1.2 Z M56 24 l1.2 3 l3 1.2 l-3 1.2 l-1.2 3 l-1.2 -3 l-3 -1.2 l3 -1.2 Z','#fff',' stroke-width="1"');
   if(s>1)o+=aC(32,40,R+2,p.H,NS+' opacity=".5"');
   var pt=[];for(var i=0;i<10;i++){var a=-Math.PI/2+i*Math.PI/5,rr=i%2?r:R;pt.push((32+Math.cos(a)*rr).toFixed(1)+' '+(40+Math.sin(a)*rr).toFixed(1))}
   o+=aP('M'+pt.join(' L')+' Z',p.c,' stroke-width="2.5"')+aC(32,44,6,p.L,NS);
@@ -2378,7 +2384,7 @@ somni:function(p){var s=p.st,o='';
   if(s>1)o+=aP('M44 4 A28 28 0 1 0 60 48 A22 22 0 1 1 44 4 Z','#FFE27A');
   if(s===1)o+=aP('M14 36 L6 30 L14 30 L10 22 L20 28 Z M50 36 L58 30 L50 30 L54 22 L44 28 Z',p.D);
   o+=aE(32,45,15,15,p.c)+aE(32,52,8,5,p.L,NS);
-  o+=aP('M14 34 Q32 44 50 34 Q50 24 54 14 Q42 30 32 28 Q22 30 10 14 Q14 24 14 34 Z','#FFE27A');
+  o+=aP('M17 36 Q32 42 47 36 Q48 28 53 20 Q42 31 32 30 Q22 31 11 20 Q16 28 17 36 Z','#FFE27A');
   if(s>1)o+=aP('M8 10 l1.2 3 l3 1.2 l-3 1.2 l-1.2 3 l-1.2 -3 l-3 -1.2 l3 -1.2 Z','#fff',' stroke-width="1"');
   return {b:o,e:[26,38,44,4.5],m:[32,51],h:[[18,52],[46,52]],t:[32,24]}},
 ullet:function(p){var s=p.st,o='';
@@ -2455,28 +2461,28 @@ BUILD.forEach(function(x){if(!x.area)x.area=H14_OLD[x.k]||'ext'});
 /* element rooms: one per world, opened when the last zone (guardian) of that world is done */
 var H14_EL={foc:'salaFoc',llamp:'salaLlamp',aigua:'salaAigua',planta:'salaPlanta',psiquic:'salaPsiquic'};
 BUILD.push(
-  {k:'llit',n:'Llit-cabana',what:'Les de casa descansen 1 punt més per expedició',price:220,max:1,cap:0,area:'dorm'},
-  {k:'neo',n:'Rètol de neó',what:'Decoració: QUIMÈRIA brilla a la paret',price:120,max:1,cap:0,area:'dorm'},
-  {k:'posters',n:'Pòsters de guardians',what:'Decoració: un pòster per cada món acabat',price:60,max:1,cap:0,area:'dorm'},
+  {k:'llit',n:'Llit-cabana',what:'A casa descansen +1 per expedició',price:220,max:1,cap:0,area:'dorm'},
+  {k:'neo',n:'Rètol de neó',what:'Decoració que brilla',price:120,max:1,cap:0,area:'dorm'},
+  {k:'posters',n:'Pòsters de guardians',what:'Un pòster per cada món acabat',price:60,max:1,cap:0,area:'dorm'},
   {k:'hamaca',n:'Hamaca',what:'+1 plaça',price:180,max:1,cap:1,area:'dorm'},
-  {k:'consola',n:'Consola i pantalla',what:'Decoració: una pantalla gran per jugar',price:300,max:1,cap:0,area:'sala'},
+  {k:'consola',n:'Consola i pantalla',what:'Decoració: pantalla gran',price:300,max:1,cap:0,area:'sala'},
   {k:'pufs',n:'Puf de colors',what:'Decoració (fins a 3)',price:60,max:3,cap:0,area:'sala'},
   {k:'pingpong',n:'Taula de ping-pong',what:'Decoració per al racó de jocs',price:250,max:1,cap:0,area:'sala'},
-  {k:'trofeus',n:'Estanteria de trofeus',what:'Mostra els mons acabats i els tresors rars',price:200,max:1,cap:0,area:'sala'},
-  {k:'peixera',n:'Peixera',what:'Les d’Aigua descansen 1 punt més per expedició',price:150,max:1,cap:0,area:'sala'},
+  {k:'trofeus',n:'Estanteria de trofeus',what:'Trofeus dels mons i tresors rars',price:200,max:1,cap:0,area:'sala'},
+  {k:'peixera',n:'Peixera',what:'Les d’Aigua descansen +1 per expedició',price:150,max:1,cap:0,area:'sala'},
   {k:'cuina',n:'Cuina de bestioles',what:'+1 menjar del món on acabes un camí',price:400,max:1,cap:0,area:'taller'},
   {k:'forja',n:'Taller de forja',what:'Forjar costa un 20% menys',price:500,max:1,cap:0,area:'taller'},
-  {k:'lab',n:'Laboratori',what:'Una altra bestiola de casa guanya 1 estrella de força per expedició',price:600,max:1,cap:0,area:'taller'},
-  {k:'salaFoc',n:'Forja de lava',what:'Les de Foc descansen 1 punt més per expedició',price:450,max:1,cap:0,area:'elem',el:'foc'},
-  {k:'salaLlamp',n:'Sala de bobines',what:'+10% de monedes a cada expedició',price:450,max:1,cap:0,area:'elem',el:'llamp'},
+  {k:'lab',n:'Laboratori',what:'Una de casa guanya +1 estrella per expedició',price:600,max:1,cap:0,area:'taller'},
+  {k:'salaFoc',n:'Forja de lava',what:'Les de Foc descansen +1 per expedició',price:450,max:1,cap:0,area:'elem',el:'foc'},
+  {k:'salaLlamp',n:'Sala de bobines',what:'+10% de monedes per expedició',price:450,max:1,cap:0,area:'elem',el:'llamp'},
   {k:'salaAigua',n:'Aquari gegant',what:'+2 places',price:450,max:1,cap:2,area:'elem',el:'aigua'},
   {k:'salaPlanta',n:'Hivernacle',what:'+1 Fulla tendra per camí completat',price:450,max:1,cap:0,area:'elem',el:'planta'},
   {k:'salaPsiquic',n:'Observatori',what:'+1 Bolet somiador per camí completat',price:600,max:1,cap:0,area:'elem',el:'psiquic'},
-  {k:'skate',n:'Rampa de skate',what:'Decoració: per fer salts',price:300,max:1,cap:0,area:'ext'},
+  {k:'skate',n:'Rampa de skate',what:'Decoració per fer salts',price:300,max:1,cap:0,area:'ext'},
   {k:'arbre',n:'Casa a l’arbre',what:'+2 places',price:500,max:1,cap:2,area:'ext'},
-  {k:'foguera',n:'Foguera',what:'De nit (21 h a 8 h) descansen el doble a casa',price:150,max:1,cap:0,area:'ext'},
+  {k:'foguera',n:'Foguera',what:'De nit, a casa descansen el doble',price:150,max:1,cap:0,area:'ext'},
   {k:'hort',n:'Hort de baies',what:'+1 menjar a l’atzar per camí completat',price:250,max:1,cap:0,area:'ext'},
-  {k:'antena',n:'Antena de rastreig',what:'Decoració: la bandera canvia de color cada dia',price:350,max:1,cap:0,area:'ext'},
+  {k:'antena',n:'Antena de rastreig',what:'Decoració: bandera d’un color cada dia',price:350,max:1,cap:0,area:'ext'},
   {k:'portal',n:'Portal entre mons',what:'+25 monedes per camí completat',price:900,max:1,cap:0,area:'ext'}
 );
 function h14Item(k){return BUILD.filter(function(x){return x.k===k})[0]}
@@ -2536,23 +2542,23 @@ function h14Folded(a){var f=G.hFold&&G.hFold[a];if(f!==undefined)return !!f;
   return BUILD.filter(function(x){return x.area===a}).every(function(x){return (G.built[x.k]||0)>=x.max})}
 var h14Act=act;
 act=function(a,d){
-  if(a==='build'){var bd=h14Item(d.k);if(bd&&!h14Open(bd)){toast('Primer acaba el '+ELS[bd.el].mon+'.');return}}
+  if(a==='build'){var bd=h14Item(d.k);if(bd&&!h14Open(bd)){toast('Primer has d’acabar: '+ELS[bd.el].mon+'.');return}}
   if(a==='hfold'){G.hFold=G.hFold||{};G.hFold[d.k]=!h14Folded(d.k);persist();render();return}
   return h14Act.apply(this,arguments);
 };
 
 /* ---------- build list, grouped by area ---------- */
 (function(){if(!document.head||!document.head.appendChild)return;var st=document.createElement('style');st.textContent=
-  '.h14head{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin-top:6px;padding:8px 4px 6px;background:none;border:0;border-bottom:2px solid #E3E0EA;font-family:var(--display);font-weight:800;font-size:17px;color:var(--ink);text-align:left;cursor:pointer}'+
+  '.h14head{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin-top:4px;padding:8px 4px 6px;background:none;border:0;border-bottom:2px solid #E3E0EA;font-family:var(--display);font-weight:800;font-size:17px;color:var(--ink);text-align:left;cursor:pointer}'+
   '.h14head>span:first-child{flex:1}.h14head .h14n{font-family:inherit;font-size:13px;font-weight:700;color:#5E5A72}'+
-  '.h14builds .grid3{margin-top:8px}.h14builds .tap{min-height:96px;justify-content:space-between}.h14builds .tap .muted{line-height:1.2}'+
+  '.h14builds .grid3{margin-top:8px}.h14builds{margin-top:-8px}.h14builds .tap{min-height:92px;justify-content:space-between}.h14builds .tap .muted{line-height:1.2;font-size:12.5px}'+
   '.h14builds .tap.h14lock{background:#ECE9F2;border-style:dashed}';
   document.head.appendChild(st)})();
 function h14Btn(x){
   var n=G.built[x.k]||0,full=n>=x.max,lock=!h14Open(x),poor=G.coins<x.price,
     stripe=x.el?' border-top:6px solid '+ELS[x.el].c+';':'';
   var tag=full?'<span class="tag good">Fet</span>':lock?'<span class="tag">Tancada</span>':'<span class="tag mid">'+x.price+' monedes</span>';
-  var what=lock?'Primer acaba el '+ELS[x.el].mon:x.what;
+  var what=lock?'Cal acabar: '+ELS[x.el].mon:x.what;
   return '<button type="button" class="tap'+(lock?' h14lock':'')+'" data-act="build" data-k="'+x.k+'"'+(full||poor||lock?' disabled':'')+' style="'+stripe+'"'+(lock?' aria-label="'+esc(x.n+': tancada. '+what)+'"':'')+'>'+
     '<span style="font-size:14px;text-align:center;line-height:1.15">'+esc(x.n)+(x.max>1&&n?' ('+n+')':'')+'</span><span class="muted small" style="text-align:center;font-weight:700">'+esc(what)+'</span>'+tag+'</button>';
 }
