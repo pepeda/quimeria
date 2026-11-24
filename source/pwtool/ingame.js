@@ -1,0 +1,14 @@
+const { chromium } = require('playwright-core');const path=require('path');
+const SH=path.resolve(__dirname,'../council-v13/shots');
+const FILE=require('url').pathToFileURL(path.resolve(__dirname,'../council-v13/dbg/joc-v14.html')).href;
+(async()=>{const b=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+const p=await b.newPage({viewport:{width:412,height:915},deviceScaleFactor:2});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto(FILE);await p.waitForTimeout(600);
+await p.evaluate(()=>{const G=D.g();G.tips=new Proxy({},{get:()=>1});G.built={habitacio:2,piscina:1,jardi:1,mobles:3};D.SP_ORDER.forEach((s,i)=>{if(i%2){const c=D.mk(s);c.stage=i%3;c.evo=c.stage===2?2:0;G.owned.push(c)}});G.screen='bestioles';D.render()});
+await p.screenshot({path:SH+'/new-ingame-bestioles.png',fullPage:false});
+await p.evaluate(()=>{window.scrollTo(0,700)});await p.screenshot({path:SH+'/new-ingame-bestioles-2.png'});
+await p.evaluate(()=>{const G=D.g();const c=D.mk('dragonet');c.stage=2;c.evo=1;G.owned.push(c);G.detail='dragonet';D.render()});
+await p.evaluate(()=>{const s=document.querySelector('#overlay .sheet');if(s){const t=s.querySelector('.tree');if(t)t.scrollIntoView()}});await p.waitForTimeout(300);
+await p.screenshot({path:SH+'/new-ingame-fitxa-arbre.png'});
+await p.evaluate(()=>{const G=D.g();G.detail=null;G.screen='casa';D.render();window.scrollTo(0,0)});await p.screenshot({path:SH+'/new-ingame-casa.png'});
+console.log('errors',errs);await b.close()})();

@@ -1,0 +1,12 @@
+{
+  "kind": "regla",
+  "order": 209,
+  "original": {
+    "at": "2026-11-23T16:00:00Z",
+    "images": [],
+    "text": "Mòbil en vertical. L'exploració és un caminet que puja per la pantalla, no un mapa obert."
+  },
+  "status": "original",
+  "title": "Format de la pantalla",
+  "versions": []
+}

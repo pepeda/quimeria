@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>Les teves bestioles</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1E1B2E}a:hover{color:#4A3FB5}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #F4F1FA; font-family: 'Nunito', sans-serif; color: #1E1B2E; display: flex; flex-direction: column">
+
+<div style="padding: 16px 16px 6px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 28px; line-height: 1.1">Bestioles</h1>
+<div style="font-size: 13px; font-weight: 800">{{ownedCount}} de {{total}} trobades</div>
+</div>
+<div style="height: 10px; border-radius: 999px; background: #E2DDEC; overflow: hidden"><div style="width: {{pct}}; height: 10px; background: #9B59E0; border-radius: 999px"></div></div>
+<div style="font-size: 12px; color: #34405A">Les ombres grises són bestioles que encara no tens. Toca'n una per veure les seves evolucions.</div>
+</div>
+
+<div style="padding: 4px 12px 0; display: flex; gap: 6px; flex-wrap: wrap">
+<div style="font-size: 12px; font-weight: 800; background: #1E1B2E; color: #FFFFFF; border-radius: 999px; padding: 6px 12px">Totes</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 10px">Foc</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 10px">Aigua</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 10px">Planta</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 10px">Llamp</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 10px">Psíquic</div>
+</div>
+
+<div style="margin: 12px 12px 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; flex-grow: 1; align-content: start">
+<sc-for list="{{list}}" as="c" hint-placeholder-count="16">
+<button onClick="{{c.pick}}" aria-label="{{c.aria}}" style="height: 96px; box-sizing: border-box; border-radius: 18px; border: 3px solid {{c.border}}; background: {{c.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px; font-family: 'Nunito', sans-serif; color: #1E1B2E; cursor: pointer">
+<dc-import name="Critter" el="{{c.el}}" locked="{{c.locked}}" px="50" hint-size="50px,50px"></dc-import>
+<span style="font-size: 12px; font-weight: 800; color: {{c.nameColor}}">{{c.label}}</span>
+</button>
+</sc-for>
+</div>
+
+<dc-import name="Nav" active="bestioles" hint-size="390px,84px"></dc-import>
+
+<sc-if value="{{open}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: rgba(30,27,46,0.5); display: flex; flex-direction: column; justify-content: flex-end">
+<div style="background: #FFFFFF; border-radius: 28px 28px 0 0; padding: 16px 16px 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; gap: 14px; align-items: center">
+<div style="width: 110px; height: 110px; border-radius: 24px; background: {{sel.soft}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><dc-import name="Critter" el="{{sel.el}}" locked="{{sel.locked}}" px="96" hint-size="96px,96px"></dc-import></div>
+<div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1; min-width: 0">
+<div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; line-height: 1">{{sel.label}}</div>
+<div style="font-size: 13px; font-weight: 800; color: #34405A">{{sel.kind}}</div>
+<div style="font-size: 12px; color: #34405A">{{sel.home}}</div>
+</div>
+<button onClick="{{close}}" aria-label="Tancar la fitxa" style="width: 44px; height: 44px; border-radius: 14px; border: none; background: #F4F1FA; display: flex; align-items: center; justify-content: center; color: #1E1B2E; align-self: flex-start; flex-shrink: 0; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6 L18 18 M18 6 L6 18"></path></svg></button>
+</div>
+
+<sc-if value="{{sel.owned}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800"><span>Millores</span><span>{{sel.level}} de 5</span></div>
+<div style="height: 10px; border-radius: 999px; background: #ECE6DC; overflow: hidden"><div style="width: {{sel.levelPct}}; height: 10px; background: {{sel.color}}; border-radius: 999px"></div></div>
+</div>
+</sc-if>
+
+<div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 17px">Pot evolucionar a</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{sel.evos}}" as="e" hint-placeholder-count="3">
+<div style="border-radius: 18px; background: {{e.bg}}; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<dc-import name="Critter" el="{{e.el}}" el2="{{e.el2}}" locked="{{e.locked}}" px="60" hint-size="60px,60px"></dc-import>
+<div style="font-size: 13px; font-weight: 800; color: {{e.nameColor}}">{{e.label}}</div>
+<div style="display: flex; gap: 4px; align-items: center">
+<span style="width: 12px; height: 12px; border-radius: 6px; background: {{e.c1}}"></span>
+<sc-if value="{{e.dual}}" hint-placeholder-val="{{ false }}"><span style="width: 12px; height: 12px; border-radius: 6px; background: {{e.c2}}"></span></sc-if>
+<span style="font-size: 11px; font-weight: 700; color: #34405A">{{e.mix}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<sc-if value="{{sel.owned}}" hint-placeholder-val="{{ true }}">
+<a href="Evolucio.dc.html" style="height: 52px; border-radius: 16px; background: #1E1B2E; color: #FFFFFF; text-decoration: none; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px">Fer-la evolucionar</a>
+</sc-if>
+<sc-if value="{{sel.canAdopt}}" hint-placeholder-val="{{ false }}">
+<button style="height: 52px; border-radius: 16px; border: none; background: #F7C948; color: #1E1B2E; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px; cursor: pointer">Adoptar · {{sel.price}} monedes</button>
+</sc-if>
+<sc-if value="{{sel.noAdopt}}" hint-placeholder-val="{{ false }}">
+<div style="border-radius: 16px; background: #F4F1FA; padding: 12px; font-size: 13px; font-weight: 700; text-align: center">Primer has de descobrir aquest món.</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"start":{"editor":"enum","options":["","brotet","brasa","somni"],"default":""},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var NAME = { foc: 'Foc', aigua: 'Aigua', planta: 'Planta', llamp: 'Llamp', psiquic: 'Psíquic' };
+    var COL = { foc: '#F26B3A', aigua: '#2E8BE6', planta: '#3DAA5C', llamp: '#F2B90F', psiquic: '#9B59E0' };
+    var SOFT = { foc: '#FFE3D6', aigua: '#DDEEFF', planta: '#DDF3E2', llamp: '#FFF4CC', psiquic: '#EFE2FF' };
+    var HOME = { foc: 'Viu al Món del Foc', aigua: 'Viu al Món de l’Aigua', planta: 'Viu al Món de la Planta', llamp: 'Viu al Món del Llamp', psiquic: 'Viu al Món Psíquic' };
+    function ev(n, el, el2, owned) { return { n: n, el: el, el2: el2 || '', owned: !!owned }; }
+    var data = [
+      { id: 'espurnet', n: 'Espurnet', el: 'foc', role: 'Atac', owned: true, lv: 3, evos: [ev('Flamarada', 'foc'), ev('Caliu', 'foc'), ev('Vapor', 'foc', 'aigua')] },
+      { id: 'fumet', n: 'Fumet', el: 'foc', role: 'Curador', owned: true, lv: 1, evos: [ev('Fogueró', 'foc'), ev('Cendra', 'foc', 'psiquic'), ev('Brasot', 'foc')] },
+      { id: 'brasa', n: 'Brasa', el: 'foc', role: 'Defensa', owned: false, price: 400, evos: [ev('Volcà', 'foc'), ev('Magma', 'foc', 'planta'), ev('Tió', 'foc')] },
+      { id: 'gotim', n: 'Gotim', el: 'aigua', role: 'Curador', owned: true, lv: 2, evos: [ev('Rierol', 'aigua', '', true), ev('Onada', 'aigua'), ev('Boira', 'aigua', 'psiquic')] },
+      { id: 'bufa', n: 'Bufa', el: 'aigua', role: 'Defensa', owned: true, lv: 4, evos: [ev('Closcot', 'aigua'), ev('Tempesta', 'aigua', 'llamp'), ev('Perlina', 'aigua')] },
+      { id: 'petxina', n: 'Petxina', el: 'aigua', role: 'Defensa', owned: false, price: 350, evos: [ev('Corall', 'aigua'), ev('Nacre', 'aigua', 'psiquic'), ev('Escull', 'aigua')] },
+      { id: 'brotet', n: 'Brotet', el: 'planta', role: 'Atac', owned: true, lv: 5, evos: [ev('Arbrot', 'planta'), ev('Floreta', 'planta', '', true), ev('Rierol', 'planta', 'aigua')] },
+      { id: 'molsa', n: 'Molsa', el: 'planta', role: 'Curador', owned: true, lv: 1, evos: [ev('Falguera', 'planta'), ev('Bolet', 'planta', 'psiquic'), ev('Liquen', 'planta')] },
+      { id: 'pinyol', n: 'Pinyol', el: 'planta', role: 'Atac', owned: false, price: 300, evos: [ev('Pinya', 'planta'), ev('Cactus', 'planta', 'foc'), ev('Gla', 'planta')] },
+      { id: 'arrel', n: 'Arrel', el: 'planta', role: 'Defensa', owned: false, price: 450, evos: [ev('Soca', 'planta'), ev('Alzina', 'planta'), ev('Arrel elèctrica', 'planta', 'llamp')] },
+      { id: 'xispa', n: 'Xispa', el: 'llamp', role: 'Defensa', owned: true, lv: 2, evos: [ev('Llampec', 'llamp'), ev('Tro', 'llamp'), ev('Aurora', 'llamp', 'psiquic')] },
+      { id: 'trona', n: 'Trona', el: 'llamp', role: 'Atac', owned: false, price: 400, evos: [ev('Tronada', 'llamp'), ev('Calamarsa', 'llamp', 'aigua'), ev('Centella', 'llamp')] },
+      { id: 'guspira', n: 'Guspira', el: 'llamp', role: 'Curador', owned: false, price: 380, evos: [ev('Estel', 'llamp'), ev('Fanal', 'llamp', 'foc'), ev('Lluerna', 'llamp')] },
+      { id: 'mentoli', n: 'Mentoli', el: 'psiquic', role: 'Curador', owned: true, lv: 3, evos: [ev('Somiatruites', 'psiquic'), ev('Endeví', 'psiquic'), ev('Lotus', 'psiquic', 'planta')] },
+      { id: 'somni', n: 'Somni', el: 'psiquic', role: 'Curador', owned: false, price: 0, evos: [ev('Malson', 'psiquic'), ev('Lluna', 'psiquic'), ev('Miratge', 'psiquic', 'foc')] },
+      { id: 'ullet', n: 'Ullet', el: 'psiquic', role: 'Atac', owned: false, price: 0, evos: [ev('Ullal', 'psiquic'), ev('Vident', 'psiquic', 'aigua'), ev('Cristall', 'psiquic')] }
+    ];
+    var selId = (this.state && this.state.sel !== undefined) ? this.state.sel : (this.props.start || '');
+    var owned = data.filter(function (d) { return d.owned; }).length;
+    var list = data.map(function (d) {
+      return {
+        el: d.el,
+        locked: !d.owned,
+        label: d.owned ? d.n : '???',
+        aria: d.owned ? ('Veure ' + d.n) : 'Veure una bestiola que encara no tens',
+        bg: d.owned ? '#FFFFFF' : '#E9E5F0',
+        border: d.owned ? COL[d.el] : '#E9E5F0',
+        nameColor: d.owned ? '#1E1B2E' : '#5E5A72',
+        pick: function () { self.setState({ sel: d.id }); }
+      };
+    });
+    var s = null;
+    data.forEach(function (d) { if (d.id === selId) { s = d; } });
+    var sel = null;
+    if (s) {
+      sel = {
+        el: s.el,
+        locked: !s.owned,
+        owned: s.owned,
+        label: s.owned ? s.n : '???',
+        kind: s.owned ? (NAME[s.el] + ' · ' + s.role) : 'Encara no l’has trobada',
+        home: HOME[s.el],
+        soft: s.owned ? SOFT[s.el] : '#E9E5F0',
+        color: COL[s.el],
+        level: s.lv || 0,
+        levelPct: ((s.lv || 0) * 20) + '%',
+        canAdopt: !s.owned && s.price > 0,
+        noAdopt: !s.owned && !(s.price > 0),
+        price: s.price || 0,
+        evos: s.evos.map(function (e) {
+          return {
+            el: e.el, el2: e.el2, locked: !e.owned,
+            label: e.owned ? e.n : '???',
+            bg: e.owned ? SOFT[e.el] : '#F1EEF6',
+            nameColor: e.owned ? '#1E1B2E' : '#5E5A72',
+            c1: COL[e.el], c2: e.el2 ? COL[e.el2] : COL[e.el],
+            dual: !!e.el2,
+            mix: e.el2 ? (NAME[e.el] + ' + ' + NAME[e.el2]) : NAME[e.el]
+          };
+        })
+      };
+    }
+    return {
+      list: list,
+      total: data.length,
+      ownedCount: owned,
+      pct: Math.round(owned * 100 / data.length) + '%',
+      open: !!sel,
+      sel: sel || { evos: [] },
+      close: function () { self.setState({ sel: '' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

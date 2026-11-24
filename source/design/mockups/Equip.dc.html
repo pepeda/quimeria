@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>Triar l'equip</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1E1B2E}a:hover{color:#4A3FB5}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #FFF7EC; font-family: 'Nunito', sans-serif; color: #1E1B2E; display: flex; flex-direction: column">
+
+<div style="padding: 14px 16px 6px; display: flex; align-items: center; gap: 10px">
+<a href="Mapa.dc.html" aria-label="Tornar al món" style="width: 44px; height: 44px; border-radius: 14px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #1E1B2E"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 L8 12 L15 19"></path></svg></a>
+<div style="display: flex; flex-direction: column">
+<div style="font-size: 12px; font-weight: 700; color: #34405A">Platja dels Corals · Món de l'Aigua</div>
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.05">Tria l'equip</h1>
+</div>
+</div>
+
+<div style="margin: 8px 12px 0; background: #FFFFFF; border-radius: 22px; padding: 12px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; box-shadow: 0 6px 18px rgba(30,27,46,0.08)">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div style="width: 70px; height: 70px; border-radius: 18px; background: #FFE08A; display: flex; align-items: center; justify-content: center"><svg width="50" height="50" viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="17" r="10" fill="#F4C6A0"></circle><path d="M14 15 Q25 0 36 15 Z" fill="#6B3E26"></path><rect x="13" y="28" width="24" height="18" rx="8" fill="#4A3FB5"></rect><circle cx="21" cy="18" r="1.8" fill="#1E1B2E"></circle><circle cx="29" cy="18" r="1.8" fill="#1E1B2E"></circle></svg></div>
+<div style="font-size: 12px; font-weight: 800">Tu</div>
+<div style="font-size: 10px; font-weight: 700; color: #34405A">Sempre hi vas</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div style="width: 70px; height: 70px; border-radius: 18px; background: #D3F2D9; display: flex; align-items: center; justify-content: center; border: 3px solid #3DAA5C; box-sizing: border-box"><dc-import name="Critter" el="planta" px="54" hint-size="54px,54px"></dc-import></div>
+<div style="font-size: 12px; font-weight: 800">Brotet</div>
+<div style="font-size: 10px; font-weight: 800; color: #1F7A3A">Avantatge</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div style="width: 70px; height: 70px; border-radius: 18px; background: #FFF0B3; display: flex; align-items: center; justify-content: center; border: 3px solid #C2410C; box-sizing: border-box"><dc-import name="Critter" el="llamp" px="54" hint-size="54px,54px"></dc-import></div>
+<div style="font-size: 12px; font-weight: 800">Xispa</div>
+<div style="font-size: 10px; font-weight: 800; color: #B3360B">Desavantatge</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+<button aria-label="Afegir una bestiola al lloc buit" style="width: 70px; height: 70px; border-radius: 18px; background: #F3EEE6; border: 3px dashed #A79F93; display: flex; align-items: center; justify-content: center; color: #6E665B"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5 V19 M5 12 H19"></path></svg></button>
+<div style="font-size: 12px; font-weight: 800">Buit</div>
+<div style="font-size: 10px; font-weight: 700; color: #34405A">Falta curador</div>
+</div>
+</div>
+
+<div style="margin: 10px 12px 0; display: flex; gap: 6px; flex-wrap: wrap">
+<div style="font-size: 12px; font-weight: 800; background: #1E1B2E; color: #FFFFFF; border-radius: 999px; padding: 6px 12px">Totes</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 12px">Atac</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 12px">Defensa</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 12px">Curador</div>
+<div style="font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 6px 12px">Amb energia</div>
+</div>
+
+<div style="margin: 10px 12px 0; display: flex; flex-direction: column; gap: 8px; flex-grow: 1">
+<sc-for list="{{roster}}" as="r" hint-placeholder-count="5">
+<div style="background: #FFFFFF; border-radius: 18px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; opacity: {{r.op}}">
+<div style="width: 48px; height: 48px; border-radius: 14px; background: #F3EEE6; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><dc-import name="Critter" el="{{r.el}}" el2="{{r.el2}}" px="42" hint-size="42px,42px"></dc-import></div>
+<div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1; min-width: 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 6px">
+<div style="font-weight: 800; font-size: 14px">{{r.name}}</div>
+<div style="font-size: 11px; font-weight: 700; color: #34405A">{{r.tag}}</div>
+</div>
+<div style="height: 8px; border-radius: 999px; background: #ECE6DC; overflow: hidden"><div style="width: {{r.energy}}; height: 8px; background: {{r.bar}}; border-radius: 999px"></div></div>
+<div style="font-size: 11px; color: #34405A">{{r.note}}</div>
+</div>
+<button aria-label="Afegir a l'equip" style="width: 44px; height: 44px; border-radius: 14px; border: none; background: #1E1B2E; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5 V19 M5 12 H19"></path></svg></button>
+</div>
+</sc-for>
+</div>
+
+<div style="padding: 10px 12px 12px">
+<a href="Cami.dc.html" style="height: 52px; border-radius: 16px; background: #3DAA5C; color: #FFFFFF; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; font-size: 16px">Sortir a explorar</a>
+</div>
+
+<dc-import name="Nav" active="explorar" hint-size="390px,84px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var bar = function (n) { return n >= 60 ? '#3DAA5C' : (n >= 30 ? '#F2A20F' : '#E0483B'); };
+    var list = [
+      { name: 'Mentoli', el: 'psiquic', el2: '', tag: 'Psíquic · Curador · niv. 2', used: 1, max: 5, note: 'Pot fer 4 exploracions més' },
+      { name: 'Molsa', el: 'planta', el2: '', tag: 'Planta · Curador · niv. 1', used: 2, max: 3, note: 'Pot fer 1 exploració més' },
+      { name: 'Bufa', el: 'aigua', el2: 'psiquic', tag: 'Aigua/Psíquic · Defensa · niv. 3', used: 0, max: 8, note: 'Descansada: pot fer 8 exploracions' },
+      { name: 'Espurnet', el: 'foc', el2: '', tag: 'Foc · Atac · niv. 1', used: 0, max: 3, note: 'Descansat · el foc perd contra l’aigua' },
+      { name: 'Gotim', el: 'aigua', el2: '', tag: 'Aigua · Curador · niv. 1', used: 3, max: 3, note: 'Esgotat: s’ha de quedar a casa 2 exploracions més' }
+    ];
+    return {
+      roster: list.map(function (r) {
+        var left = Math.round((r.max - r.used) * 100 / r.max);
+        return Object.assign({}, r, { energy: left + '%', bar: bar(left), op: r.used >= r.max ? 0.55 : 1 });
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

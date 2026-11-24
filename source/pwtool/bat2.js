@@ -1,0 +1,23 @@
+const { chromium } = require('playwright-core');
+const path=require('path');
+const SH=path.resolve(__dirname,'../council-v13/shots');
+const FILE=require('url').pathToFileURL(path.resolve(__dirname,'../council-v13/dbg/joc.html')).href;
+(async()=>{
+  const b=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+  const p=await b.newPage({viewport:{width:412,height:915},deviceScaleFactor:2});
+  await p.goto(FILE);await p.waitForTimeout(600);
+  const click=async sel=>{await p.locator(sel).first().click({force:true});await p.waitForTimeout(400)};
+  await p.evaluate(()=>{const G=D.g();G.tips={explorar:1,mon:1,equip:1,run:1,bestioles:1,casa:1,batalla:1};G.screen='explorar';D.render()});
+  await click('[data-act=world][data-w=planta]');await click("[data-act=path][data-p='0']");
+  await p.screenshot({path:SH+'/07-equip.png',fullPage:true});
+  for(const u of await p.$$eval('[data-act=pick]',a=>a.slice(0,3).map(e=>e.dataset.u)))await click(`[data-act=pick][data-u='${u}']`);
+  await click('[data-act=go]');
+  await p.screenshot({path:SH+'/08-cami.png',fullPage:true});
+  await p.evaluate(()=>{const r=D.g().runs[D.g().active];r.event=D.makeBattle({el:'foc',L:1});D.render()});
+  await p.waitForTimeout(2500);
+  await p.screenshot({path:SH+'/09-batalla.png',fullPage:true});
+  await p.evaluate(()=>{const r=D.g().runs[D.g().active];r.event=D.makeBattle({el:'planta',L:2,final:true,guardian:true});r.event.introDone=true;D.render()});
+  await p.waitForTimeout(2500);
+  await p.screenshot({path:SH+'/13-boss.png',fullPage:true});
+  await b.close();
+})();

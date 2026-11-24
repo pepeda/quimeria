@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>El camí</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1E1B2E}a:hover{color:#4A3FB5}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #FCE9C2; font-family: 'Nunito', sans-serif; color: #1E1B2E; display: flex; flex-direction: column">
+
+<div style="padding: 14px 14px 8px; background: #FFFFFF; border-radius: 0 0 24px 24px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 6px 18px rgba(30,27,46,0.08); position: relative">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; flex-direction: column">
+<div style="font-size: 12px; font-weight: 700; color: #34405A">Món de l'Aigua</div>
+<div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; line-height: 1.1">Platja dels Corals</div>
+</div>
+<div style="display: flex; align-items: center; gap: 6px; background: #FFF4D6; border-radius: 999px; padding: 5px 12px 5px 6px; font-weight: 800; font-size: 14px"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#F7C948" stroke="#C98A00" stroke-width="1.5"></circle><circle cx="10" cy="10" r="4" fill="none" stroke="#C98A00" stroke-width="1.5"></circle></svg>+85</div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px">
+<div style="flex-grow: 1; height: 10px; border-radius: 999px; background: #ECE6DC; overflow: hidden"><div style="width: 58%; height: 10px; background: #2E8BE6; border-radius: 999px"></div></div>
+<div style="font-size: 12px; font-weight: 800">Pas 7 de 12</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{team}}" as="m" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 4px; background: #F6F2EA; border-radius: 12px; padding: 4px">
+<div style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><dc-import name="Critter" el="{{m.el}}" px="30" hint-size="30px,30px"></dc-import></div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<div style="font-size: 10px; font-weight: 800">{{m.name}}</div>
+<div style="height: 5px; border-radius: 999px; background: #DCD5C8; overflow: hidden"><div style="width: {{m.hp}}; height: 5px; background: {{m.bar}}"></div></div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="position: relative; flex-grow: 1">
+<svg width="390" height="420" viewBox="0 0 390 420" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+<path d="M330 0 C300 120 360 220 330 420 L390 420 L390 0 Z" fill="#8CCBF5"></path>
+<path d="M340 40 q8 -6 16 0 M350 140 q8 -6 16 0 M345 260 q8 -6 16 0" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"></path>
+<circle cx="40" cy="200" r="22" fill="#9ED37E"></circle>
+<circle cx="60" cy="330" r="16" fill="#9ED37E"></circle>
+<path d="M195 430 C185 370 215 330 195 270 C185 230 200 200 195 180" stroke="#F5D9A0" stroke-width="44" fill="none" stroke-linecap="round"></path>
+<path d="M195 185 C160 150 120 130 105 95" stroke="#F5D9A0" stroke-width="38" fill="none" stroke-linecap="round"></path>
+<path d="M195 185 C230 150 270 130 285 95" stroke="#F5D9A0" stroke-width="38" fill="none" stroke-linecap="round"></path>
+<circle cx="193" cy="385" r="12" fill="#3DAA5C" stroke="#FFFFFF" stroke-width="3"></circle>
+<path d="M188 385 L192 389 L199 381" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<circle cx="203" cy="318" r="12" fill="#3DAA5C" stroke="#FFFFFF" stroke-width="3"></circle>
+<path d="M198 318 L202 322 L209 314" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M70 100 L105 40 L140 100 Z" fill="#E2574C" stroke="#A23A31" stroke-width="3" stroke-linejoin="round"></path>
+<path d="M105 40 L105 100 M96 100 L105 72 L114 100" stroke="#A23A31" stroke-width="3" fill="none"></path>
+<path d="M245 108 C245 40 325 40 325 108 Z" fill="#5E5A72"></path>
+<path d="M262 108 C262 66 308 66 308 108 Z" fill="#1E1B2E"></path>
+<path d="M318 40 q8 -4 6 -12 M330 52 q10 -2 10 -12" stroke="#1E1B2E" stroke-width="3" fill="none" stroke-linecap="round"></path>
+</svg>
+<div style="position: absolute; left: 86px; top: 106px; font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 2px 10px">Tenda</div>
+<div style="position: absolute; left: 262px; top: 114px; font-size: 12px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 2px 10px">Cova</div>
+<div style="position: absolute; left: 172px; top: 196px">
+<svg width="46" height="56" viewBox="0 0 50 60" aria-hidden="true"><circle cx="25" cy="17" r="11" fill="#F4C6A0"></circle><path d="M13 15 Q25 -2 37 15 Z" fill="#6B3E26"></path><rect x="13" y="29" width="24" height="22" rx="8" fill="#4A3FB5"></rect><circle cx="21" cy="18" r="2" fill="#1E1B2E"></circle><circle cx="29" cy="18" r="2" fill="#1E1B2E"></circle></svg>
+</div>
+<div style="position: absolute; left: 142px; top: 232px"><dc-import name="Critter" el="planta" px="34" hint-size="34px,34px"></dc-import></div>
+<div style="position: absolute; left: 214px; top: 236px"><dc-import name="Critter" el="llamp" px="32" hint-size="32px,32px"></dc-import></div>
+<div style="position: absolute; left: 180px; top: 262px"><dc-import name="Critter" el="psiquic" px="30" hint-size="30px,30px"></dc-import></div>
+</div>
+
+<div style="position: relative; margin: 0 10px 10px; background: #FFFFFF; border-radius: 24px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 -6px 24px rgba(30,27,46,0.14)">
+<div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; line-height: 1.1">Una cruïlla</div>
+<div style="font-size: 14px; line-height: 1.4; color: #2A2840">A la dreta hi ha una tenda abandonada. A l'esquerra, et sembla sentir un soroll dins d'una cova.</div>
+<a href="Troballa.dc.html" style="display: flex; align-items: center; gap: 10px; border-radius: 16px; background: #FDEBE9; padding: 10px 12px; text-decoration: none; color: #1E1B2E; min-height: 44px">
+<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M3 26 L15 4 L27 26 Z" fill="#E2574C"></path></svg>
+<span style="display: flex; flex-direction: column"><span style="font-weight: 800; font-size: 15px">Mirar dins la tenda</span><span style="font-size: 12px; color: #34405A">Segur · objectes, menjar o una bestiola</span></span>
+</a>
+<a href="Cova.dc.html" style="display: flex; align-items: center; gap: 10px; border-radius: 16px; background: #E9E7F2; padding: 10px 12px; text-decoration: none; color: #1E1B2E; min-height: 44px">
+<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M3 27 C3 6 27 6 27 27 Z" fill="#5E5A72"></path><path d="M9 27 C9 14 21 14 21 27 Z" fill="#1E1B2E"></path></svg>
+<span style="display: flex; flex-direction: column"><span style="font-weight: 800; font-size: 15px">Entrar a la cova</span><span style="font-size: 12px; color: #34405A">Arriscat · nou camí amb monstres i relíquies</span></span>
+</a>
+<a href="#" style="text-align: center; font-size: 13px; font-weight: 800; color: #34405A; padding: 6px">Passar de llarg i seguir el camí</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var bar = function (n) { return n >= 60 ? '#3DAA5C' : (n >= 30 ? '#F2A20F' : '#E0483B'); };
+    var t = [
+      { name: 'Brotet', el: 'planta', h: 90 },
+      { name: 'Xispa', el: 'llamp', h: 35 },
+      { name: 'Mentoli', el: 'psiquic', h: 70 },
+      { name: 'Molsa', el: 'planta', h: 100 }
+    ];
+    return { team: t.map(function (m) { return Object.assign({}, m, { hp: m.h + '%', bar: bar(m.h) }); }) };
+  }
+}
+</script>
+</body>
+</html>

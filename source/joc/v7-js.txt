@@ -1,0 +1,562 @@
+/* ================= V7: zones, abilities, combos, synergies ================= */
+function mult(a,d){if(!a||!d)return 1;if(a===d)return 0.75;if(BEATS[a].indexOf(d)>=0)return 1.5;if(BEATS[d].indexOf(a)>=0)return 0.67;return 1}
+function maxTeam(){return 3+(G.completed>=2?1:0)+(G.completed>=5?1:0)+(G.completed>=9?1:0)}
+function nextTeamAt(){return G.completed<2?2:G.completed<5?5:G.completed<9?9:0}
+var ZONES={
+  foc:['Camp de cendres','Rius de lava','Cor del volcà'],
+  aigua:['Platja dels corals','Llacuna boirosa','Fossa profunda'],
+  planta:['Bosc del brot','Pantà de les arrels','Cor de l’arbre gegant'],
+  llamp:['Prats elèctrics','Muntanyes de tempesta','Ciutat dels núvols'],
+  psiquic:['Jardí dels somnis','Laberint de miralls','Palau de la ment']};
+var ZONE_ROUTES=[
+  ['gen','fork','gen','spring','land','gen','sig','gen','mini','guardian'],
+  ['gen','fork','gen','land','gen','spring','mini','gen','fork2','sig','gen','land','gen','guardian'],
+  ['gen','fork','gen','land','gen','spring','gen','mini','fork2','gen','land','sig','gen','cave','spring','gen','land','guardian']];
+var ZONE_BONUS=[40,70,110];
+var ZONE_INFO=['Una cruïla, una font, llocs especials, un campament de monstres i un guardià.','Més llocs, dues cruïlles, un campament i un guardià més fort.','Una cova profunda, molts llocs i el guardià més fort.'];
+function zoneL(w,z){return TIER[w]+z*0.8}
+function zoneOpen(w,z){return z===0||!!G.done[w+':z'+(z-1)]}
+if(!G.zonesV){Object.keys(G.done).forEach(function(k){if(/:curt$/.test(k))G.done[k.replace(':curt',':z0')]=true;if(/:llarg$/.test(k))G.done[k.replace(':llarg',':z1')]=true});G.runs={};G.active=null;if(G.screen==='run')G.screen='explorar';G.zonesV=1}
+NODE_ICON.mini='!';NODE_ICON.cave='∩';
+
+/* abilities: [name, charge turns, kind, power] */
+var ABIL={
+  espurnet:[['Bola de foc',3,'burn',1.5],['Pluja d’espurnes',5,'multi',0.8],['Explosió solar',8,'hit',2.6]],
+  fumet:[['Escalfor amiga',3,'heal',1.6],['Fum calent',5,'weaken',0.7],['Foc de la llar',8,'healAll',0.45]],
+  brasa:[['Mur de brases',4,'shield',1],['Cop de roca',5,'stun',1.0],['Pell de lava',6,'reflect',1]],
+  gotim:[['Pluja que cura',3,'heal',1.6],['Rosada',5,'regen',0.07],['Font de vida',8,'healAll',0.5]],
+  bufa:[['Bombolla gegant',4,'shield',1],['Onada',5,'soak',1.0],['Closca dura',7,'reflect',1]],
+  petxina:[['Raig d’aigua',3,'soak',1.3],['Remolí',5,'multi',0.8],['Tsunami',8,'hit',2.5]],
+  brotet:[['Fuetada de liana',3,'hit',1.6],['Espores',5,'poison',1.0],['Bosc salvatge',8,'multi',1.0]],
+  molsa:[['Pols de flors',3,'heal',1.6],['Saba dolça',5,'regen',0.07],['Primavera',8,'healAll',0.5]],
+  pinyol:[['Pluja de pinyols',3,'multi',0.7],['Arrel que estreny',5,'stun',1.1],['Pinya explosiva',7,'hit',2.4]],
+  arrel:[['Arrels protectores',4,'shield',1],['Abraçada d’heura',5,'poison',0.8],['Espines',6,'reflect',1]],
+  xispa:[['Paret elèctrica',4,'shield',1],['Descàrrega',5,'stun',1.0],['Camp magnètic',7,'reflect',1]],
+  trona:[['Tro de mil volts',3,'hit',1.6],['Llamp en cadena',5,'multi',0.85],['Tempesta final',8,'stun',2.2]],
+  guspira:[['Llum que cura',3,'heal',1.6],['Energia',5,'buff',1],['Aurora',8,'healAll',0.45]],
+  mentoli:[['Somni tranquil',3,'heal',1.6],['Calma',5,'weaken',0.7],['Despertar',8,'healAll',0.5]],
+  somni:[['Escut de la ment',4,'shield',1],['Hipnosi',5,'stun',0.8],['Mirall',7,'reflect',1]],
+  ullet:[['Mirada hipnòtica',3,'weaken',1.3],['Raig mental',5,'hit',1.9],['Tempesta de pensaments',8,'multi',1.0]]
+};
+var KIND_DESC={hit:'Un cop molt fort.',multi:'3 cops seguits.',burn:'Cop i cremada: l’enemic perd vida 3 torns.',poison:'Cop i verí: l’enemic perd vida 4 torns.',stun:'Cop i l’enemic queda atordit: perd el seu torn.',
+  soak:'Cop i l’enemic queda mullat: té menys defensa i els llamps li fan molt més mal.',weaken:'Cop i l’enemic queda debilitat: fa menys mal 3 torns.',
+  shield:'Escut per a tot l’equip: els 3 cops següents fan la meitat de mal.',reflect:'Mirall: 2 torns tornant a l’enemic la meitat del mal que rep.',
+  heal:'Cura molt la bestiola més ferida.',regen:'Tot l’equip es cura una mica cada torn, 3 torns.',healAll:'Cura tothom i desperta les que estan KO.',buff:'Tot l’equip fa +30% de mal, 3 torns.'};
+var OFFENSIVE=['hit','multi','burn','poison','stun','soak','weaken'];
+function abilities(c){var l=ABIL[c.sp]||[],n=c.stage>=1?3:2,p=1+0.25*c.stage;
+  return l.slice(0,n).map(function(a,i){return {i:i,n:a[0],cd:a[1],kind:a[2],pow:a[3]*(a[2]==='shield'||a[2]==='reflect'||a[2]==='buff'?1:p)}})}
+function comboKey(a,b){return [a,b].sort().join('+')}
+var COMBOS={'aigua+llamp':['Tempesta elèctrica','stun',1.4],'foc+planta':['Incendi del bosc','burn',1.4],'aigua+foc':['Núvol de vapor','weaken',1.3],
+  'llamp+psiquic':['Llamp mental','stun',1.3],'planta+psiquic':['Jardí dels somnis','poison',1.3],'aigua+planta':['Pluja de llavors','poison',1.3],
+  'foc+llamp':['Plasma','hit',1.6],'foc+psiquic':['Foc fantasma','burn',1.3],'aigua+psiquic':['Boira màgica','weaken',1.3],'llamp+planta':['Arrels elèctriques','stun',1.3]};
+var SYN=[
+  {k:'germans',n:'Germans',d:'2 o més del mateix element: fan +15% de mal.'},
+  {k:'protector',n:'Protector i metge',d:'Un tanc i un curador: les cures curen +30%.'},
+  {k:'complet',n:'Equip complet',d:'Un de cada rol: +10% de defensa per a tothom.'},
+  {k:'tempesta',n:'Tempesta',d:'Aigua i Llamp: els llamps fan +60% als enemics mullats.'},
+  {k:'incendi',n:'Incendi',d:'Foc i Planta: les cremades duren 2 torns més.'},
+  {k:'natura',n:'Ment i natura',d:'Psíquic i Planta: tothom es cura un 3% cada torn.'}];
+function synergies(list){
+  list=list.filter(Boolean);var els={},roles={},on={};
+  list.forEach(function(c){els[sp(c).el]=(els[sp(c).el]||0)+1;roles[sp(c).role]=1});
+  on.germans=Object.keys(els).some(function(k){return els[k]>=2});on.protector=!!(roles.Defensa&&roles.Curador);on.complet=!!(roles.Atac&&roles.Defensa&&roles.Curador);
+  on.tempesta=!!(els.aigua&&els.llamp);on.incendi=!!(els.foc&&els.planta);on.natura=!!(els.psiquic&&els.planta);return on;
+}
+function synChips(on){var l=SYN.filter(function(s){return on[s.k]});return l.length?l.map(function(s){return '<span class="syn" title="'+esc(s.d)+'">'+esc(s.n)+'</span>'}).join(' '):''}
+
+/* ---------- route ---------- */
+function buildRoute(w,z){
+  var used=[];
+  return ZONE_ROUTES[z].map(function(k){
+    if(k==='fork')return {k:'fork',opts:['tenda','cova'],scene:null};
+    if(k==='fork2'){var a=pickScene('gen',w,used),b=pickScene('land',w,used);return {k:'fork',opts:[a,b],scene:null}}
+    if(k==='guardian'||k==='mini'||k==='cave')return {k:k};
+    if(k==='spring')return {k:'spring',scene:'font'};
+    return {k:k,scene:pickScene(k,w,used)};
+  });
+}
+function startRun(){
+  var w=G.world,z=G.zone||0,hp={};
+  G.pick.forEach(function(u){hp[u]=stats(byUid(u)).hp});
+  G.runs[w]={world:w,zone:z,L:zoneL(w,z),i:0,slots:buildRoute(w,z),team:G.pick.slice(),hp:hp,coins:0,cave:null,scene:null,node:'a',event:null,reveal:0,bless:0};
+  G.active=w;G.pick=[];G.screen='run';arrive();
+}
+function arrive(){
+  var r=run();if(!r)return;
+  if(r.i>=r.slots.length){finishRun(true);return}
+  var s=r.slots[r.i];
+  if(s.k==='fork'&&!s.scene){r.event={type:'fork'};return}
+  if(s.k==='guardian'){r.event={type:'guardianPre'};return}
+  if(s.k==='mini'){r.event={type:'miniPre'};return}
+  if(s.k==='cave'){r.cave=newCave(1);enterScene(r.cave.list[0]);return}
+  enterScene(s.scene);
+}
+function newCave(lvl){return {lvl:lvl,i:0,list:['cova-tunels',pickOne(['cova-cristalls','cova-ratpenats','cova-bolets','cova-llac']),pickOne(['cova-ratpenats','cova-mina','cova-cristalls','cova-bolets']),lvl>=3?'cova-rei':'cova-escala']}}
+function enterScene(id){
+  var r=run();r.scene=id;r.node='a';r.event={type:'scene'};
+  G.seen[r.world]=G.seen[r.world]||{};G.seen[r.world][id]=1;
+}
+function advance(){
+  var r=run();if(!r)return;
+  if(r.cave){r.cave.i++;if(r.cave.i<r.cave.list.length){enterScene(r.cave.list[r.cave.i]);return}r.cave=null;toast('Surts de la cova i tornes al camí.')}
+  r.i++;arrive();
+}
+function caveL(r){return r.cave?0.5+0.6*(r.cave.lvl-1):0}
+function startBattle(o){var r=run(),b=makeBattle(o);if(r.bless){b.tm.buff=3;r.bless=0;b.caption='La benedicció us dona +30% de mal!'}r.event=b}
+function applyEffect(e){
+  var r=run();if(!e){advance();return}
+  if(e.rand){var x=Math.random(),acc=0;for(var i=0;i<e.rand.length;i++){acc+=e.rand[i][0];if(x<acc){applyEffect(e.rand[i][1]);return}}applyEffect(e.rand[e.rand.length-1][1]);return}
+  if(e.go){r.node=e.go;r.event={type:'scene'};return}
+  if(e.exitCave){if(e.coins)r.coins+=e.coins;r.cave=null;r.i++;toast('Surts de la cova'+(e.coins?' amb '+e.coins+' monedes':'')+'.');arrive();return}
+  if(e.deeper){var lv=r.cave.lvl+1;r.cave=newCave(lv);enterScene(r.cave.list[0]);toast('Baixeu al nivell '+lv+' de la cova. Ara és més perillós!');return}
+  if(e.coins){r.event={type:'card',kind:'coins',n:e.coins,why:'Has trobat monedes.'};return}
+  if(e.food){r.event={type:'card',kind:'food',el:r.world,n:e.food,why:'Menjar per a les bestioles.'};return}
+  if(e.loot){r.event={type:'card',kind:'item',item:pickOne(e.loot==='relic'?RELICS:COMMON),why:e.loot==='relic'?'Un tresor rar!':'Un objecte per a la motxilla.'};return}
+  if(e.heal){var ko=0;r.team.forEach(function(u){var c=byUid(u);if(!c)return;var mx=stats(c).hp;if(r.hp[u]<=0)ko++;r.hp[u]=Math.min(mx,Math.max(1,Math.round(r.hp[u]+(mx-r.hp[u])*e.heal/100)))});
+    r.event={type:'note',title:'Descanseu',text:'L’equip recupera vida.'+(ko?' Les bestioles que estaven KO es desperten.':'')};return}
+  if(e.dmgTeam){alive(r).forEach(function(c){var mx=stats(c).hp;r.hp[c.uid]=Math.max(1,r.hp[c.uid]-Math.round(mx*e.dmgTeam/100))});r.event={type:'note',title:'Ai!',text:'L’equip perd una mica de vida.'};return}
+  if(e.bless){r.bless=1;r.event={type:'note',title:'Benedicció',text:'A la propera batalla, tot l’equip farà +30% de mal durant 3 torns.'};return}
+  if(e.reveal){r.reveal=Math.min(r.slots.length-1,r.i+5);r.event={type:'note',title:'Des de dalt',text:'Veus els propers llocs del camí (mira les boles de dalt).'};return}
+  if(e.skip){var to=Math.min(r.i+e.skip,r.slots.length-2),n=to-r.i;r.i=to;r.event={type:'note',title:'Drecera!',text:n>0?'Us salteu '+n+' llocs del camí.':'Ja sou a prop del final.'};return}
+  if(e.wild){r.event={type:'wild',sp:pickOne(speciesOf(r.world)),rare:!!e.rare};return}
+  if(e.fight){startBattle({el:r.world,L:r.L+(e.L||0)+caveL(r),n:e.n,win:e.win,waves:e.waves,guardian:!!e.guardian});return}
+  if(e.cave){r.cave=newCave(1);enterScene(r.cave.list[0]);return}
+  if(e.shop){if(r.coins>=e.shop){r.coins-=e.shop;r.event={type:'card',kind:'item',item:pickOne(COMMON),why:'L’has comprat.'}}else r.event={type:'note',title:'No tens prou monedes',text:'Necessites '+e.shop+' monedes de les que portes en aquesta aventura (en portes '+r.coins+').'};return}
+  if(e.buyFood){if(r.coins>=e.buyFood){r.coins-=e.buyFood;r.event={type:'card',kind:'food',el:r.world,n:3,why:'L’has comprat.'}}else r.event={type:'note',title:'No tens prou monedes',text:'Necessites '+e.buyFood+' monedes de les que portes (en portes '+r.coins+').'};return}
+  if(e.buyItem){if(r.coins>=e.price){r.coins-=e.price;r.event={type:'card',kind:'item',item:e.buyItem,why:'L’heu fet a la forja.'}}else r.event={type:'note',title:'No tens prou monedes',text:'Necessites '+e.price+' monedes de les que portes (en portes '+r.coins+').'};return}
+  if(e.note){r.event={type:'note',title:'',text:e.note};return}
+  advance();
+}
+
+/* ---------- new scenes ---------- */
+Object.assign(SCENES,{
+  riu:{n:'Riu ràpid',art:'river',pool:'gen',nodes:{a:{t:'Un riu ràpid talla el camí. Hi ha pedres per saltar.',ch:[
+    {l:'Salta per les pedres',d:'Potser relliques.',risk:1,out:{rand:[[0.6,{coins:12}],[0.4,{dmgTeam:15}]]}},
+    {l:'Busca un gual',d:'Tranquil, però no trobes res.',risk:0,out:{note:'Trobeu un lloc on l’aigua és baixa i passeu.'}},
+    {l:'Una bestiola d’Aigua us porta',d:'I pesca de passada.',risk:0,req:{el:'aigua'},out:{food:3}}]}}},
+  mercader:{n:'Mercader ambulant',art:'village',pool:'gen',nodes:{a:{t:'Un mercader amb un carro ple de coses.',ch:[
+    {l:'Compra menjar (20 monedes)',d:'3 de menjar d’aquest món.',risk:0,out:{buyFood:20}},
+    {l:'Compra un objecte (40 monedes)',d:'Un objecte per a la motxilla.',risk:0,out:{shop:40}},
+    {l:'Saluda i segueix',d:'',risk:0,out:{note:'El mercader us desitja bon viatge.'}}]}}},
+  trampa:{n:'Pas de pedres',art:'rocks',pool:'gen',nodes:{a:{t:'Un pas estret. Des de dalt cauen pedres de tant en tant.',ch:[
+    {l:'Corre!',d:'Potser us cau alguna pedra.',risk:1,out:{rand:[[0.5,{note:'Passeu sense que us caigui res!'}],[0.5,{dmgTeam:20}]]}},
+    {l:'Un tanc aguanta les pedres',d:'La teva Defensa us protegeix.',risk:0,req:{role:'Defensa'},out:{coins:10}},
+    {l:'Busca un altre camí',d:'Més llarg i cansat.',risk:0,out:{dmgTeam:5}}]}}},
+  niu:{n:'Niu d’ous',art:'meadow',pool:'gen',nodes:{a:{t:'Un niu amb ous de colors. Un d’ells es mou.',ch:[
+    {l:'Espera que surti',d:'Potser és una bestiola rara.',risk:0,out:{rand:[[0.5,{wild:1,rare:1}],[0.5,{note:'Encara no surt. Seguiu el camí.'}]]}},
+    {l:'Agafa un ou',d:'La mare el defensa!',risk:2,out:{fight:1,L:0.5,n:'Mare protectora',win:{wild:1,rare:1}}},
+    {l:'Deixa’l tranquil',d:'La mare us dona les gràcies.',risk:0,out:{bless:1}}]}}},
+  altar:{n:'Altar antic',art:'ruins',pool:'gen',nodes:{a:{t:'Un altar de pedra amb una gemma que brilla.',ch:[
+    {l:'Fes una reverencia',d:'Una benedicció per a la propera batalla.',risk:0,out:{bless:1}},
+    {l:'Agafa la gemma',d:'Tresor rar… o un guardià enfadat.',risk:2,out:{rand:[[0.3,{loot:'relic'}],[0.7,{fight:1,L:0.8,n:'Guardià de l’altar',win:{loot:'relic'}}]]}},
+    {l:'Passa de llarg',d:'',risk:0,out:{note:'Continueu el camí.'}}]}}},
+  campament:{n:'Campament de monstres',art:'tent',pool:'gen',nodes:{a:{t:'Un campament de monstres. N’hi ha més d’un!',ch:[
+    {l:'Ataca el campament',d:'2 monstres, un després de l’altre.',risk:2,out:{fight:1,waves:2,win:{rand:[[0.6,{loot:'common'}],[0.4,{coins:40}]]}}},
+    {l:'Passa d’amagat',d:'Si et veuen, n’has de lluitar contra un.',risk:1,out:{rand:[[0.6,{note:'No us han vist!'}],[0.4,{fight:1}]]}},
+    {l:'Un Psíquic els adorm',d:'Passeu i agafeu les seves monedes.',risk:0,req:{el:'psiquic'},out:{coins:30}}]}}},
+  cascada:{n:'Cascada',art:'waterfall',pool:'gen',nodes:{a:{t:'Una cascada molt alta. Darrere l’aigua sembla que hi ha un forat.',ch:[
+    {l:'Banyeu-vos',d:'L’equip recupera vida.',risk:0,out:{heal:40}},
+    {l:'Mira darrere l’aigua',d:'Una cova amagada!',risk:2,out:{cave:1}}]}}},
+  mina:{n:'Mina abandonada',art:'cave',pool:'gen',nodes:{a:{t:'Una mina vella amb vagonetes i pics.',ch:[
+    {l:'Pica la paret',d:'Monedes… o una esllavissada.',risk:1,out:{rand:[[0.6,{coins:30}],[0.4,{dmgTeam:20}]]}},
+    {l:'Busca a les vagonetes',d:'',risk:0,out:{coins:10}},
+    {l:'Una bestiola de Llamp encén els llums',d:'Ara es veu tot.',risk:0,req:{el:'llamp'},out:{loot:'common'}}]}}},
+  guaita:{n:'Torre de guaita',art:'tower',pool:'gen',nodes:{a:{t:'Una torre de fusta des d’on es veu lluny.',ch:[
+    {l:'Puja a dalt',d:'Veuràs els propers llocs del camí.',risk:0,out:{reveal:1}},
+    {l:'Descansa a l’ombra',d:'L’equip recupera una mica de vida.',risk:0,out:{heal:25}}]}}},
+  globus:{n:'Globus aerostàtic',art:'balloon',pool:'gen',nodes:{a:{t:'Un globus lligat a un arbre. La cistella té lloc per a tots.',ch:[
+    {l:'Puja al globus',d:'Us salteu 2 llocs del camí.',risk:0,out:{skip:2}},
+    {l:'Busca a la cistella',d:'',risk:0,out:{food:1}}]}}},
+  petita:{n:'Bestiola perduda',art:'trail',pool:'gen',nodes:{a:{t:'Una bestiola petita plora al costat del camí. S’ha perdut.',ch:[
+    {l:'Acompanya-la a casa',d:'La seva família us ho agraïrà.',risk:0,out:{rand:[[0.5,{bless:1}],[0.5,{coins:20}]]}},
+    {l:'Juga amb ella',d:'Potser vol venir amb tu.',risk:0,out:{wild:1}}]}}},
+  forja:{n:'Forja antiga',art:'castle',pool:'sig',world:'foc',nodes:{a:{t:'Una forja que encara crema. Hi ha eines i metall.',ch:[
+    {l:'Fes una espasa (40 monedes)',d:'Una Espasa de llamp.',risk:0,out:{buyItem:'espasaLlamp',price:40}},
+    {l:'Escalfa’t',d:'L’equip recupera vida.',risk:0,out:{heal:30}},
+    {l:'Una bestiola de Foc aviva el foc',d:'Fa un tresor.',risk:0,req:{el:'foc'},out:{loot:'relic'}}]}}},
+  tortugues:{n:'Illa de les tortugues',art:'lake',pool:'sig',world:'aigua',nodes:{a:{t:'Tortugues gegants dormen a la platja d’una illa.',ch:[
+    {l:'Puja a una tortuga',d:'Us porta 2 llocs més endavant.',risk:0,out:{skip:2}},
+    {l:'Busca perles',d:'Monedes… o un cranc enfadat.',risk:1,out:{rand:[[0.6,{coins:25}],[0.4,{fight:1,n:'Cranc enfadat'}]]}}]}}},
+  pantà:{n:'Pantà',art:'lake',pool:'sig',world:'planta',nodes:{a:{t:'Un pantà ple de fang i bolets estranys.',ch:[
+    {l:'Creua pel fang',d:'Hi ha coses que piquen.',risk:1,out:{rand:[[0.5,{dmgTeam:15}],[0.5,{wild:1,rare:1}]]}},
+    {l:'Recull bolets',d:'Menjar.',risk:0,out:{food:2}},
+    {l:'Una bestiola de Planta fa un pont d’arrels',d:'Passeu i trobeu un tresor.',risk:0,req:{el:'planta'},out:{loot:'relic'}}]}}},
+  nuvol:{n:'Núvol elèctric',art:'balloon',pool:'sig',world:'llamp',nodes:{a:{t:'Un núvol baix que fa espurnes. Si el toques, et carrega d’energia.',ch:[
+    {l:'Toca el núvol',d:'Benedicció… o una descarrega.',risk:1,out:{rand:[[0.6,{bless:1}],[0.4,{dmgTeam:20}]]}},
+    {l:'Una bestiola de Llamp hi parla',d:'Us porta volant.',risk:0,req:{el:'llamp'},out:{skip:2}},
+    {l:'Passa de llarg',d:'',risk:0,out:{note:'Continueu el camí.'}}]}}},
+  miralls:{n:'Sala de miralls',art:'crystals',pool:'sig',world:'psiquic',nodes:{a:{t:'Miralls per tot arreu. No saps quin és el camí bo.',ch:[
+    {l:'Segueix el teu reflex',d:'Bestiola rara o monstre.',risk:1,out:{rand:[[0.5,{wild:1,rare:1}],[0.5,{fight:1,L:0.5,n:'Reflex dolent'}]]}},
+    {l:'Una bestiola Psíquica veu el camí',d:'Drecera i monedes.',risk:0,req:{el:'psiquic'},out:{skip:2}}]}}},
+  'cova-bolets':{n:'Bolets brillants',art:'crystals',pool:'cave2',nodes:{a:{t:'Bolets que fan llum a les parets de la cova.',ch:[
+    {l:'Menja’n un',d:'Cura… o fa mal de panxa.',risk:1,out:{rand:[[0.6,{heal:40}],[0.4,{dmgTeam:15}]]}},
+    {l:'Recull-ne per a les bestioles',d:'Menjar.',risk:0,out:{food:2}},
+    {l:'Una bestiola Psíquica els entén',d:'Benedicció.',risk:0,req:{el:'psiquic'},out:{bless:1}}]}}},
+  'cova-llac':{n:'Llac subterrani',art:'lake',pool:'cave2',nodes:{a:{t:'Un llac fosc dins la cova. Alguna cosa neda.',ch:[
+    {l:'Neda',d:'Bestiola rara o monstre.',risk:2,out:{rand:[[0.5,{wild:1,rare:1}],[0.5,{fight:1,L:0.5}]]}},
+    {l:'Beu aigua',d:'L’equip recupera vida.',risk:0,out:{heal:30}},
+    {l:'Busca a la riba',d:'',risk:0,out:{coins:15}}]}}},
+  'cova-mina':{n:'Vagonetes velles',art:'chest',pool:'cave2',nodes:{a:{t:'Vies i vagonetes velles plenes de pedres que brillen.',ch:[
+    {l:'Puja a una vagoneta',d:'Monedes… o un cop.',risk:1,out:{rand:[[0.6,{coins:30}],[0.4,{dmgTeam:20}]]}},
+    {l:'Un tanc empeny la vagoneta',d:'Sense perill.',risk:0,req:{role:'Defensa'},out:{coins:30}},
+    {l:'Deixa-ho estar',d:'',risk:0,out:{note:'Continueu cova endins.'}}]}}},
+  'cova-escala':{n:'Escales cap avall',art:'tunnels',pool:'cave3',nodes:{a:{t:'Unes escales baixen encara més endins. Es fa més fosc i se senten sorolls.',ch:[
+    {l:'Baixa al nivell següent',d:'Més perill, més tresors. Al fons de tot hi ha el Rei de la cova.',risk:2,out:{deeper:1}},
+    {l:'Obre el cofre de l’escala i surt',d:'25 monedes i tornes al camí.',risk:0,out:{exitCave:1,coins:25}}]}}},
+  'cova-rei':{n:'Sala del rei',art:'guardian',pool:'cave3',nodes:{a:{t:'Al fons de tot de la cova, el Rei de la cova seu en un tron de pedra.',ch:[
+    {l:'Lluita contra el Rei de la cova',d:'Molt difícil. Guanya un tresor rar i 60 monedes.',risk:2,out:{fight:1,L:1.5,guardian:1,n:'Rei de la cova',win:{loot:'relic'}}},
+    {l:'Surt corrents',d:'Tornes al camí.',risk:0,out:{exitCave:1}}]}}}
+});
+
+/* ---------- battle ---------- */
+function enemyStats(L,guardian,ts){var s=1+0.22*Math.max(0,ts-3);
+  return {hp:Math.round((80+40*L)*s*(guardian?2.2:1)),atk:Math.round((7+3.5*L)*(guardian?1.2:1)*(1+0.08*Math.max(0,ts-3))),def:Math.round(5+2.5*L)}}
+function makeBattle(o){
+  var r=run(),L=o.L,b,ts=r?r.team.length:3;
+  if(o.wild){var s=SPECIES[o.wild],base=ROLE[s.role],k=0.8+0.3*L;b={n:s.n+' salvatge',el:s.el,hp:Math.round(base.hp*k*1.8),atk:Math.round(base.atk*k),def:Math.round(base.def*k),wild:o.wild}}
+  else{var es=enemyStats(L,o.guardian,ts);b={n:o.n||MONSTERS[o.el],el:o.el,hp:es.hp,atk:es.atk,def:es.def}}
+  b.max=b.hp;b.L=L;b.guardian=!!o.guardian;b.final=!!o.final;
+  if(o.guardian){var others=ORDER.filter(function(e){return e!==b.el&&BEATS[e].indexOf(b.el)<0});b.resist=pickOne(others)}
+  var ch={};if(r)r.team.forEach(function(u,idx){var c=byUid(u);ch[u]=c?abilities(c).map(function(a){return a.cd+(idx%3)}):[]});
+  return {type:'battle',enemy:b,waves:o.waves||1,wavesTotal:o.waves||1,turn:0,ch:ch,shield:0,warn:false,over:null,rare:!!o.rare,win:o.win||null,caption:'Comença la batalla!',
+    st:{burn:null,poison:null,stun:0,soak:0,weak:0},tm:{buff:0,regen:null,reflect:{}},syn:r?synergies(r.team.map(byUid)):{}};
+}
+function alive(r){return r.team.map(byUid).filter(function(c){return c&&r.hp[c.uid]>0})}
+function lowest(r){return alive(r).sort(function(a,z){return r.hp[a.uid]/stats(a).hp-r.hp[z.uid]/stats(z).hp})[0]}
+function sameEl(r,el){return alive(r).filter(function(c){return sp(c).el===el}).length}
+function resistF(b,c){return b.enemy.resist&&sp(c).el===b.enemy.resist?0.5:1}
+function outDmg(c,pow,b,r){
+  var s=stats(c),atk=s.atk*pow*(b.tm.buff>0?1.3:1)*(b.syn.germans&&sameEl(r,sp(c).el)>=2?1.15:1);
+  var def=b.enemy.def*(b.st.soak>0?0.5:1),m=effMult(c,b.enemy.el)*resistF(b,c);
+  var zap=(sp(c).el==='llamp'||cEl2(c)==='llamp')&&b.st.soak>0?(b.syn.tempesta?1.6:1.3):1;
+  return {n:Math.max(1,Math.round((atk*m-def*0.5)*zap)),m:m,zap:zap>1};
+}
+function inDmg(b,t,x){var s=stats(t),def=s.def*(b.syn.complet?1.1:1),atk=b.enemy.atk*(b.st.weak>0?0.7:1)*(b.enemy.enraged?1.3:1)*(x||1);
+  return Math.max(1,Math.round(atk*mult(b.enemy.el,sp(t).el)-def*0.5))}
+function danger(enemy){
+  var r=run(),team=alive(r);if(!team.length)return {cls:'bad',t:'Perillós'};
+  var out=0,hp=0,tank=team.filter(function(c){return sp(c).role==='Defensa'})[0];
+  team.forEach(function(c){var s=stats(c);out+=Math.max(1,Math.round(s.atk*1.35*effMult(c,enemy.el)*(enemy.resist===sp(c).el?0.5:1)-enemy.def*0.5));hp+=r.hp[c.uid]});
+  var tg=tank||team[0],inc=Math.max(1,Math.round(enemy.atk*mult(enemy.el,sp(tg).el)-stats(tg).def*0.5))*1.4;
+  var ratio=(hp/inc)/(enemy.hp/out);
+  return ratio>=3.2?{cls:'good',t:'Fàcil per al teu equip'}:ratio>=1.8?{cls:'mid',t:'Ajustat'}:{cls:'bad',t:'Perillós per al teu equip'};
+}
+function sampleEnemy(e){var r=run(),L=r.L+(e.L||0)+caveL(r),es=enemyStats(L,!!e.guardian,r.team.length);return {el:r.world,hp:es.hp*(e.waves||1),atk:es.atk,def:es.def}}
+function statusActive(b,k){return (k==='burn'&&b.st.burn)||(k==='poison'&&b.st.poison)||(k==='soak'&&b.st.soak>0)||(k==='weaken'&&b.st.weak>0)||(k==='stun'&&b.st.stun>0)}
+function chooseAbility(c,b,r){
+  var list=abilities(c).filter(function(a){return (b.ch[c.uid]||[])[a.i]===0});if(!list.length)return null;
+  var low=lowest(r),lowPct=low?r.hp[low.uid]/stats(low).hp:1,ko=r.team.some(function(u){return r.hp[u]<=0}),hurt=alive(r).filter(function(m){return r.hp[m.uid]<stats(m).hp*0.6}).length;
+  function pick(k){return list.filter(function(a){return a.kind===k})[0]}
+  var a;
+  if((ko||hurt>=2)&&(a=pick('healAll')))return a;
+  if(lowPct<0.55&&(a=pick('heal')))return a;
+  if(hurt>=1&&!(b.tm.regen&&b.tm.regen.t>0)&&(a=pick('regen')))return a;
+  if(b.warn&&b.shield<=0&&(a=pick('shield')))return a;
+  if(b.warn==='strong'&&!b.tm.reflect[c.uid]&&(a=pick('reflect')))return a;
+  if(b.tm.buff<=0&&(a=pick('buff')))return a;
+  var off=list.filter(function(x){return OFFENSIVE.indexOf(x.kind)>=0&&!statusActive(b,x.kind)});
+  if(off.length)return off.sort(function(x,y){return y.pow-x.pow})[0];
+  if(b.turn>=7&&b.shield<=0&&(a=pick('shield')))return a;
+  return null;
+}
+function doAbility(c,a,b,r){
+  b.ch[c.uid][a.i]=a.cd;
+  var e={t:'special',uid:c.uid,el:sp(c).el,el2:cEl2(c),kind:a.kind,name:a.n+(c.stage?' '+'★'.repeat(c.stage):''),heals:[]},k=a.kind;
+  if(OFFENSIVE.indexOf(k)>=0){
+    var times=k==='multi'?3:1,total=0;for(var t=0;t<times;t++){var o=outDmg(c,a.pow,b,r);total+=o.n;b.enemy.hp=Math.max(0,b.enemy.hp-o.n)}
+    e.n=total;e.after=b.enemy.hp;var extra='';
+    if(k==='burn'){b.st.burn={t:3+(b.syn.incendi?2:0),n:Math.max(2,Math.round(stats(c).atk*0.45))};extra=' i el crema'}
+    if(k==='poison'){b.st.poison={t:4,n:Math.max(2,Math.round(stats(c).atk*0.4))};extra=' i l’enverina'}
+    if(k==='stun'){b.st.stun=1;extra=' i l’atordeix'}
+    if(k==='soak'){b.st.soak=3;extra=' i el deixa mullat'}
+    if(k==='weaken'){b.st.weak=3;extra=' i el debilita'}
+    e.txt=cName(c)+' fa '+e.name+': -'+total+extra+'.';
+  }else if(k==='shield'){b.shield=Math.min(4,b.shield+3);e.txt=cName(c)+' fa '+e.name+': escut per a tot l’equip.'}
+  else if(k==='reflect'){b.tm.reflect[c.uid]=2;e.txt=cName(c)+' fa '+e.name+': tornarà la meitat del mal que rebi.'}
+  else if(k==='buff'){b.tm.buff=3;e.txt=cName(c)+' fa '+e.name+': tot l’equip fa +30% de mal.'}
+  else if(k==='regen'){b.tm.regen={t:3,pct:a.pow};e.txt=cName(c)+' fa '+e.name+': l’equip es curarà cada torn.'}
+  else if(k==='heal'){var low=lowest(r);if(low){var mx=stats(low).hp,h=Math.round(stats(c).heal*a.pow*1.6*(b.syn.protector?1.3:1)),nh=Math.min(mx,r.hp[low.uid]+h);e.heals.push({uid:low.uid,n:nh-r.hp[low.uid],after:nh});r.hp[low.uid]=nh}e.txt=cName(c)+' fa '+e.name+(low?' i cura '+cName(low):'')+'.'}
+  else if(k==='healAll'){var rev=false;r.team.forEach(function(u){var m=byUid(u);if(!m)return;var mx=stats(m).hp,cur=r.hp[u],nh=Math.min(mx,cur>0?cur+Math.round(mx*a.pow*(b.syn.protector?1.3:1)):Math.round(mx*0.3));
+      if(nh>cur){e.heals.push({uid:u,n:nh-cur,after:nh,revived:cur===0});if(cur===0)rev=true;r.hp[u]=nh}});e.txt=cName(c)+' fa '+e.name+': cura tothom'+(rev?' i desperta qui estava KO':'')+'.'}
+  return e;
+}
+function findCombo(r,b){
+  var ready=alive(r).map(function(c){var a=abilities(c).filter(function(x){return OFFENSIVE.indexOf(x.kind)>=0&&(b.ch[c.uid]||[])[x.i]===0})[0];return a?{c:c,a:a}:null}).filter(Boolean);
+  for(var i=0;i<ready.length;i++)for(var j=i+1;j<ready.length;j++){var e1=sp(ready[i].c).el,e2=sp(ready[j].c).el,cb=COMBOS[comboKey(e1,e2)];
+    if(e1!==e2&&cb)return {A:ready[i].c,aa:ready[i].a,B:ready[j].c,ba:ready[j].a,cb:cb}}
+  return null;
+}
+function doCombo(x,r,b){
+  b.ch[x.A.uid][x.aa.i]=x.aa.cd;b.ch[x.B.uid][x.ba.i]=x.ba.cd;
+  var o1=outDmg(x.A,x.cb[2]*1.3,b,r),o2=outDmg(x.B,x.cb[2]*1.3,b,r),n=o1.n+o2.n,k=x.cb[1],pw=Math.round((stats(x.A).atk+stats(x.B).atk)*0.3);
+  b.enemy.hp=Math.max(0,b.enemy.hp-n);
+  if(k==='burn')b.st.burn={t:4+(b.syn.incendi?2:0),n:Math.max(3,pw)};if(k==='poison')b.st.poison={t:4,n:Math.max(3,pw)};if(k==='stun')b.st.stun=1;if(k==='weaken')b.st.weak=3;
+  return {t:'combo',a:x.A.uid,b:x.B.uid,elA:sp(x.A).el,elB:sp(x.B).el,name:x.cb[0],n:n,after:b.enemy.hp,txt:'ATAC COMBINAT! '+cName(x.A)+' i '+cName(x.B)+' fan '+x.cb[0]+': -'+n+'.'};
+}
+function foeCheck(r,b,ev){
+  if(b.enemy.hp>0&&b.enemy.guardian&&!b.enemy.enraged&&b.enemy.hp<b.enemy.max/2){b.enemy.enraged=true;ev.push({t:'enrage',txt:b.enemy.n+' s’enfada! Ara fa més mal.'})}
+  if(b.enemy.hp>0||b.over)return false;
+  if(b.waves>1){b.waves--;var es=enemyStats(b.enemy.L,false,r.team.length);
+    b.enemy={n:'Reforç: '+MONSTERS[b.enemy.el],el:b.enemy.el,hp:es.hp,max:es.hp,atk:es.atk,def:es.def,L:b.enemy.L};b.st={burn:null,poison:null,stun:0,soak:0,weak:0};
+    ev.push({t:'wave',txt:'Arriba un altre monstre! Onada '+(b.wavesTotal-b.waves+1)+' de '+b.wavesTotal+'.',name:b.enemy.n,max:es.hp});return false}
+  b.over='win';ev.push({t:'foeDown',txt:b.enemy.n+' ha perdut!'});return true;
+}
+function battleTick(){
+  var r=run(),b=r.event,ev=[];b.turn++;
+  r.team.forEach(function(u){(b.ch[u]||[]).forEach(function(v,i){if(v>0)b.ch[u][i]=v-1})});
+  ['burn','poison'].forEach(function(k){var s=b.st[k];if(s&&s.t>0&&b.enemy.hp>0){b.enemy.hp=Math.max(0,b.enemy.hp-s.n);s.t--;ev.push({t:'dot',kind:k,n:s.n,after:b.enemy.hp,txt:b.enemy.n+(k==='burn'?' es crema':' està enverinat')+': -'+s.n});if(s.t<=0)b.st[k]=null}});
+  if(foeCheck(r,b,ev))return ev;
+  var rp=(b.tm.regen&&b.tm.regen.t>0?b.tm.regen.pct:0)+(b.syn.natura?0.03:0);
+  if(rp>0){var hs=[];alive(r).forEach(function(c){var mx=stats(c).hp,nh=Math.min(mx,r.hp[c.uid]+Math.max(1,Math.round(mx*rp)));if(nh>r.hp[c.uid]){hs.push({uid:c.uid,n:nh-r.hp[c.uid],after:nh});r.hp[c.uid]=nh}});
+    if(b.tm.regen&&b.tm.regen.t>0)b.tm.regen.t--;if(hs.length)ev.push({t:'regen',hits:hs,txt:'L’equip es cura una mica.'})}
+  var acted={},cx=findCombo(r,b);
+  if(cx){ev.push(doCombo(cx,r,b));acted[cx.A.uid]=acted[cx.B.uid]=1;if(foeCheck(r,b,ev))return ev}
+  alive(r).forEach(function(c){
+    if(b.over||acted[c.uid]||r.hp[c.uid]<=0)return;
+    var ab=chooseAbility(c,b,r);
+    if(ab){ev.push(doAbility(c,ab,b,r));foeCheck(r,b,ev);return}
+    if(sp(c).role==='Curador'){var low=lowest(r);if(low&&r.hp[low.uid]<stats(low).hp*0.65){var hh=Math.min(Math.round(stats(c).heal*(b.syn.protector?1.3:1)),stats(low).hp-r.hp[low.uid]);r.hp[low.uid]+=hh;ev.push({t:'heal',src:c.uid,tgt:low.uid,n:hh,after:r.hp[low.uid],txt:cName(c)+' cura '+cName(low)+' (+'+hh+')'});return}}
+    var o=outDmg(c,1,b,r);b.enemy.hp=Math.max(0,b.enemy.hp-o.n);
+    ev.push({t:'hit',src:c.uid,n:o.n,after:b.enemy.hp,eff:o.zap?'zap':o.m>1.1?'super':o.m<0.9?'weak':'',txt:cName(c)+' ataca: -'+o.n+(o.zap?' (llamp sobre mullat!)':o.m>1.1?' (molt efectiu!)':o.m<0.9?' (poc efectiu)':'')});
+    foeCheck(r,b,ev);
+  });
+  if(b.over)return ev;
+  var al=alive(r),tank=al.filter(function(c){return sp(c).role==='Defensa'})[0];
+  if(b.st.stun>0){b.st.stun=0;ev.push({t:'stunned',txt:b.enemy.n+' està atordit i no ataca!'})}
+  else if(b.warn==='area'){
+    var sh0=b.shield>0,hits=[];
+    al.forEach(function(t){var d=inDmg(b,t,0.75);if(sh0)d=Math.ceil(d/2);r.hp[t.uid]=Math.max(0,r.hp[t.uid]-d);hits.push({uid:t.uid,n:d,after:r.hp[t.uid]})});
+    if(sh0)b.shield--;b.warn=false;ev.push({t:'aoe',hits:hits,txt:'ATAC A TOTHOM! '+b.enemy.n+' ataca tot l’equip'+(sh0?' (l’escut para la meitat)':'')+'.'});
+  }else{
+    var tg=tank||pickOne(al),strong=b.warn==='strong',d=inDmg(b,tg,strong?2:1),sh=false;
+    if(b.shield>0){d=Math.ceil(d/2);b.shield--;sh=true}
+    b.warn=false;r.hp[tg.uid]=Math.max(0,r.hp[tg.uid]-d);var refl=0;
+    if(b.tm.reflect[tg.uid]>0){refl=Math.max(1,Math.round(d*0.5));b.enemy.hp=Math.max(0,b.enemy.hp-refl)}
+    ev.push({t:'ehit',tgt:tg.uid,n:d,after:r.hp[tg.uid],strong:strong,refl:refl,foeAfter:b.enemy.hp,txt:(strong?'COP FORT! ':'')+b.enemy.n+' ataca '+cName(tg)+(tank?' (el tanc es posa davant)':'')+': -'+d+(sh?' (l’escut para la meitat)':'')+(refl?'. El mirall li torna -'+refl:'')+(r.hp[tg.uid]===0?'. Queda fora de combat.':'')});
+    if(foeCheck(r,b,ev))return ev;
+  }
+  if(!alive(r).length){b.over='lose';ev.push({t:'teamDown',txt:'Tot l’equip ha caigut.'});return ev}
+  if(b.turn%3===2&&!b.warn){b.warn=Math.random()<0.5?'area':'strong';ev.push({t:'warn',kind:b.warn,txt:b.enemy.n+(b.warn==='area'?' prepara un ATAC A TOTHOM!':' prepara un COP FORT!')})}
+  if(b.st.soak>0)b.st.soak--;if(b.st.weak>0)b.st.weak--;if(b.tm.buff>0)b.tm.buff--;
+  Object.keys(b.tm.reflect).forEach(function(u){if(b.tm.reflect[u]>0)b.tm.reflect[u]--});
+  return ev;
+}
+var battleTimer=null,playing=false;
+function scheduleTick(){
+  if(battleTimer||playing)return;
+  battleTimer=setTimeout(function(){battleTimer=null;var r=run();if(!r||G.screen!=='run'||!r.event||r.event.type!=='battle'||r.event.over)return;
+    var ev=battleTick();persist();playEvents(ev,function(){var b=r.event;if(b.over)render();else scheduleTick()})},RM?600:1050);
+}
+function stopBattle(){clearTimeout(battleTimer);battleTimer=null}
+function playEvents(ev,done){
+  playing=true;var i=0;
+  (function next(){var rr=run();if(!rr||!rr.event||rr.event.type!=='battle'){playing=false;return}if(i>=ev.length){playing=false;done();return}var e=ev[i++];showEvent(e);
+    setTimeout(next,e.t==='combo'?(RM?300:1500):e.t==='special'?(RM?250:1200):(RM?60:320))})();
+}
+function updateStatus(){
+  var r=run(),b=r&&r.event;if(!b||b.type!=='battle')return;var f=$('foe-st'),t=$('team-st');
+  if(f){var s=[];if(b.st.burn)s.push('<span class="stchip burn">Cremat '+b.st.burn.t+'</span>');if(b.st.poison)s.push('<span class="stchip poison">Enverinat '+b.st.poison.t+'</span>');
+    if(b.st.stun)s.push('<span class="stchip stun">Atordit</span>');if(b.st.soak>0)s.push('<span class="stchip soak">Mullat '+b.st.soak+'</span>');if(b.st.weak>0)s.push('<span class="stchip weak">Debilitat '+b.st.weak+'</span>');
+    if(b.enemy.enraged)s.push('<span class="stchip burn">Enfadat</span>');f.innerHTML=s.join('')}
+  if(t){var q=[];if(b.shield>0)q.push('<span class="stchip good">Escut '+b.shield+'</span>');if(b.tm.buff>0)q.push('<span class="stchip good">Ànims '+b.tm.buff+'</span>');
+    if(b.tm.regen&&b.tm.regen.t>0)q.push('<span class="stchip good">Regeneració '+b.tm.regen.t+'</span>');
+    Object.keys(b.tm.reflect).forEach(function(u){if(b.tm.reflect[u]>0&&byUid(u))q.push('<span class="stchip good">Mirall: '+esc(cName(byUid(u)))+'</span>')});t.innerHTML=q.join('')}
+  var sh=$('shield');if(sh)sh.classList.toggle('on',b.shield>0);
+}
+function updateAbilities(){
+  var r=run(),b=r&&r.event;if(!b||b.type!=='battle')return;
+  r.team.forEach(function(u){var c=byUid(u);if(!c)return;var ko=r.hp[u]<=0;
+    abilities(c).forEach(function(a){var m=$('ch-'+u+'-'+a.i);if(!m)return;var ch=Math.min(a.cd,(b.ch[u]||[])[a.i]||0),pct=ko?0:Math.round((a.cd-ch)/a.cd*100);m.style.width=pct+'%';m.parentNode.classList.toggle('full',!ko&&ch===0)})});
+  updateStatus();
+}
+function showEvent(e){
+  var r=run(),b=r&&r.event;if(!b||b.type!=='battle'||!$('caption'))return;$('caption').textContent=e.txt;
+  var fa=$('foe-art');
+  if(e.t==='hit'){anim($('m-'+e.src),'lunge');anim(fa,'shake');anim(fa,'flash');floatNum(fa,'-'+e.n,'dmg'+(e.eff==='super'||e.eff==='zap'?' big':''));if(e.eff==='super')floatNum(fa,'SUPER!','tagtxt');if(e.eff==='zap')floatNum(fa,'DESCÀRREGA!','tagtxt');if(e.eff==='weak')floatNum(fa,'poc efectiu','tagtxt');setBar('foe-hp',e.after,b.enemy.max)}
+  else if(e.t==='dot'){floatNum(fa,'-'+e.n,'dmg');var ic=document.createElement('span');ic.className='rise';ic.innerHTML=elIcon(e.kind==='burn'?'foc':'planta',22,e.kind==='burn'?'#FF8A00':'#3DDC84');if(fa){fa.appendChild(ic);setTimeout(function(){ic.remove()},1000)}setBar('foe-hp',e.after,b.enemy.max)}
+  else if(e.t==='heal'){anim($('m-'+e.tgt),'healglow');floatNum($('m-'+e.tgt),'+'+e.n,'heal');setBar('hp-'+e.tgt,e.after,stats(byUid(e.tgt)).hp)}
+  else if(e.t==='regen'){e.hits.forEach(function(h){floatNum($('m-'+h.uid),'+'+h.n,'heal');setBar('hp-'+h.uid,h.after,stats(byUid(h.uid)).hp)})}
+  else if(e.t==='ehit'){anim(fa,'lungeDown');anim($('m-'+e.tgt),'shake');floatNum($('m-'+e.tgt),'-'+e.n,'dmg'+(e.strong?' big':''));setBar('hp-'+e.tgt,e.after,stats(byUid(e.tgt)).hp);if(e.after===0&&$('m-'+e.tgt))$('m-'+e.tgt).classList.add('ko');
+    if(e.refl){floatNum(fa,'-'+e.refl,'dmg');floatNum(fa,'MIRALL!','tagtxt');setBar('foe-hp',e.foeAfter,b.enemy.max)}$('warn').classList.remove('on')}
+  else if(e.t==='aoe'){anim(fa,'lungeDown');anim($('squad'),'shake');e.hits.forEach(function(h){var m=$('m-'+h.uid);floatNum(m,'-'+h.n,'dmg');setBar('hp-'+h.uid,h.after,stats(byUid(h.uid)).hp);if(h.after===0&&m)m.classList.add('ko')});$('warn').classList.remove('on')}
+  else if(e.t==='warn'){$('warn').textContent=e.kind==='area'?'Prepara un ATAC A TOTHOM!':'Prepara un COP FORT!';$('warn').classList.add('on')}
+  else if(e.t==='stunned'){floatNum(fa,'ATORDIT','tagtxt');anim(fa,'shake')}
+  else if(e.t==='enrage'){floatNum(fa,'S’ENFADA!','tagtxt');anim(fa,'flash')}
+  else if(e.t==='wave'){var nm=$('foe-name');if(nm)nm.textContent=e.name;setBar('foe-hp',e.max,e.max);anim(fa,'lungeDown')}
+  else if(e.t==='special')showSpecial(e);
+  else if(e.t==='combo')showCombo(e);
+  updateAbilities();
+}
+function particles(host,els,n){if(!host)return;for(var k=0;k<n;k++){(function(k){var pe=els[k%els.length],p=document.createElement('span');p.className='particle';p.style.animationDelay=(k*60)+'ms';p.innerHTML=elIcon(pe,28,ELS[pe].c);host.appendChild(p);setTimeout(function(){p.remove()},1000)})(k)}}
+function showSpecial(e){
+  var st=$('stage'),c=byUid(e.uid);if(!st||!c)return;
+  var ci=document.createElement('div');ci.className='cutin';ci.style.setProperty('--cc',ELS[e.el].c);
+  ci.innerHTML='<div class="lines"></div><div class="who">'+cArt(c,100)+'</div><div class="sname">'+esc(e.name.toUpperCase())+'!</div>';
+  st.appendChild(ci);anim($('m-'+e.uid),'lunge');
+  setTimeout(function(){ci.remove();var fa=$('foe-art'),rr=run();
+    if(OFFENSIVE.indexOf(e.kind)>=0){particles(fa,e.el2?[e.el,e.el2]:[e.el],e.kind==='multi'?9:6);
+      setTimeout(function(){anim(fa,'shake');anim(fa,'flash');anim(st,'flash');floatNum(fa,'-'+e.n,'dmg big');
+        var tag={burn:'CREMAT!',poison:'ENVERINAT!',stun:'ATORDIT!',soak:'MULLAT!',weaken:'DEBILITAT!'}[e.kind];if(tag)floatNum(fa,tag,'tagtxt');
+        if(rr&&rr.event&&rr.event.enemy)setBar('foe-hp',e.after,rr.event.enemy.max)},RM?0:430)}
+    else if(e.kind==='shield'){$('shield').classList.add('on');anim($('shield'),'flash')}
+    else if(e.kind==='reflect'){var m=$('m-'+e.uid);anim(m,'healglow');floatNum(m,'MIRALL','tagtxt')}
+    else if(e.kind==='buff'||e.kind==='regen'){rr&&rr.team.forEach(function(u){var m=$('m-'+u);if(m){anim(m,'healglow');floatNum(m,e.kind==='buff'?'+30%':'+','heal')}})}
+    else e.heals.forEach(function(h){var m=$('m-'+h.uid);if(!m)return;if(h.revived)m.classList.remove('ko');anim(m,'healglow');floatNum(m,'+'+h.n,'heal');setBar('hp-'+h.uid,h.after,stats(byUid(h.uid)).hp)});
+    updateStatus();
+  },RM?120:700);
+}
+function showCombo(e){
+  var st=$('stage'),A=byUid(e.a),B=byUid(e.b);if(!st||!A||!B)return;
+  var ci=document.createElement('div');ci.className='cutin combo';ci.style.setProperty('--cc',ELS[e.elA].c);ci.style.setProperty('--cc2',ELS[e.elB].c);
+  ci.innerHTML='<div class="lines"></div><div class="pair"><div class="who">'+cArt(A,84)+'</div><div class="who">'+cArt(B,84)+'</div></div><div class="sname">COMBO! '+esc(e.name.toUpperCase())+'</div>';
+  st.appendChild(ci);
+  setTimeout(function(){ci.remove();var fa=$('foe-art'),rr=run();particles(fa,[e.elA,e.elB],10);
+    setTimeout(function(){anim(fa,'shake');anim(fa,'flash');anim(st,'flash');floatNum(fa,'-'+e.n,'dmg big');floatNum(fa,'COMBO!','tagtxt');if(rr&&rr.event&&rr.event.enemy)setBar('foe-hp',e.after,rr.event.enemy.max);updateStatus()},RM?0:450)},RM?150:900);
+}
+function abandonRun(w){var r=G.runs[w];if(!r)return;stopBattle();G.coins+=Math.floor(r.coins/2);delete G.runs[w];if(G.active===w)G.active=null;G.world=w;G.screen='mon';toast('Aventura abandonada. Pots tornar a començar quan vulguis.')}
+function restartRun(){var r=run();if(!r)return;var w=r.world,z=r.zone||0,team=r.team.slice();stopBattle();G.coins+=Math.floor(r.coins/2);delete G.runs[w];G.active=null;G.world=w;G.zone=z;G.pick=team.filter(function(u){return byUid(u)});startRun();toast('Torneu a començar la zona amb tota la vida.')}
+function battleWon(){
+  var r=run(),b=r.event,L=b.enemy.L||1;
+  if(b.enemy.final){r.coins+=60+20*Math.round(L);r.event={type:'card',kind:'item',item:pickOne(RELICS),why:'El guardià deixa caure un tresor rar. +'+(60+20*Math.round(L))+' monedes.',last:true};return}
+  if(b.enemy.wild){recruitCard(b.enemy.wild,b.rare);return}
+  if(b.enemy.guardian)r.coins+=60;
+  if(b.win){applyEffect(b.win);return}
+  r.event={type:'card',kind:'coins',n:Math.round(15+10*L),why:'Has guanyat la batalla!'};
+}
+function finishRun(ok,keepAll){
+  var r=run();if(!r)return;stopBattle();
+  var z=r.zone||0,bonus=ok?ZONE_BONUS[z]:0,coins=ok||keepAll?r.coins+bonus:Math.floor(r.coins/2);
+  G.coins+=coins;
+  var spa=G.built.spa?2:1,tired=[];
+  G.owned.forEach(function(c){
+    if(r.team.indexOf(c.uid)>=0){c.fat++;if(c.fat>=maxFat(c)){c.fat=maxFat(c);c.rest=maxFat(c);tired.push(cName(c))}}
+    else if(!busyWorld(c)){if(c.rest>0){c.rest=Math.max(0,c.rest-spa);if(!c.rest)c.fat=0}else c.fat=Math.max(0,c.fat-spa)}
+  });
+  var tennis=null;
+  if(G.built.tennis){var home=G.owned.filter(function(c){return r.team.indexOf(c.uid)<0&&!busyWorld(c)&&c.mill<5});if(home.length){var t=pickOne(home);t.mill++;tennis=cName(t)}}
+  var unlocked=false,before=maxTeam();
+  if(ok){G.completed++;G.done[r.world+':z'+z]=true;if(G.completed>=3&&!G.psiquic){G.psiquic=true;unlocked=true}}
+  G.summary={ok:ok,keepAll:!!keepAll,coins:coins,bonus:bonus,world:r.world,zone:z,tired:tired,unlocked:unlocked,tennis:tennis,pct:0,bigger:maxTeam()>before?maxTeam():0};
+  delete G.runs[r.world];G.active=null;G.screen='resum';G.summary.pct=worldPct(r.world);
+}
+function worldPct(w){
+  var sps=speciesOf(w),own=sps.filter(ownsSp).length,sc=worldScenes(w),seen=sc.filter(function(id){return G.seen[w]&&G.seen[w][id]}).length,z=[0,1,2].filter(function(i){return G.done[w+':z'+i]}).length;
+  return Math.round(40*own/sps.length+10*z+30*seen/sc.length);
+}
+
+/* ---------- screens ---------- */
+function scMon(){
+  var w=G.world,A=ELS[w],r=G.runs[w],pct=worldPct(w),sps=speciesOf(w),sc=worldScenes(w),seen=sc.filter(function(id){return G.seen[w]&&G.seen[w][id]}).length;
+  var spsH=sps.map(function(s){var own=ownsSp(s);return '<div class="box'+(own?'':' off')+'">'+critter(SPECIES[s].el,'',44,!own)+(own?esc(SPECIES[s].n):'???')+'</div>'}).join('');
+  var body;
+  if(r)body='<div class="flat"><h3>Tens una aventura a mitges aquí</h3><p class="muted">'+esc(ZONES[w][r.zone||0])+' · lloc '+(r.i+1)+' de '+r.slots.length+(r.cave?', dins una cova':'')+'.</p><div class="row"><button type="button" class="btn green" data-act="resume" data-w="'+w+'">Continua</button><button type="button" class="btn light sm" data-act="abandon" data-w="'+w+'">'+(abandonArm===w?'Segur? Toca un altre cop':'Abandona-la')+'</button></div></div>';
+  else body=ZONES[w].map(function(zn,i){var open=zoneOpen(w,i),done=G.done[w+':z'+i];
+    return '<button type="button" class="opt" data-act="path" data-p="'+i+'"'+(open?'':' disabled')+'><b>Zona '+(i+1)+': '+esc(zn)+(done?' ✓':'')+'</b><span class="d">'+starStr(starsN(zoneL(w,i)))+' · '+ZONE_ROUTES[i].length+' llocs</span><span class="d">'+esc(ZONE_INFO[i])+'</span>'+(open?'':'<span class="need">Tancada: acaba primer la zona '+i+'</span>')+'</button>'}).join('');
+  return '<div class="flat" style="background:'+A.c+';color:'+(w==='llamp'?'#1E1B2E':'#fff')+'"><div class="row"><button type="button" class="btn sm light" data-act="nav" data-to="explorar">Enrere</button><h1>'+esc(A.mon)+'</h1></div>'+
+    '<p>Explorat: <b>'+pct+'%</b> · Llocs vistos '+seen+' de '+sc.length+' · Bestioles '+sps.filter(ownsSp).length+' de '+sps.length+'</p><p>Aquí hi viuen bestioles de '+esc(A.n.toLowerCase())+'. Els monstres resisteixen el seu propi element. Consell: porta bestioles de '+esc(goodAgainst(w))+'.</p></div>'+
+    tip('mon','Cada món té 3 zones. Quan acabes una zona, s’obre la següent. Les estrelles ★ diuen com és de difícil.')+
+    '<h3>Bestioles d’aquest món</h3><div class="grid4">'+spsH+'</div>'+body;
+}
+function teamSummary(){
+  var list=G.pick.map(byUid),n=roleCounts(list),miss=['Atac','Defensa','Curador'].filter(function(r){return !n[r]}),on=synergies(list),chips=synChips(on);
+  var act=SYN.filter(function(s){return on[s.k]});
+  return '<div class="flat" style="gap:6px"><div class="row" style="gap:6px"><b>El teu equip:</b>'+['Atac','Defensa','Curador'].map(function(r){return roleTag(r,true)+'<b>'+n[r]+'</b>'}).join(' ')+'</div>'+
+    (G.pick.length&&miss.length?'<p class="muted small">Consell: un equip amb un de cada rol aguanta més. Et falta: '+esc(miss.map(function(r){return ROLE_LABEL[r]}).join(', '))+'.</p>':'')+
+    '<div class="row" style="gap:6px"><b>Sinergies:</b>'+(chips||'<span class="muted small">cap encara</span>')+'</div>'+
+    (act.length?act.map(function(s){return '<p class="small"><b>'+esc(s.n)+':</b> '+esc(s.d)+'</p>'}).join(''):'<p class="muted small">Prova de portar Aigua i Llamp, Foc i Planta, o un tanc i un curador junts.</p>')+'</div>';
+}
+function scEquip(){
+  var w=G.world,z=G.zone||0,mx=maxTeam(),nx=nextTeamAt();
+  var rows=G.owned.map(function(c){
+    var bw=busyWorld(c),blocked=!!bw||c.rest>0,on=G.pick.indexOf(c.uid)>=0,m=mult(sp(c).el,w),adv=m>1?'<span class="tag good">Avantatge aquí</span>':m<1?'<span class="tag bad">'+(m===0.75?'Resisteixen el seu element':'Desavantatge aquí')+'</span>':'';
+    var left=c.rest>0?0:Math.round((maxFat(c)-c.fat)*100/maxFat(c));
+    return '<button type="button" class="tap'+(on?' sel':'')+'" data-act="pick" data-u="'+c.uid+'"'+(blocked?' disabled':'')+' aria-pressed="'+on+'" style="flex-direction:row;justify-content:flex-start;gap:10px;padding:8px">'+cArt(c,48)+
+      '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;text-align:left"><span class="row" style="gap:6px"><b style="font-size:15px">'+esc(cName(c))+'</b>'+adv+'</span><span class="row" style="gap:6px">'+roleTag(sp(c).role)+'<span class="muted small">'+esc(ELS[sp(c).el].n+' · nivell '+lvl(c)+' · '+abilities(c).length+' habilitats')+'</span></span>'+bar(left,hpColor(left))+'<span class="muted small">'+esc(fatigueText(c))+'</span></span>'+(on?'<b style="color:var(--accent)">✓</b>':'')+'</button>'}).join('');
+  return '<div class="row"><button type="button" class="btn sm light" data-act="world" data-w="'+w+'">Enrere</button><div><div class="muted small">'+esc(ELS[w].mon)+' · '+esc(ZONES[w][z])+' '+starStr(starsN(zoneL(w,z)))+'</div><h1>Tria l’equip</h1></div></div>'+
+    tip('equip','El teu personatge sempre hi va. Toca les bestioles per triar-les. Algunes combinacions tenen sinergies i atacs combinats.')+
+    '<p class="muted">Triades: <b>'+G.pick.length+' de '+mx+'</b>'+(nx?' · Quan facis '+nx+' expedicions en podràs portar '+(mx+1):'')+'</p><div style="display:flex;flex-direction:column;gap:10px">'+rows+'</div>'+
+    teamSummary()+'<button type="button" class="btn green" data-act="go"'+(G.pick.length?'':' disabled')+'>Surt a explorar</button>';
+}
+function routeStrip(r){
+  return '<div class="route" aria-label="El camí: lloc '+(r.i+1)+' de '+r.slots.length+'">'+r.slots.map(function(s,i){
+    var cls=i<r.i?'node done':i===r.i?'node cur':'node',bg=i<=r.i?' style="background:'+ELS[r.world].c+(r.world==='llamp'?';color:#1E1B2E':'')+'"':'';
+    var show=i<=r.i||i<=(r.reveal||0)||s.k==='guardian'||s.k==='spring'||s.k==='mini';
+    return (i?'<span class="link'+(i<=r.i?' done':'')+'"></span>':'')+'<span class="'+cls+'"'+bg+'>'+(show?NODE_ICON[s.k]||'·':'?')+'</span>'}).join('')+'</div>';
+}
+function scRun(){
+  var r=run();if(!r){G.screen='explorar';return scExplorar()}
+  var head='<div class="flat"><div class="row between"><h3>'+esc(ZONES[r.world][r.zone||0])+' · lloc '+(r.i+1)+' de '+r.slots.length+'</h3>'+starStr(starsN(r.L))+'</div>'+
+    (r.cave?'<p class="small"><b>Dins la cova · nivell '+r.cave.lvl+' de 3 · sala '+(r.cave.i+1)+' de '+r.cave.list.length+'</b></p>':'')+(r.bless?'<span class="syn">Benedicció activa</span>':'')+routeStrip(r)+'</div>';
+  var e=r.event,body='',showTeam=true;
+  if(!e)body='';
+  else if(e.type==='battle'){showTeam=false;body=battleStage(r,e)}
+  else if(e.type==='scene'){var S=SCENES[r.scene],N=S.nodes[r.node],txt=N.t.replace('{riu}',ELS[r.world].w.riu).replace('{arbres}',ELS[r.world].w.arbres);
+    body='<div class="scene">'+sceneArt(S.art,r.world)+'<span class="label">'+esc(S.n)+(N.secret?' · secret!':'')+'</span>'+crew(r)+'</div>'+
+      '<div class="event"><p style="font-size:16px">'+esc(txt)+'</p><p class="muted small">Què fas? Toca una opció.</p>'+N.ch.map(function(ch,i){
+        var ok=!ch.req||teamHas(ch.req),dg='',fo=ch.out&&(ch.out.fight?ch.out:ch.out.rand?null:null);
+        if(fo){var d0=danger(sampleEnemy(fo));dg=' <span class="tag '+d0.cls+'">'+esc(d0.t)+'</span>'}
+        return '<button type="button" class="opt" data-act="choice" data-i="'+i+'"'+(ok?'':' disabled')+'><b>'+esc(ch.l)+'</b>'+(ch.d?'<span class="d">'+esc(ch.d)+'</span>':'')+'<span>'+riskHtml(ch.risk)+dg+'</span>'+(ok?'':'<span class="need">'+esc(reqText(ch.req))+'</span>')+'</button>'}).join('')+'</div>';}
+  else if(e.type==='fork'){var s=r.slots[r.i];
+    body='<div class="event"><h2>Una cruïla</h2><p>El camí es divideix. On vols anar?</p><div class="grid2">'+s.opts.map(function(id){var S=SCENES[id];return '<button type="button" class="tap" data-act="fork" data-s="'+id+'" style="padding:6px;gap:6px"><span style="width:100%;border-radius:12px;overflow:hidden;line-height:0">'+sceneArt(S.art,r.world)+'</span><span style="font-size:15px">'+esc(S.n)+'</span></button>'}).join('')+'</div></div>';}
+  else if(e.type==='guardianPre'||e.type==='miniPre'){var fin=e.type==='guardianPre',gname=fin?'Guardià de '+ZONES[r.world][r.zone||0]:'Campament de monstres',
+      ge=makeBattle({el:r.world,L:r.L+(fin?1:0.3),guardian:fin,final:fin,n:gname,waves:fin?1:2}).enemy,d1=danger(fin?ge:{el:ge.el,hp:ge.hp*2,atk:ge.atk,def:ge.def});
+    body='<div class="scene">'+sceneArt(fin?'guardian':'tent',r.world)+'<span class="label">'+(fin?'Final de la zona':'Campament de monstres')+'</span><div style="position:absolute;right:20px;bottom:6px;line-height:0">'+monster(r.world,96,fin)+'</div>'+crew(r)+'</div>'+
+      '<div class="event"><h2>'+esc(gname)+'</h2><p>'+starStr(starsN(ge.L))+' <span class="tag '+d1.cls+'">'+esc(d1.t)+'</span>'+(ge.resist?' <span class="tag">Resisteix '+esc(ELS[ge.resist].n)+'</span>':'')+'</p>'+
+      (fin?'<p class="muted">Si el guanyes, acabes la zona i guanyes un tresor rar. A la meitat de la vida s’enfada i fa més mal.</p><button type="button" class="opt" data-act="gfight"><b>Lluita contra el guardià</b><span>'+riskHtml(2)+'</span></button><button type="button" class="opt" data-act="gleave"><b>Torna a casa ara</b><span class="d">Et quedes totes les monedes, però la zona no compta com a acabada.</span><span>'+riskHtml(0)+'</span></button>':
+        '<p class="muted">Hi ha 2 monstres: quan en guanyes un, arriba l’altre.</p><button type="button" class="opt" data-act="mfight"><b>Ataca el campament</b><span class="d">Si guanyes: 40 monedes i un objecte.</span><span>'+riskHtml(2)+'</span></button><button type="button" class="opt" data-act="mleave"><b>Fes una volta llarga</b><span class="d">L’equip es cansa i perd una mica de vida.</span><span>'+riskHtml(0)+'</span></button>')+'</div>';}
+  else if(e.type==='wild'){var sw=SPECIES[e.sp],own=ownsSp(e.sp),hasFood=(G.food[sw.el]||0)>0,we=makeBattle({wild:e.sp,L:r.L+(e.rare?1:0)}).enemy,d2=danger(we);
+    body='<div class="scene">'+sceneArt(r.cave?'tunnels':'meadow',r.world)+'<span class="label">'+(e.rare?'Una bestiola rara!':'Una bestiola salvatge')+'</span><div style="position:absolute;right:30px;bottom:8px;line-height:0">'+critter(sw.el,'',90,!own)+'</div>'+crew(r)+'</div>'+
+      '<div class="event"><p>'+(own?'És una '+esc(sw.n)+'. Ja en tens una.':'No l’has vista mai.')+' '+roleTag(sw.role)+' Vols que vingui amb tu?</p>'+
+      '<button type="button" class="opt" data-act="wfight"><b>Lluita per fer-te’n amic</b><span class="d">Si guanyes, s’uneix a tu.</span><span>'+riskHtml(1)+' <span class="tag '+d2.cls+'">'+esc(d2.t)+'</span></span></button>'+
+      '<button type="button" class="opt" data-act="wfeed"'+(hasFood?'':' disabled')+'><b>Dona-li '+esc(FOOD[sw.el])+'</b><span class="d">S’uneix segur, sense lluitar.</span><span>'+riskHtml(0)+'</span>'+(hasFood?'<span class="d">En tens '+G.food[sw.el]+'</span>':'<span class="need">No en tens. En trobaràs pel camí.</span>')+'</button>'+
+      '<button type="button" class="opt" data-act="skip"><b>Deixa-la tranquil·la</b><span>'+riskHtml(0)+'</span></button></div>';}
+  else if(e.type==='note')body='<div class="event"><h2>'+esc(e.title||'D’acord')+'</h2><p>'+esc(e.text)+'</p><button type="button" class="btn green" data-act="next">Continua</button></div>';
+  else if(e.type==='card'){body=bigCard(e);showTeam=false}
+  var leave=e&&e.type==='battle'?'':'<div class="row"><button type="button" class="btn light sm" data-act="pause">Surt i guarda</button><button type="button" class="btn light sm" data-act="restart">'+(restartArm?'Segur? Toca un altre cop':'Torna a començar la zona')+'</button><button type="button" class="btn light sm" data-act="abandon" data-w="'+r.world+'">'+(abandonArm===r.world?'Segur? Toca un altre cop':'Abandona')+'</button></div>';
+  return head+tip('run','Les boles de dalt són el camí: la que es mou és on ets. Les opcions amb fletxa ▸ es poden tocar. Els punts vermells diuen el risc.')+body+(showTeam?teamMini(r):'')+leave;
+}
+function battleStage(r,b){
+  var en=b.enemy,p=Math.round(en.hp*100/en.max),d=danger(en);
+  var art=en.wild?critter(en.el,'',92):monster(en.el,92,en.guardian);
+  var weak=Object.keys(BEATS).filter(function(k){return BEATS[k].indexOf(en.el)>=0}).map(function(k){return ELS[k].n}).join(', ');
+  var res='';
+  if(playing){}
+  else if(b.over==='win')res='<div class="event" style="color:var(--ink)"><h2>Heu guanyat!</h2><button type="button" class="btn green" data-act="bwin">Continua</button></div>';
+  else if(b.over==='lose')res=en.wild?'<div class="event" style="color:var(--ink)"><h2>Heu perdut</h2><p>La bestiola salvatge marxa corrents. Les bestioles KO es desperten amb una mica de vida i seguiu el camí.</p><button type="button" class="btn" data-act="blose">Continua</button></div>':
+    '<div class="event" style="color:var(--ink)"><h2>Heu perdut</h2><p>Podeu tornar a començar la zona amb tota la vida, o tornar a casa amb la meitat de les monedes.</p><button type="button" class="btn green" data-act="restartNow">Torna a començar la zona</button><button type="button" class="btn light" data-act="blose">Torna a casa</button></div>';
+  var order=r.team.slice().sort(function(a,z){var ra=byUid(a),rz=byUid(z);return (ra&&sp(ra).role==='Defensa'?0:1)-(rz&&sp(rz).role==='Defensa'?0:1)});
+  return tip('battle','La batalla va sola. Cada bestiola té 2 o 3 habilitats que es carreguen a velocitats diferents (les barres grogues) i les fa soles. Si dues bestioles d’elements diferents tenen un atac a punt alhora, fan un ATAC COMBINAT.')+
+    '<div class="stage" id="stage"><div class="banner" id="banner"></div>'+
+    '<div class="foe"><div class="foe-art" id="foe-art">'+art+'</div><div class="foe-info"><h2 id="foe-name">'+esc(en.n)+'</h2><div>'+starStr(starsN(en.L))+' <span class="tag" style="background:'+ELS[en.el].c+';color:'+(en.el==='llamp'?'#1E1B2E':'#fff')+'">'+esc(ELS[en.el].n)+'</span>'+(b.wavesTotal>1?' <span class="tag">Onada '+(b.wavesTotal-b.waves+1)+' de '+b.wavesTotal+'</span>':'')+'</div>'+
+    '<span class="small">Feble a: <b>'+esc(weak)+'</b>'+(en.resist?' · Resisteix: <b>'+esc(ELS[en.resist].n)+'</b>':'')+'</span><span class="tag '+d.cls+'" style="align-self:flex-start">'+esc(d.t)+'</span>'+bar(p,hpColor(p),'foe-hp')+'<span class="small" id="foe-hpt">'+en.hp+'/'+en.max+'</span><div class="stchips" id="foe-st"></div><span class="warn" id="warn">'+(b.warn==='area'?'Prepara un ATAC A TOTHOM!':'Prepara un COP FORT!')+'</span></div></div>'+
+    '<div class="caption" id="caption" aria-live="polite">'+esc(b.caption||'')+'</div>'+
+    '<div class="row" style="gap:6px">'+synChips(b.syn)+'</div><div class="stchips" id="team-st"></div>'+
+    '<div class="squad" id="squad" style="grid-template-columns:repeat('+Math.min(3,order.length)+',minmax(0,1fr))"><div class="shield" id="shield"></div>'+order.map(function(u){var c=byUid(u);if(!c)return '';var mx=stats(c).hp,pp=Math.round(r.hp[u]*100/mx),front=sp(c).role==='Defensa';
+      return '<div class="mem'+(r.hp[u]<=0?' ko':'')+'" id="m-'+u+'"'+(front?' style="outline:3px solid #2E6BC6"':'')+'>'+(front?'<span class="tag" style="background:#2E6BC6;color:#fff">Davant</span>':'')+cArt(c,44)+'<span>'+esc(cName(c))+'</span>'+roleTag(sp(c).role,true)+bar(pp,hpColor(pp),'hp-'+u)+'<span class="small" id="hp-'+u+'t">'+r.hp[u]+'/'+mx+'</span>'+
+        abilities(c).map(function(a){return '<div class="ab-row"><span>'+esc(a.n)+'</span><div class="charge"><i id="ch-'+u+'-'+a.i+'"></i></div></div>'}).join('')+'</div>'}).join('')+'</div></div>'+res;
+}
+function detailSheet(){
+  var s=G.detail,S=SPECIES[s],mine=G.owned.filter(function(c){return c.sp===s}),own=mine.length>0;
+  var evoOwned={};mine.forEach(function(c){if(c.stage)evoOwned[c.evo]=true});
+  function node(i){var e=i<0?{n:S.n,el2:''}:S.evos[i],ok=i<0?own:!!evoOwned[i];
+    return '<div class="box'+(ok?'':' off')+'" style="padding:8px">'+critter(S.el,e.el2,52,!ok,i>=0)+(ok?esc(e.n):'???')+'<span class="muted small" style="text-align:center">'+(i<0?'Nivell 1':i===0?'Nivell 2':'Nivell 3')+' · '+esc(ELS[S.el].n+(e.el2?' + '+ELS[e.el2].n:''))+'</span></div>'}
+  var line='<svg width="40" height="20" viewBox="0 0 40 20" aria-hidden="true"><path d="M20 0 V20" stroke="#B9B3C6" stroke-width="3"/></svg>';
+  var fork='<svg width="200" height="22" viewBox="0 0 200 22" aria-hidden="true" style="max-width:70%"><path d="M100 0 V8 M50 8 H150 M50 8 V22 M150 8 V22" stroke="#B9B3C6" stroke-width="3" fill="none"/></svg>';
+  var evos='<div class="tree"><div class="lvl">'+node(-1)+'</div>'+line+'<div class="lvl">'+node(0)+'</div>'+fork+'<div class="lvl">'+node(1)+node(2)+'</div></div>';
+  var best=mine.sort(function(a,z){return z.stage-a.stage})[0],have=best?abilities(best).length:0;
+  var abil='<div class="flat" style="background:var(--soft);gap:6px"><h3>Habilitats</h3>'+(ABIL[s]||[]).map(function(a,i){var open=own&&i<have;
+    return '<div style="display:flex;flex-direction:column;gap:1px;'+(open?'':'opacity:.6')+'"><b>'+esc(a[0])+' <span class="muted small">· cada '+a[1]+' torns</span></b><span class="small">'+esc(KIND_DESC[a[2]])+'</span>'+(open?'':'<span class="muted small">'+(i===2?'S’obre al nivell 2 (primera evolució).':'S’obre quan la tinguis.')+'</span>')+'</div>'}).join('')+'<p class="muted small">Al nivell 3, les habilitats fan més efecte.</p></div>';
+  var inst=mine.map(function(c){var st=stats(c),full=c.mill>=5;
+    var foods=Object.keys(G.food).filter(function(k){return G.food[k]>0}).map(function(k){return '<button type="button" class="btn sm light" data-act="feed" data-u="'+c.uid+'" data-el="'+k+'"'+(full?' disabled':'')+'>'+esc(FOOD[k])+' ('+G.food[k]+') '+(k===S.el?'+2':'+1')+'</button>'}).join('');
+    var opts=c.stage===0?[0]:c.stage===1?[1,2]:[];
+    var evoBtns=full&&opts.length?'<p><b>'+(opts.length>1?'Pot evolucionar! Tria la branca:':'Pot evolucionar!')+'</b></p><div class="grid2">'+opts.map(function(i){var e=S.evos[i];return '<button type="button" class="tap" data-act="evolve" data-u="'+c.uid+'" data-i="'+i+'">'+critter(S.el,e.el2,52,false,true)+esc(e.n)+'<span class="muted small" style="text-align:center">'+(e.el2?'70% '+esc(ELS[S.el].n)+' + 30% '+esc(ELS[e.el2].n):esc(ELS[S.el].n))+'</span></button>'}).join('')+'</div>':'';
+    return '<div class="flat" style="background:var(--soft)"><div class="row" style="gap:10px">'+cArt(c,58)+'<div style="flex:1;min-width:0"><b style="font-size:16px">'+esc(cName(c))+'</b> <span class="muted small">nivell '+lvl(c)+'</span><div class="muted small">Vida '+st.hp+' · Atac '+st.atk+' · Defensa '+st.def+(st.heal?' · Cura '+st.heal:'')+'</div><div class="muted small">'+esc(fatigueText(c))+'</div></div></div>'+
+      '<div class="row between small" style="font-weight:800"><span>Estrelles de força</span><span>'+Math.min(c.mill,5)+' de 5</span></div>'+bar(Math.min(c.mill,5)*20,ELS[S.el].c)+
+      (full?(c.stage>=2?'<p class="muted small">Ja té totes les estrelles.</p>':''):(foods?'<p class="muted small">Dona-li menjar per guanyar estrelles. El menjar del seu element en dona 2.</p><div class="row">'+foods+'</div>':'<p class="muted small">No tens menjar. En trobaràs pel camí.</p>'))+evoBtns+'</div>'}).join('');
+  var adopt='';
+  if(!own){var open=worldOpen(S.el);
+    adopt=open?'<button type="button" class="btn gold" data-act="adopt" data-s="'+s+'"'+(G.coins<S.price||G.owned.length>=cap()?' disabled':'')+'>Adopta-la · '+S.price+' monedes</button>'+(G.owned.length>=cap()?'<p class="muted">La casa és plena.</p>':G.coins<S.price?'<p class="muted">No tens prou monedes (en tens '+G.coins+').</p>':''):'<p class="flat" style="background:var(--soft)">Primer has de descobrir aquest món.</p>';}
+  return '<div class="modal" data-act="closeBg"><div class="sheet" role="dialog" aria-label="Fitxa de la bestiola" data-s="'+s+'"><div class="row" style="gap:12px;align-items:flex-start"><div style="background:'+(own?ELS[S.el].soft:'#E9E5F0')+';border-radius:20px;padding:6px">'+critter(S.el,'',90,!own)+'</div><div style="flex:1;min-width:0"><h1>'+(own?esc(S.n):'???')+'</h1><div class="muted">'+(own?esc(ELS[S.el].n):'Encara no l’has trobada')+'</div><div class="muted">Viu al '+esc(worldOpen(S.el)?ELS[S.el].mon.replace('Món ','món '):'món desconegut')+'</div></div><button type="button" class="btn sm light" data-act="close">Tanca</button></div>'+
+    '<div class="row" style="gap:8px;align-items:flex-start">'+roleTag(S.role)+'<p class="small" style="flex:1;min-width:0">'+esc(ROLE_DESC[S.role])+'</p></div>'+
+    inst+adopt+abil+'<h3>Arbre d’evolucions</h3>'+evos+'</div></div>';
+}

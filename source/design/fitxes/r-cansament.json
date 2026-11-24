@@ -1,0 +1,16 @@
+{
+  "claude": {
+    "at": "2026-11-23T19:00:00Z",
+    "text": "Al joc (versió 2): el nivell és el de l'evolució (nivell 1 = 3 expedicions, nivell 2 = 5, nivell 3 = 8). Les bestioles també descansen amb el temps: 1 punt cada 10 minuts. Si totes estan cansades, a Casa surt el botó «Fes la migdiada» perquè el joc no es quedi encallat."
+  },
+  "kind": "regla",
+  "order": 204,
+  "original": {
+    "at": "2026-11-23T16:00:00Z",
+    "images": [],
+    "text": "Es compta per exploracions, no per hores ni per dies.\nNivell 1: 3 exploracions seguides. Nivell 2: 5. Nivell 3: 8.\nQuan arriba al màxim, s'ha de quedar a casa el mateix nombre d'exploracions mentre hi van altres bestioles. Per això cal anar recollint moltes bestioles.\nPer confirmar: si es queda a casa abans d'arribar al màxim, recupera 1 punt per cada exploració que no fa."
+  },
+  "status": "revisat",
+  "title": "Cansament",
+  "versions": []
+}

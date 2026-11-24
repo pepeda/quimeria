@@ -1,0 +1,12 @@
+{
+  "kind": "regla",
+  "order": 201,
+  "original": {
+    "at": "2026-11-23T16:00:00Z",
+    "images": [],
+    "text": "5 elements: Foc, Aigua, Planta, Llamp i Psíquic.\nProposta: cada element en guanya 2 i en perd 2.\n- Aigua guanya Foc i Llamp\n- Foc guanya Planta i Psíquic\n- Planta guanya Aigua i Llamp\n- Llamp guanya Foc i Psíquic\n- Psíquic guanya Aigua i Planta"
+  },
+  "status": "original",
+  "title": "Elements i qui guanya a qui",
+  "versions": []
+}

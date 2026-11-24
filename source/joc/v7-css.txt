@@ -1,0 +1,10 @@
+.ab-row{width:100%;display:flex;flex-direction:column;gap:1px}
+.ab-row span{font-size:10px;font-weight:800;line-height:1.1;text-align:left;color:#47435C}
+.ab-row.locked span{color:#9C98AE}
+.stchips{display:flex;flex-wrap:wrap;gap:4px;min-height:22px}
+.stchip{font-size:12px;font-weight:800;border-radius:999px;padding:1px 8px;background:rgba(255,255,255,.2);color:#fff}
+.stchip.burn{background:#F26B3A}.stchip.poison{background:#3DAA5C}.stchip.stun{background:#F2B90F;color:#1E1B2E}.stchip.soak{background:#2E8BE6}.stchip.weak{background:#9B59E0}
+.stchip.good{background:#DDF3E2;color:#1F6B35}
+.cutin.combo{background:linear-gradient(100deg,rgba(0,0,0,.85) 0 12%,var(--cc) 12% 50%,var(--cc2) 50% 88%,rgba(0,0,0,.85) 88%)}
+.cutin .pair{display:flex;gap:18px;position:relative}
+.syn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:800;border-radius:999px;padding:2px 9px;background:#2F2780;color:#fff}

@@ -1,0 +1,12 @@
+{
+  "kind": "regla",
+  "order": 202,
+  "original": {
+    "at": "2026-11-23T16:00:00Z",
+    "images": [],
+    "text": "Cada bestiola té un rol: atac, defensa o curador."
+  },
+  "status": "original",
+  "title": "Rols de les bestioles",
+  "versions": []
+}

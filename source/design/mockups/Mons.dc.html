@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>Explorar els mons</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1E1B2E}a:hover{color:#4A3FB5}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #BFE3F7; font-family: 'Nunito', sans-serif; color: #1E1B2E; display: flex; flex-direction: column">
+
+<div style="padding: 16px 16px 0">
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 28px; line-height: 1.1">Explorar</h1>
+<p style="margin: 2px 0 0; font-size: 14px; color: #34405A">Tria a quin món vols entrar</p>
+</div>
+
+<div style="position: relative; flex-grow: 1">
+<svg width="390" height="500" viewBox="0 0 390 500" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+<g stroke="#FFFFFF" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round" fill="none">
+<path d="M195 240 L195 75"></path>
+<path d="M195 240 L338 190"></path>
+<path d="M195 240 L283 400"></path>
+<path d="M195 240 L107 400"></path>
+<path d="M195 240 L52 190"></path>
+</g>
+</svg>
+
+<div style="position: absolute; left: 149px; top: 14px; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div style="width: 84px; height: 84px; border-radius: 42px; background: #F26B3A; border: 4px solid #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C14 6 18 8 18 13 A6 6 0 0 1 6 13 C6 10 8 8 9 6 C10 8 11 9 12 9 C12 6 11 4 12 2 Z" fill="#FFFFFF"></path></svg></div>
+<div style="font-weight: 800; font-size: 13px">Foc</div>
+<div style="font-size: 11px; font-weight: 700; background: #FFFFFF; border-radius: 999px; padding: 1px 8px">40% explorat</div>
+</div>
+
+<div style="position: absolute; left: 292px; top: 130px; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div style="width: 84px; height: 84px; border-radius: 42px; background: #F2B90F; border: 4px solid #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 L4 14 H11 L10 22 L20 9 H13 Z" fill="#FFFFFF"></path></svg></div>
+<div style="font-weight: 800; font-size: 13px">Llamp</div>
+<div style="font-size: 11px; font-weight: 700; background: #FFFFFF; border-radius: 999px; padding: 1px 8px">10% explorat</div>
+</div>
+
+<a href="Mapa.dc.html" style="position: absolute; left: 237px; top: 342px; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-decoration: none; color: #1E1B2E">
+<span style="width: 84px; height: 84px; border-radius: 42px; background: #2E8BE6; border: 4px solid #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C15 7 19 10 19 14 A7 7 0 0 1 5 14 C5 10 9 7 12 2 Z" fill="#FFFFFF"></path></svg></span>
+<span style="font-weight: 800; font-size: 13px">Aigua</span>
+<span style="font-size: 11px; font-weight: 800; background: #1E1B2E; color: #FFFFFF; border-radius: 999px; padding: 1px 8px">Camí nou</span>
+</a>
+
+<div style="position: absolute; left: 61px; top: 342px; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div style="position: relative; width: 84px; height: 84px; border-radius: 42px; background: #3DAA5C; border: 4px solid #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 C5 9 11 4 20 4 C20 13 15 19 5 19 Z" fill="#FFFFFF"></path><path d="M5 19 L13 11" stroke="#3DAA5C" stroke-width="2" stroke-linecap="round"></path></svg>
+<div style="position: absolute; right: -8px; top: -6px; width: 30px; height: 30px; border-radius: 15px; background: #1E1B2E; border: 3px solid #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 30 30" aria-hidden="true"><path d="M3 27 C3 6 27 6 27 27 Z" fill="#FFFFFF"></path></svg></div>
+</div>
+<div style="font-weight: 800; font-size: 13px">Planta</div>
+<div style="font-size: 11px; font-weight: 800; background: #FFE08A; border-radius: 999px; padding: 1px 8px">Cova a mitges</div>
+</div>
+
+<div style="position: absolute; left: 6px; top: 130px; width: 92px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div style="width: 84px; height: 84px; border-radius: 42px; background: #8E94A8; border: 4px dashed #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 40px; color: #FFFFFF">?</div>
+<div style="font-weight: 800; font-size: 13px">Psíquic</div>
+<div style="font-size: 11px; font-weight: 700; background: #FFFFFF; border-radius: 999px; padding: 1px 8px">Desconegut</div>
+</div>
+
+<a href="Main.dc.html" style="position: absolute; left: 140px; top: 186px; width: 110px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: #1E1B2E">
+<svg width="110" height="96" viewBox="0 0 180 160" aria-hidden="true">
+<ellipse cx="90" cy="128" rx="86" ry="28" fill="#4E9A43"></ellipse>
+<ellipse cx="90" cy="118" rx="86" ry="28" fill="#7CC46B"></ellipse>
+<rect x="104" y="32" width="12" height="24" fill="#8A5A3C"></rect>
+<rect x="60" y="62" width="62" height="50" rx="4" fill="#FFF4E0" stroke="#8A5A3C" stroke-width="3"></rect>
+<path d="M52 66 L91 32 L130 66 Z" fill="#E2574C" stroke="#A23A31" stroke-width="3" stroke-linejoin="round"></path>
+<rect x="83" y="84" width="16" height="28" rx="3" fill="#8A5A3C"></rect>
+</svg>
+<span style="font-size: 11px; font-weight: 800; background: #FFFFFF; border-radius: 999px; padding: 1px 8px">Casa</span>
+</a>
+</div>
+
+<div style="margin: 0 12px 12px; background: #FFFFFF; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 6px 18px rgba(30,27,46,0.10)">
+<div style="font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 17px">Aventura a mitges</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="width: 44px; height: 44px; border-radius: 12px; background: #1E1B2E; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="26" height="26" viewBox="0 0 30 30" aria-hidden="true"><path d="M3 27 C3 6 27 6 27 27 Z" fill="#5E5A72"></path><path d="M9 27 C9 14 21 14 21 27 Z" fill="#3DAA5C"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1">
+<div style="font-weight: 800; font-size: 14px">Cova de les Arrels · Món de la Planta</div>
+<div style="font-size: 12px; color: #34405A">L'has deixada al pas 3 de 6. T'espera allà on la vas deixar.</div>
+</div>
+</div>
+<a href="Cova.dc.html" style="height: 46px; border-radius: 14px; background: #3DAA5C; color: #FFFFFF; text-decoration: none; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px">Continuar la cova</a>
+</div>
+
+<dc-import name="Nav" active="explorar" hint-size="390px,84px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

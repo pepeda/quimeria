@@ -1,0 +1,2 @@
+cd "$(dirname "$0")" && cp joc-bestioles-v12.bak joc-bestioles.html && node patch-v13.js >/dev/null && node patch-v13b.js >/dev/null && node patch-v13c.js >/dev/null && node patch-v13d.js >/dev/null && node patch-v14.js >/dev/null && node -e "
+const fs=require('fs');const h=fs.readFileSync('joc-bestioles.html','utf8');const a=h.indexOf('<script>')+8,b=h.lastIndexOf('</script>');fs.writeFileSync('check.js',h.slice(a,b));"

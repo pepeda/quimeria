@@ -1,0 +1,17 @@
+{
+  "claude": {
+    "at": "2026-11-23T19:00:00Z",
+    "text": "Al joc (versió 2): la casa ja es veu (abans un error l'aixafava) i les bestioles surten dins les habitacions. La partida nova comença a Explorar."
+  },
+  "kind": "pantalla",
+  "mockup": "https://claude.ai/artifact/DcQW5Cvu6cTyxe6aS5N3jD#artboard-Main",
+  "order": 101,
+  "original": {
+    "at": "2026-11-23T16:00:00Z",
+    "images": [],
+    "text": "Pestanya Casa. Ensenya la casa per dins, amb les habitacions i les bestioles que hi descansen.\nHi pots comprar mobles i afegir habitacions, jardí, piscina, spa o pista de tennis.\nCom més gran és la casa, més bestioles hi caben (ara 6 de 8 places). Algunes evolucions necessiten més espai."
+  },
+  "status": "revisat",
+  "title": "Casa per dins",
+  "versions": []
+}

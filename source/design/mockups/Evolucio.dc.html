@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>Evolució</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&amp;family=Nunito:wght@600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1E1B2E}a:hover{color:#4A3FB5}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #E9F7EC; font-family: 'Nunito', sans-serif; color: #1E1B2E; display: flex; flex-direction: column">
+
+<div style="padding: 14px 16px 4px; display: flex; align-items: center; gap: 10px">
+<a href="Bestioles.dc.html" aria-label="Tornar a les bestioles" style="width: 44px; height: 44px; border-radius: 14px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; color: #1E1B2E"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 L8 12 L15 19"></path></svg></a>
+<h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.05">Brotet pot evolucionar</h1>
+</div>
+
+<div style="margin: 8px 12px 0; background: #FFFFFF; border-radius: 22px; padding: 12px; display: flex; gap: 12px; align-items: center">
+<div style="width: 96px; height: 96px; border-radius: 20px; background: #D3F2D9; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><dc-import name="Critter" el="planta" px="84" hint-size="84px,84px"></dc-import></div>
+<div style="display: flex; flex-direction: column; gap: 6px; flex-grow: 1">
+<div style="font-weight: 800; font-size: 16px">Brotet · Planta · Atac</div>
+<div style="font-size: 12px; font-weight: 700; color: #34405A">Millores 5 de 5</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px">
+<div style="height: 8px; border-radius: 4px; background: #3DAA5C"></div>
+<div style="height: 8px; border-radius: 4px; background: #3DAA5C"></div>
+<div style="height: 8px; border-radius: 4px; background: #3DAA5C"></div>
+<div style="height: 8px; border-radius: 4px; background: #3DAA5C"></div>
+<div style="height: 8px; border-radius: 4px; background: #3DAA5C"></div>
+</div>
+<div style="font-size: 12px; color: #34405A">Ha menjat 3 fulles tendres i n'has trobat 1 de repetit.</div>
+</div>
+</div>
+
+<div style="padding: 14px 16px 6px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px">Tria en què es converteix</div>
+
+<div style="margin: 0 12px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1">
+<sc-for list="{{forms}}" as="f" hint-placeholder-count="3">
+<div style="background: #FFFFFF; border-radius: 20px; padding: 10px 12px; display: flex; gap: 12px; align-items: center; border: 3px solid {{f.ring}}">
+<div style="width: 70px; height: 70px; border-radius: 18px; background: #F2F7F3; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><dc-import name="Critter" el="{{f.el}}" el2="{{f.el2}}" px="60" hint-size="60px,60px"></dc-import></div>
+<div style="display: flex; flex-direction: column; gap: 5px; flex-grow: 1; min-width: 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline; gap: 6px">
+<div style="font-weight: 800; font-size: 15px">{{f.name}}</div>
+<div style="font-size: 11px; font-weight: 800; color: #34405A">{{f.role}}</div>
+</div>
+<div style="display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: #ECE6DC">
+<div style="width: {{f.w1}}; background: {{f.c1}}"></div>
+<div style="width: {{f.w2}}; background: {{f.c2}}"></div>
+</div>
+<div style="font-size: 11px; font-weight: 700; color: #34405A">{{f.mix}}</div>
+<div style="font-size: 11px; color: #34405A">{{f.note}}</div>
+</div>
+</div>
+</sc-for>
+</div>
+
+<div style="padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 12px; font-weight: 700; color: #34405A; text-align: center">Necessites: 1 perla de riu (en tens 1) · ocuparà 2 places a casa</div>
+<button style="height: 52px; border-radius: 16px; border: none; background: #1E1B2E; color: #FFFFFF; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 16px">Evolucionar a Rierol</button>
+</div>
+
+<dc-import name="Nav" active="bestioles" hint-size="390px,84px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var G = '#3DAA5C', B = '#2E8BE6';
+    return {
+      forms: [
+        { name: 'Arbrot', el: 'planta', el2: '', role: 'Defensa', w1: '100%', w2: '0%', c1: G, c2: G, mix: 'Planta 100%', note: 'Molt resistent. És gran: ocupa 2 places.', ring: '#FFFFFF' },
+        { name: 'Floreta', el: 'planta', el2: '', role: 'Curador', w1: '100%', w2: '0%', c1: G, c2: G, mix: 'Planta 100%', note: 'Cura tot l’equip una mica cada torn.', ring: '#FFFFFF' },
+        { name: 'Rierol', el: 'planta', el2: 'aigua', role: 'Atac', w1: '70%', w2: '30%', c1: G, c2: B, mix: 'Planta 70% · Aigua 30%', note: 'Atac de planta, i un atac secundari d’aigua contra el foc.', ring: '#2E8BE6' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

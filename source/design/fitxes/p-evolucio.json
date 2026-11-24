@@ -1,0 +1,17 @@
+{
+  "claude": {
+    "at": "2026-11-23T19:00:00Z",
+    "text": "Canviat al joc (versió 2), segons el comentari de la partida de prova: les evolucions fan un arbre. Nivell 1 = la bestiola. Nivell 2 = primera evolució, sempre d'un sol element. Nivell 3 = dues branques per triar; només una té dos elements (70/30). La fitxa de cada bestiola dibuixa l'arbre, i la llista de Bestioles ensenya la forma evolucionada."
+  },
+  "kind": "pantalla",
+  "mockup": "https://claude.ai/artifact/DcQW5Cvu6cTyxe6aS5N3jD#artboard-Evolucio",
+  "order": 106,
+  "original": {
+    "at": "2026-11-23T16:00:00Z",
+    "images": [],
+    "text": "Una bestiola millora menjant i quan trobes una còpia repetida. Després de 5 millores pot evolucionar.\nCada bestiola té 3 evolucions i tu tries quina.\nAlgunes evolucions afegeixen un segon element, per exemple Planta 70% + Aigua 30%. Algunes ocupen més places a casa."
+  },
+  "status": "revisat",
+  "title": "Evolució",
+  "versions": []
+}

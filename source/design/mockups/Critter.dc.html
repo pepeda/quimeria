@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>Bestiola</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<svg width="{{px}}" height="{{px}}" viewBox="0 0 64 64" aria-hidden="true" style="display: block; filter: {{filt}}">
+<g display="{{d.foc}}"><path d="M22 24 C19 14 27 12 26 3 C33 8 35 12 34 17 C37 13 41 13 41 7 C47 15 45 21 41 25 Z" fill="#FFB238"></path></g>
+<g display="{{d.aigua}}"><path d="M24 25 Q32 3 42 25 Z" fill="#7CC0FF"></path></g>
+<g display="{{d.planta}}"><path d="M32 24 L32 11" stroke="#2E7D45" stroke-width="3" stroke-linecap="round"></path><path d="M32 13 Q21 4 18 12 Q25 18 32 13 Z" fill="#7BD389"></path><path d="M32 13 Q43 4 46 12 Q39 18 32 13 Z" fill="#7BD389"></path></g>
+<g display="{{d.llamp}}"><path d="M17 30 L11 9 L20 17 L22 6 L29 24 Z" fill="#E09A00"></path><path d="M47 30 L53 9 L44 17 L42 6 L35 24 Z" fill="#E09A00"></path></g>
+<g display="{{d.psiquic}}"><path d="M32 24 L32 10" stroke="#6B2FB3" stroke-width="2.5" stroke-linecap="round"></path><circle cx="32" cy="8" r="5" fill="#F0C3FF" stroke="#6B2FB3" stroke-width="2"></circle></g>
+<ellipse cx="32" cy="41" rx="23" ry="19" fill="{{c}}"></ellipse>
+<ellipse cx="32" cy="48" rx="13" ry="9" fill="{{belly}}"></ellipse>
+<g display="{{spotD}}"><circle cx="14" cy="38" r="4" fill="{{spot}}"></circle><circle cx="50" cy="44" r="4.5" fill="{{spot}}"></circle><circle cx="45" cy="29" r="3" fill="{{spot}}"></circle></g>
+<circle cx="25" cy="38" r="5.5" fill="#FFFFFF"></circle>
+<circle cx="39" cy="38" r="5.5" fill="#FFFFFF"></circle>
+<circle cx="26" cy="39" r="2.8" fill="#1E1B2E"></circle>
+<circle cx="40" cy="39" r="2.8" fill="#1E1B2E"></circle>
+<path d="M29 46 Q32 49 35 46" stroke="#1E1B2E" stroke-width="2" fill="none" stroke-linecap="round"></path>
+</svg>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"el":{"editor":"enum","options":["foc","aigua","planta","llamp","psiquic"],"default":"foc"},"el2":{"editor":"enum","options":["","foc","aigua","planta","llamp","psiquic"],"default":""},"px":{"editor":"int","default":96,"min":24,"max":240},"locked":{"editor":"boolean","default":false},"$preview":{"width":96,"height":96}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var C = {
+      foc: ['#F26B3A', '#FFD3B8'],
+      aigua: ['#2E8BE6', '#CFE6FF'],
+      planta: ['#3DAA5C', '#D3F2D9'],
+      llamp: ['#F2B90F', '#FFF0B3'],
+      psiquic: ['#9B59E0', '#EBD9FF']
+    };
+    var el = this.props.el ?? 'foc';
+    var el2 = this.props.el2 ?? '';
+    var c = C[el] || C.foc;
+    var c2 = C[el2];
+    var on = function (k) { return (k === el || k === el2) ? 'inline' : 'none'; };
+    return {
+      px: this.props.px ?? 96,
+      filt: (this.props.locked === true || this.props.locked === 'true') ? 'brightness(0) opacity(0.22)' : 'none',
+      c: c[0],
+      belly: c[1],
+      spot: c2 ? c2[0] : c[0],
+      spotD: c2 ? 'inline' : 'none',
+      d: { foc: on('foc'), aigua: on('aigua'), planta: on('planta'), llamp: on('llamp'), psiquic: on('psiquic') }
+    };
+  }
+}
+</script>
+</body>
+</html>
