@@ -26,7 +26,7 @@ function makeBattle(o){
   bt.meter=0;
   if(k){en.boss=k;en.n=BOSS[k].n;en.bossD=BOSS[k].d;if(k==='tricap'){en.max=en.hp=Math.round(en.max*0.7);en.atk=Math.round(en.atk*0.85)}bt.minions=0;bt.mhp=Math.round(en.max*0.09);bt.mcur=0;bt.frozen={};bt.charging=0;bt.phase=0;bt.fallen=0;bt.heads=3}
   /* softer enemies (V13_ADJ; the first bosses even softer), and the powers of the equipped gear */
-  var ad=V13_ADJ[en.boss?'boss':en.guardian?'guardian':'normal'];en.atk=Math.max(1,Math.round(en.atk*ad.atk*(en.boss&&r&&!r.zone&&!r.cave?0.85:1)));en.max=en.hp=Math.round(en.hp*ad.hp);bt.P=powerOf(G.equip);if(bt.P.shield0)bt.shield=Math.min(6,bt.shield+bt.P.shield0);bt.megaUsed={};
+  var ad=V13_ADJ[en.boss?'boss':en.guardian?'guardian':'normal'];en.atk=Math.max(1,Math.round(en.atk*ad.atk*(en.boss&&r&&!r.zone&&!r.cave?0.85:1)));en.max=en.hp=Math.round(en.hp*ad.hp);if(r&&r.tut&&!en.wild){en.max=en.hp=Math.round(en.hp*TUT_GUARD_HP)}bt.P=powerOf(G.equip);if(bt.P.shield0)bt.shield=Math.min(6,bt.shield+bt.P.shield0);bt.megaUsed={};
   /* the first boss of the game was too hard for the starters: the zone-1 final guardian has 15% less life */
   if(o.final&&r&&(r.zone||0)===0&&!r.cave){en.hp=Math.round(en.hp*0.85);en.max=en.hp}
   if(curZone()>=3)en.hard=true;
@@ -263,7 +263,7 @@ function battleWon(){
   var r2=run();if(r2&&r2.team&&!r2.team.some(function(u){return r2.hp[u]>0}))r2.team.forEach(function(u){r2.hp[u]=1});
 }
 function finishRun(ok,keepAll){
-  var r=run();if(!r)return;
+  var r=run();if(!r)return;if(r.tut&&G.tut)G.tut.done=1;
   var team=r.team.slice(),c0=G.coins;stopBattle();
   var z=r.zone||0,bonus=ok?ZONE_BONUS[z]:0,coins=ok||keepAll?r.coins+bonus:Math.floor(r.coins/2);
   G.coins+=coins;

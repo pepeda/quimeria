@@ -1,6 +1,7 @@
 const fs=require('fs');const vm=require('vm');
 const ev=require('./harness/h.js');
 function ok(c,m){console.log((c?'ok   ':'FAIL ')+m);if(!c)process.exitCode=1}
+ev("G.items=['espasaFusta'];G.superForged=true"); // the forge and sets tabs show once they are useful
 const mx=ev("G.mtab='obj';scMotxilla()")+ev("G.mtab='sets';scMotxilla()")+ev("G.mtab='eq';scMotxilla()");
 ok(mx.indexOf('class="qd"')>=0&&mx.indexOf('4 objectes iguals → 1')>=0,'forge short text with ?');
 ok(mx.indexOf('Molt difícils d’aconseguir')>=0&&mx.indexOf('Hi ha <b>10 sets</b>')<0,'sets short text, details behind ?');

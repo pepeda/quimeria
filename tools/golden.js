@@ -257,6 +257,8 @@ function play(game, emit) {
   rec('init');
   // the title screen shows at start; open the help once, then close both
   step('help'); exec("if(typeof closeStory==='function')closeStory()", 'close title and help');
+  // this transcript follows the normal game; the first-expedition guide is tested on its own
+  exec("if(G.tut)G.tut.done=1", 'guide done');
   // first look at every screen
   step('tip', { k: 'explorar' });
   ['casa', 'bestioles', 'motxilla', 'explorar'].forEach(to => step('nav', { to }));

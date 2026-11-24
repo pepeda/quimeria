@@ -26,7 +26,7 @@ const START=['brotet','gotim','xispa','espurnet'],TEAM=['brasa','gotim','arrel',
 const STR=[['Inicials F1 nv1, 3',3,1,1,-1,START],['Inicials F1 nv5, 4',4,1,5,-1,START],['F1 nv5, 4, Normal',4,1,5,0],['F2 nv10, 4, Normal',4,2,10,0],['F2 nv8, 4, cofres 3 dies',4,2,8,'chest3'],['F2 nv10, 4, cofres 3 dies',4,2,10,'chest3'],
   ['F2 nv10, 4, Refinada',4,2,10,1],['F2 nv10, 4, Màgica',4,2,10,2],['F3 nv15, 5, Màgica',5,3,15,2],['F3 nv15, 5, cofres 2 setm.',5,3,15,'chest14'],['F3 nv15, 5, Èpica',5,3,15,3],['F4 nv20, 5, Èpica',5,4,20,3],['F4 nv20, 5, cofres 2 setm.',5,4,20,'chest14'],['F4 nv20, 6, Superèpica',6,4,20,4]];
 function trial(world, zone, s){
-  const G=T.G;G.owned=(s[5]||TEAM).slice(0,s[1]).map(sp=>{const c=T.mk(sp);c.stage=s[2]-1;c.evo=c.stage?(c.stage===1?0:1):-1;c.lvl=s[3];return c});
+  const G=T.G;if(G.tut)G.tut.done=1;G.owned=(s[5]||TEAM).slice(0,s[1]).map(sp=>{const c=T.mk(sp);c.stage=s[2]-1;c.evo=c.stage?(c.stage===1?0:1):-1;c.lvl=s[3];return c});
   G.runs={};G.active=null;G.world=world;G.zone=zone;G.pick=G.owned.map(c=>c.uid);G.equip=typeof s[4]==='string'?Object.assign({},CG[s[4].slice(5)]):gearT(s[4]);
   T.startRun();const r=T.run();T.startBattle({el:world,L:r.L+0.6,guardian:true,final:true,n:'G'});
   const b=r.event;let n=0;while(!b.over&&n<300){T.battleTick();n++}return b.over==='win';

@@ -40,6 +40,7 @@ function render(){
   if(s==='run'&&r&&r.event&&r.event.type==='battle'&&!r.event.over){updateAbilities();$('shield').classList.toggle('on',r.event.shield>0);$('warn').classList.toggle('on',!!r.event.warn);scheduleTick()}else stopBattle();
   persist();
   menuDots();
+  tutUpdate();
 }
 /* red dots on the menu: a critter can evolve, something can be forged, better gear is in the backpack */
 function menuDots(){try{var nav=$('nav');if(!nav||!nav.querySelector)return;

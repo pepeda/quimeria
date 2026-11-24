@@ -25,8 +25,8 @@ function act(a,d){
     case 'tip':G.tips[d.k]=1;break;
     case 'help':showHelp(false);return;
     case 'nav':G.screen=d.to;G.detail=null;break;
-    case 'world':if(!worldOpen(d.w)){toast('Aquest món encara és desconegut. Completa 3 expedicions.');break}G.world=d.w;G.screen='mon';break;
-    case 'path':G.zone=+d.p;G.pick=[];G.screen='equip';break;
+    case 'world':if(tutOn()&&d.w!=='aigua'){toast('Primer prova el món d’Aigua.');break}if(!worldOpen(d.w)){toast('Aquest món encara és desconegut. Completa 3 expedicions.');break}G.world=d.w;G.screen='mon';break;
+    case 'path':G.zone=+d.p;G.pick=tutOn()&&G.world==='aigua'&&!G.zone?tutPick():[];G.screen='equip';break;
     case 'pick':var i=G.pick.indexOf(d.u);if(i>=0)G.pick.splice(i,1);else if(G.pick.length<maxTeam())G.pick.push(d.u);else toast('Ara nom\u00e9s hi caben '+maxTeam()+' bestioles.');break;
     case 'go':if(G.pick.length&&needOk()){if(G.pick.length<2)toast('Amb poques bestioles és més difícil!');startRun()}break;
     case 'resume':G.active=d.w;G.screen='run';break;

@@ -22,7 +22,7 @@ function evoDots(c,S){if(!c)return '';var col=ELS[S.el].c,need=xpNeed(lvl(c)),x=
   return '<span class="small" style="display:block;font-weight:800;margin-top:2px" aria-label="Forma '+form(c)+', nivell '+lvl(c)+'">F'+form(c)+' · niv. '+lvl(c)+'</span>'+
     '<span style="display:block;width:100%;height:5px;border-radius:3px;background:#E6E1D6;overflow:hidden"><span style="display:block;height:100%;width:'+Math.round(x*100/need)+'%;background:'+col+'"></span></span>'}
 /* --- the Niu: critters that do not fit in the house wait here, without limit. They are copies for evolving --- */
-function niuBlock(){var N=G.niu||[],room=G.owned.length<cap();
+function niuBlock(){var N=G.niu||[],room=G.owned.length<cap();if(!N.length)return '';
   var rows=N.map(function(c){var sel=G.niuSwap===c.uid;
     var swap=sel?'<div class="flat" style="background:#fff;gap:6px;width:100%"><b class="small">Quina bestiola de casa va al Niu?</b>'+G.owned.filter(function(h){return !busyWorld(h)}).map(function(h){
         return '<button type="button" class="btn sm light" style="text-align:left" data-act="niuSwap" data-u="'+c.uid+'" data-h="'+h.uid+'">'+esc(cName(h))+' · forma '+form(h)+' · niv. '+lvl(h)+'</button>'}).join('')+'<button type="button" class="btn sm" data-act="niuPick" data-u="'+c.uid+'">Cancel·la</button></div>':'';

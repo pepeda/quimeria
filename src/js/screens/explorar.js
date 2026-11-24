@@ -8,7 +8,7 @@ function scExplorar(){
   var house='<div style="position:absolute;left:145px;top:190px;width:100px;text-align:center"><svg width="100" height="80" viewBox="0 0 180 150" aria-hidden="true"><ellipse cx="90" cy="120" rx="86" ry="26" fill="#7CC46B"/><rect x="60" y="62" width="62" height="50" rx="4" fill="#FFF4E0" stroke="#8A5A3C" stroke-width="3"/><path d="M52 66 L91 32 L130 66 Z" fill="#E2574C" stroke="#A23A31" stroke-width="3"/></svg></div>';
   var paused=Object.keys(G.runs).map(function(w){var r=G.runs[w];return '<div class="row" style="gap:10px">'+elIcon(w,28,ELS[w].c)+'<div style="flex:1;min-width:0"><b>'+esc(ELS[w].mon)+'</b><div class="muted small">Pas '+(r.i+1)+' de '+r.slots.length+(r.cave?' · dins una cova':'')+'</div></div><button type="button" class="btn sm green" data-act="resume" data-w="'+w+'">Continua</button><button type="button" class="btn sm light" data-act="abandon" data-w="'+w+'">'+(abandonArm===w?'Segur?':'Deixa-la')+'</button></div>'}).join('');
   return tip('explorar','Toca un món per entrar-hi. El número % diu quant n’has explorat. Les estrelles ★ diuen com és de difícil.')+
-    (G.chest&&!G.chest.open?'<button type="button" class="btn gold" data-act="nav" data-to="resum">Tens un cofre per obrir!</button>':'')+
+    goalCard()+
     '<h1>Explorar</h1><p class="muted">Tria a quin món vols entrar.</p><div style="overflow-x:auto"><div class="map">'+lines+house+ws+'</div></div>'+
     (paused?'<div class="flat"><h3>Aventures a mitges</h3><p class="muted small">Les bestioles d’una aventura a mitges no poden anar enlloc més fins que l’acabis o la deixis.</p>'+paused+'</div>':'')+
     (G.psiquic?'':'<p class="muted">Completa 3 expedicions per descobrir el món desconegut ('+G.completed+' de 3).</p>');

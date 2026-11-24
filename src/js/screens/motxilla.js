@@ -18,10 +18,11 @@ function scMotxilla(){
   tabs.obj=forge;tabs.eq+=powersBlock();tabs.sets=setsBlock();
   tabs.obj+='<h2>A la motxilla</h2>'+(inv||'<p class="muted">Encara no tens objectes. En trobaràs explorant.</p>');
   tabs.menjar='<h2>Menjar</h2><div class="grid3">'+food+'</div>';
-  var t=tabs[G.mtab]?G.mtab:'eq';
+  var show={eq:1,menjar:1,obj:G.items.length>0||!!G.forgeChoice,sets:legendOpen()};
+  var t=tabs[G.mtab]&&show[G.mtab]?G.mtab:'eq';
   /* red dots on the tabs: something can be forged, a legend piece can be bought, better gear is in the backpack */
   var dot={obj:forgeReady().length>0,sets:legendOpen()&&G.coins>=LEGEND_COST&&ORDER.filter(worldOpen).some(function(el){return missingPieces(el).length}),eq:betterGear()};
-  var bar='<div class="mtabs" role="tablist">'+[['eq','Equip'],['obj','Objectes i forja'],['sets','Sets'],['menjar','Menjar']].map(function(x){return '<button type="button" role="tab" class="mtab'+(t===x[0]?' on':'')+'" aria-selected="'+(t===x[0])+'" data-act="mtab" data-k="'+x[0]+'">'+x[1]+(dot[x[0]]?'<span class="rdot" aria-label="hi ha novetats"></span>':'')+'</button>'}).join('')+'</div>';
+  var bar='<div class="mtabs" role="tablist">'+[['eq','Equip'],['obj','Objectes i forja'],['sets','Sets'],['menjar','Menjar']].filter(function(x){return show[x[0]]}).map(function(x){return '<button type="button" role="tab" class="mtab'+(t===x[0]?' on':'')+'" aria-selected="'+(t===x[0])+'" data-act="mtab" data-k="'+x[0]+'">'+x[1]+(dot[x[0]]?'<span class="rdot" aria-label="hi ha novetats"></span>':'')+'</button>'}).join('')+'</div>';
   return '<h1>Motxilla</h1>'+bar+(t==='obj'?forgeChoiceBlock():'')+tabs[t];
 }
 function heroOutfit(){var id=G.equip.vestit,it=IT(id);

@@ -13,7 +13,8 @@ function buildRoute(w,z){
 function startRun(){
   var w=G.world,z=G.zone||0,hp={};
   G.pick.forEach(function(u){hp[u]=stats(byUid(u)).hp});
-  G.runs[w]={world:w,zone:z,L:zoneL(w,z),i:0,slots:buildRoute(w,z),team:G.pick.slice(),hp:hp,coins:0,cave:null,scene:null,node:'a',event:null,reveal:0,bless:0};
+  var tu=tutOn()&&w==='aigua'&&!z;
+  G.runs[w]={world:w,zone:z,L:zoneL(w,z),i:0,slots:tu?TUT_ROUTE.map(function(k,i){return k==='gen'?{k:k,scene:pickScene('gen',w,[])}:k==='spring'?{k:k,scene:'font'}:k==='wild'?{k:k,sp:tutWild()}:{k:k}}):buildRoute(w,z),tut:tu?1:0,team:G.pick.slice(),hp:hp,coins:0,cave:null,scene:null,node:'a',event:null,reveal:0,bless:0};
   G.active=w;G.pick=[];G.screen='run';arrive();
 }
 function arrive(){
@@ -23,6 +24,8 @@ function arrive(){
   if(s.k==='fork'&&!s.scene){r.event={type:'fork'};return}
   if(s.k==='guardian'){r.event={type:'guardianPre'};return}
   if(s.k==='mini'){r.event={type:'miniPre'};return}
+  if(s.k==='wild'){r.event={type:'wild',sp:s.sp,rare:false};return}
+  if(s.k==='fight'){startBattle({el:r.world,L:Math.max(0.5,r.L-0.3)});return}
   if(s.k==='cave'){r.cave=newCave(1);enterScene(r.cave.list[0]);return}
   enterScene(s.scene);
 }
