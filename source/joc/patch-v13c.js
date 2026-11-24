@@ -17,7 +17,7 @@ rep("var G=migrate(load(S_KEY));", "var G=(function(){var raw=null,g=null;try{ra
   "  try{g=raw?JSON.parse(raw):null}catch(e){g=null}\n" +
   "  if(raw&&(!g||typeof g!=='object'||(g.v!==1&&g.v!==2))){try{localStorage.setItem(S_KEY+'.bak-'+Date.now(),raw)}catch(e){}g=null}\n" +
   "  g=migrate(g);var d=newGame();Object.keys(d).forEach(function(k){if(g[k]===undefined||g[k]===null)g[k]=d[k]});\n" +
-  "  if(!Array.isArray(g.owned))g.owned=[];g.owned=g.owned.filter(function(c){return c&&SPECIES[c.sp]});if(!g.owned.length)g.owned=d.owned;\n" +
+  "  if(!Array.isArray(g.owned))g.owned=[];g.owned=g.owned.filter(function(c){return c&&typeof c==='object'&&c.sp});if(!g.owned.length)g.owned=d.owned;\n" +
   "  if(!Array.isArray(g.items))g.items=[];['equip','built','food','runs','done','seen','tips'].forEach(function(k){if(typeof g[k]!=='object'||Array.isArray(g[k]))g[k]={}});\n" +
   "  return g})();");
 // 3) phone clock went backwards: restart the rest clock from now
@@ -30,5 +30,6 @@ function battleTick(){var r=run(),b=r&&r.event;
 function battleWon(){battleWon3();var r=run();if(r&&r.team&&!r.team.some(function(u){return r.hp[u]>0}))r.team.forEach(function(u){r.hp[u]=1})}
 try{document.documentElement.style.touchAction='manipulation'}catch(e){}
 /* ================= COMMENTS ================= */`);
+rep("renderTypes();render();renderF();", "/* drop critters of unknown species only now, after all species are defined (doing it at load lost the later species) */\nG.owned=G.owned.filter(function(c){return SPECIES[c.sp]});if(!G.owned.length)G.owned=newGame().owned;\nrenderTypes();render();renderF();");
 fs.writeFileSync(P, s);
 console.log('patched v13c');
