@@ -45,11 +45,15 @@ function starsN(L){return Math.max(1,Math.min(5,Math.round(L)))}
 function starStr(n){var s='';for(var i=0;i<5;i++)s+=i<n?'★':'☆';return '<span class="stars" aria-label="Dificultat '+n+' de 5">'+s+'</span>'}
 function pathL(w,path){return TIER[w]+(path==='llarg'?1:0)}
 function worldScenes(w){return Object.keys(SCENES).filter(function(id){var s=SCENES[id];return (s.pool==='gen'||s.pool==='land'||s.pool==='fork'||(s.pool==='sig'&&s.world===w))})}
-/* real-time rest: 1 point every 10 minutes at home (2 with the spa) */
+/* real-time rest: 1 point every 10 minutes at home (2 with the spa, and double again at night with the campfire) */
 function applyRestClock(){
   var now=Date.now();if(!(G.restClock<=now))G.restClock=now;var steps=Math.floor((now-G.restClock)/600000);
   if(steps<=0)return;G.restClock+=steps*600000;
   var per=(G.built.spa?2:1)*Math.min(steps,20);
+  G.owned.forEach(function(c){if(busyWorld(c))return;if(c.rest>0){c.rest=Math.max(0,c.rest-per);if(!c.rest)c.fat=0}else c.fat=Math.max(0,c.fat-per)});
+  /* campfire (house): at night, from 21:00 to 8:00, the rest counts double */
+  var hr=new Date().getHours();if(!G.built.foguera||(hr>=8&&hr<21))return;
+  per=Math.min(steps,20);
   G.owned.forEach(function(c){if(busyWorld(c))return;if(c.rest>0){c.rest=Math.max(0,c.rest-per);if(!c.rest)c.fat=0}else c.fat=Math.max(0,c.fat-per)});
 }
 function available(c){return !busyWorld(c)&&c.rest===0}

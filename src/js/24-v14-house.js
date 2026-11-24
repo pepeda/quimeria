@@ -40,12 +40,8 @@ function h14Open(x){return !x.el||h14WorldDone(x.el)}
 var H14_FC=FORGE_COST.slice();
 function h14Forge(){for(var i=0;i<H14_FC.length;i++)FORGE_COST[i]=G.built.forja?Math.round(H14_FC[i]*0.8):H14_FC[i]}
 
-/* after each expedition: extra rest, extra coins and food from the house */
-var h14FinishRun=finishRun;
-finishRun=function(ok,keepAll){
-  var r=run();if(!r)return h14FinishRun.apply(this,arguments);
-  var team=r.team.slice(),w=r.world,c0=G.coins;
-  var out=h14FinishRun.apply(this,arguments);
+/* after each expedition: extra rest, extra coins and food from the house (team: who went, w: the world, c0: coins before) */
+function houseAfterRun(ok,team,w,c0){
   var s=G.summary||{},B=G.built,got=G.coins-c0,notes=[];
   var home=G.owned.filter(function(c){return team.indexOf(c.uid)<0&&!busyWorld(c)});
   function rest1(c){if(c.rest>0){c.rest=Math.max(0,c.rest-1);if(!c.rest)c.fat=0}else c.fat=Math.max(0,c.fat-1)}
@@ -64,22 +60,8 @@ finishRun=function(ok,keepAll){
   }
   if(B.lab){var cand=home.filter(function(c){return c.mill<5&&cName(c)!==s.tennis});if(cand.length){var t=pickOne(cand);t.mill++;notes.push(cName(t)+' ha fet experiments al laboratori: +1 estrella de força.')}}
   s.house=notes;
-  return out;
-};
-var h14ScResum=scResum;
-scResum=function(){var h=h14ScResum.apply(this,arguments),s=G.summary,m='<div class="row" style="justify-content:center">',i=h.lastIndexOf(m);
-  if(!s||!s.house||!s.house.length||i<0)return h;
-  return h.slice(0,i)+'<div class="small" style="background:#FFF4D6;border-radius:12px;padding:8px 12px;text-align:left"><b>La casa ajuda:</b> '+esc(s.house.join(' '))+'</div>'+h.slice(i)};
+}
 
-/* campfire: at night the 10-minute rest at home counts double */
-var h14Rest=applyRestClock;
-applyRestClock=function(){
-  var now=Date.now(),before=G.restClock;h14Rest.apply(this,arguments);
-  if(!G.built.foguera||!(before<=now))return;
-  var steps=Math.round((G.restClock-before)/600000),hr=new Date().getHours();if(steps<=0||(hr>=8&&hr<21))return;
-  var per=Math.min(steps,20);
-  G.owned.forEach(function(c){if(busyWorld(c))return;if(c.rest>0){c.rest=Math.max(0,c.rest-per);if(!c.rest)c.fat=0}else c.fat=Math.max(0,c.fat-per)});
-};
 
 /* locked element rooms cannot be bought; area headings fold */
 function h14Folded(a){var f=G.hFold&&G.hFold[a];if(f!==undefined)return !!f;

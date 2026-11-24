@@ -195,7 +195,8 @@ function battleWon0(){
   r.event={type:'card',kind:'coins',n:Math.round((15+10*L)*(teamTalent('tresor')?1.5:1)),why:'Has guanyat la batalla!'};
 }
 function finishRun(ok,keepAll){
-  var r=run();if(!r)return;stopBattle();
+  var r=run();if(!r)return;
+  var team=r.team.slice(),c0=G.coins;stopBattle();
   var z=r.zone||0,bonus=ok?ZONE_BONUS[z]:0,coins=ok||keepAll?r.coins+bonus:Math.floor(r.coins/2);
   G.coins+=coins;
   var spa=G.built.spa?2:1,tired=[];
@@ -209,6 +210,7 @@ function finishRun(ok,keepAll){
   if(ok){G.completed++;G.done[r.world+':z'+z]=true;if(G.completed>=3&&!G.psiquic){G.psiquic=true;unlocked=true}}
   G.summary={ok:ok,keepAll:!!keepAll,coins:coins,bonus:bonus,world:r.world,zone:z,tired:tired,unlocked:unlocked,tennis:tennis,pct:0,bigger:maxTeam()>before?maxTeam():0};
   delete G.runs[r.world];G.active=null;G.screen='resum';G.summary.pct=worldPct(r.world);
+  houseAfterRun(ok,team,r.world,c0);
 }
 function worldPct(w){
   var sps=speciesOf(w),own=sps.filter(ownsSp).length,sc=worldScenes(w),seen=sc.filter(function(id){return G.seen[w]&&G.seen[w][id]}).length,z=[0,1,2].filter(function(i){return G.done[w+':z'+i]}).length;
