@@ -155,7 +155,6 @@ function doMega(x,r,b){var m=x.mega;b.megaUsed[m.id]=1;
     txt:'COMBO SECRET! '+x.parts.map(function(p){return cName(p.c)}).join(', ')+' fan '+m.n+': -'+n+'. '+m.d+(isNew?' Nou combo descobert: queda apuntat a la fitxa!':'')}}
 /* --- battle start and each turn --- */
 var V13_ADJ={boss:{atk:0.78,hp:0.85},guardian:{atk:0.85,hp:0.9},normal:{atk:0.92,hp:1}};
-function makeBattle(o){var bt=makeBattle1(o),en=bt.enemy,ad=V13_ADJ[en.boss?'boss':en.guardian?'guardian':'normal'];var rz=run();en.atk=Math.max(1,Math.round(en.atk*ad.atk*(en.boss&&rz&&!rz.zone&&!rz.cave?0.85:1)));en.max=en.hp=Math.round(en.hp*ad.hp);bt.P=powerOf(G.equip);if(bt.P.shield0)bt.shield=Math.min(6,bt.shield+bt.P.shield0);bt.megaUsed={};return bt}
 function battleTick3(){
   var r=run(),b=r.event;if(!b.P)b.P=powerOf(G.equip);var P=b.P;b._procs=[];b._vamp=0;b._thorn=0;
   if(P.haste)r.team.forEach(function(u){(b.ch[u]||[]).forEach(function(v,i){if(v>1&&Math.random()*100<P.haste)b.ch[u][i]=v-1})});

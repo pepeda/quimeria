@@ -11,12 +11,6 @@ var BOSS_W={foc:'cavaller',aigua:'gel',planta:'gegant',llamp:'eixam',psiquic:'om
 var TEAM_METER=7;
 var GROUP_NAMES={'aigua+foc+llamp':'Tempesta de vapor elèctric','foc+llamp+planta':'Bosc en flames','aigua+planta+psiquic':'Pluja de somnis','foc+llamp+psiquic':'Llamp de foc mental',
   'aigua+llamp+planta':'Tempesta verda','aigua+foc+planta':'Gèiser del bosc','foc+planta+psiquic':'Flor de foc','aigua+llamp+psiquic':'Mar de llamps','llamp+planta+psiquic':'Arbre del tro','aigua+foc+psiquic':'Boira de foc'};
-function makeBattle1(o){
-  var bt=makeBattle0(o),en=bt.enemy,k=o.final?BOSS_W[o.el]:((o.n==='Rei de la cova'||o.n==='Rei de les Profunditats')?'tricap':null);
-  bt.meter=0;
-  if(k){en.boss=k;en.n=BOSS[k].n;en.bossD=BOSS[k].d;if(k==='tricap'){en.max=en.hp=Math.round(en.max*0.7);en.atk=Math.round(en.atk*0.85)}bt.minions=0;bt.mhp=Math.round(en.max*0.09);bt.mcur=0;bt.frozen={};bt.charging=0;bt.phase=0;bt.fallen=0;bt.heads=3}
-  return bt;
-}
 function outDmg1(c,pow,b,r){var o=outDmg0(c,pow,b,r);if(b.frozen&&b.frozen[c.uid]>0){o.n=1;o.m=1;o.zap=false}return o}
 function bestOff(c){var l=abilities(c).filter(function(a){return OFFENSIVE.indexOf(a.kind)>=0}).sort(function(x,y){return y.pow-x.pow});var a=l[0]||{kind:'hit',pow:1,cd:0};return {i:-1,cd:0,kind:a.kind,pow:Math.max(1,a.pow)}}
 function findCombo0(r,b){

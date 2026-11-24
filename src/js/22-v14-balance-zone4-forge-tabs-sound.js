@@ -2,18 +2,8 @@
 /* ================= V14: Quimèria. Balance, very hard zone 4, forge choice, backpack tabs, red dots, sounds ================= */
 try{document.title='Quimèria'}catch(e){}
 function curZone(){var r=run();return r?(r.zone||0):-1}
-/* --- balance: a stronger team makes ordinary enemies only a little stronger (square root), so evolving and gear are felt.
-   In zone 4 enemies never get weaker for a weak team: they assume at least a team of level-3 critters with Epic gear. --- */
+/* --- zone 4: enemies assume at least a team of level-3 critters with Epic gear (team power per world, used by enemyStats) --- */
 var HARD_TP={foc:3.8,aigua:3.8,planta:3.1,llamp:2.9,psiquic:2.7};
-var enemyStatsV13=enemyStats;
-enemyStats=function(L,g,ts,tp){tp=tp||1;var hard=curZone()===3,eff=hard?(HARD_TP[(run()||{}).world]||3):Math.pow(tp,0.5);
-  var s=enemyStatsV13(L,g,ts,1);s.hp=Math.round(s.hp*eff);s.atk=Math.round(s.atk*(1+(eff-1)*(hard?0.4:0.3)));if(hard)s.def=Math.round(s.def*1.3);return s};
-/* first boss of the game was too hard for the starters: zone-1 final guardian has 15% less life */
-var makeBattleV13=makeBattle;
-makeBattle=function(o){var bt=makeBattleV13(o),r=run();
-  if(o&&o.final&&r&&(r.zone||0)===0&&!r.cave&&bt&&bt.enemy){bt.enemy.hp=Math.round(bt.enemy.hp*0.85);bt.enemy.max=bt.enemy.hp}
-  if(bt&&bt.enemy&&curZone()===3)bt.enemy.hard=true;
-  return bt};
 /* --- zone 4 in every world: very hard, opens after zone 3 --- */
 (function(){var Z4={foc:'Forja prohibida',aigua:'Abisme sense fons',planta:'Bosc maleït',llamp:'Ull de la tempesta',psiquic:'Malson etern'};
   Object.keys(Z4).forEach(function(w){if(ZONES[w]&&ZONES[w].length===3)ZONES[w].push(Z4[w])});

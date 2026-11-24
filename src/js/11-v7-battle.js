@@ -1,17 +1,33 @@
 'use strict';
 /* ---------- battle ---------- */
 function teamPow(r){if(!r)return 1;var l=r.team.map(byUid).filter(Boolean);if(!l.length)return 1;var st=l.reduce(function(a,c){return a+c.stage},0)/l.length,ml=l.reduce(function(a,c){return a+c.mill},0)/l.length;var q=bonusPct(G.equip);return (1+0.55*st+0.04*ml)*(1+(q.atk+q.def+q.hp)/400)}
-function enemyStats(L,guardian,ts,tp){tp=tp||1;var s=(1+0.22*Math.max(0,ts-3))*tp;
-  return {hp:Math.round((90+54*L)*s*(guardian?1.8:1)),atk:Math.round((8.5+4*L)*(guardian?1.1:1)*(1+0.04*Math.max(0,ts-3))*(1+(tp-1)*0.3)),def:Math.round(5+2.5*L)}}
-function makeBattle0(o){
+/* enemy life, attack and defence for difficulty L, team size ts and team power tp.
+   A stronger team makes ordinary enemies only a little stronger (square root), so evolving and gear are felt.
+   In zone 4 enemies never get weaker for a weak team: they assume a strong team (HARD_TP per world). */
+function enemyStats(L,guardian,ts,tp){tp=tp||1;var hard=curZone()===3,eff=hard?(HARD_TP[(run()||{}).world]||3):Math.pow(tp,0.5);
+  var s=1+0.22*Math.max(0,ts-3);
+  var st={hp:Math.round((90+54*L)*s*(guardian?1.8:1)),atk:Math.round((8.5+4*L)*(guardian?1.1:1)*(1+0.04*Math.max(0,ts-3))),def:Math.round(5+2.5*L)};
+  st.hp=Math.round(st.hp*eff);st.atk=Math.round(st.atk*(1+(eff-1)*(hard?0.4:0.3)));if(hard)st.def=Math.round(st.def*1.3);return st}
+/* a new battle. o: {el, L (difficulty), n (name), guardian, final, waves, win (reward), wild (species), rare} */
+function makeBattle(o){
   var r=run(),L=o.L,b,ts=r?r.team.length:3;
   if(o.wild){var s=SPECIES[o.wild],base=ROLE[s.role],k=0.8+0.3*L;b={n:s.n+' salvatge',el:s.el,hp:Math.round(base.hp*k*1.8),atk:Math.round(base.atk*k),def:Math.round(base.def*k),wild:o.wild}}
   else{var es=enemyStats(L,o.guardian,ts,teamPow(r));b={n:o.n||MONSTERS[o.el],el:o.el,hp:es.hp,atk:es.atk,def:es.def}}
   b.max=b.hp;b.L=L;b.guardian=!!o.guardian;b.final=!!o.final;
   if(o.guardian){var others=ORDER.filter(function(e){return e!==b.el&&BEATS[e].indexOf(b.el)<0});b.resist=pickOne(others)}
   var ch={};if(r)r.team.forEach(function(u,idx){var c=byUid(u);ch[u]=c?abilities(c).map(function(a){return a.cd+(idx%3)}):[]});
-  return {type:'battle',enemy:b,waves:o.waves||1,wavesTotal:o.waves||1,turn:0,ch:ch,shield:0,warn:false,over:null,rare:!!o.rare,win:o.win||null,caption:'Comença la batalla!',
+  var bt={type:'battle',enemy:b,waves:o.waves||1,wavesTotal:o.waves||1,turn:0,ch:ch,shield:0,warn:false,over:null,rare:!!o.rare,win:o.win||null,caption:'Comença la batalla!',
     st:{burn:null,poison:null,stun:0,soak:0,weak:0},tm:{buff:0,regen:null,reflect:{}},syn:r?synergies(r.team.map(byUid)):{}};
+  /* bosses: the final guardian of each world and the cave king are bosses with their own moves (BOSS) */
+  var en=b,k=o.final?BOSS_W[o.el]:((o.n==='Rei de la cova'||o.n==='Rei de les Profunditats')?'tricap':null);
+  bt.meter=0;
+  if(k){en.boss=k;en.n=BOSS[k].n;en.bossD=BOSS[k].d;if(k==='tricap'){en.max=en.hp=Math.round(en.max*0.7);en.atk=Math.round(en.atk*0.85)}bt.minions=0;bt.mhp=Math.round(en.max*0.09);bt.mcur=0;bt.frozen={};bt.charging=0;bt.phase=0;bt.fallen=0;bt.heads=3}
+  /* softer enemies (V13_ADJ; the first bosses even softer), and the powers of the equipped gear */
+  var ad=V13_ADJ[en.boss?'boss':en.guardian?'guardian':'normal'];en.atk=Math.max(1,Math.round(en.atk*ad.atk*(en.boss&&r&&!r.zone&&!r.cave?0.85:1)));en.max=en.hp=Math.round(en.hp*ad.hp);bt.P=powerOf(G.equip);if(bt.P.shield0)bt.shield=Math.min(6,bt.shield+bt.P.shield0);bt.megaUsed={};
+  /* the first boss of the game was too hard for the starters: the zone-1 final guardian has 15% less life */
+  if(o.final&&r&&(r.zone||0)===0&&!r.cave){en.hp=Math.round(en.hp*0.85);en.max=en.hp}
+  if(curZone()===3)en.hard=true;
+  return bt;
 }
 function alive(r){return r.team.map(byUid).filter(function(c){return c&&r.hp[c.uid]>0})}
 function lowest(r){return alive(r).sort(function(a,z){return r.hp[a.uid]/stats(a).hp-r.hp[z.uid]/stats(z).hp})[0]}
