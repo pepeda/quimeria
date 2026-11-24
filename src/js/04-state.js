@@ -16,7 +16,7 @@ var G=(function(){var raw=null,g=null;try{raw=localStorage.getItem(S_KEY)}catch(
   try{g=raw?JSON.parse(raw):null}catch(e){g=null}
   if(raw&&(!g||typeof g!=='object'||(g.v!==1&&g.v!==2))){try{localStorage.setItem(S_KEY+'.bak-'+Date.now(),raw)}catch(e){}g=null}
   g=migrate(g);var d=newGame();Object.keys(d).forEach(function(k){if(g[k]===undefined||g[k]===null)g[k]=d[k]});
-  if(!Array.isArray(g.owned))g.owned=[];g.owned=g.owned.filter(function(c){return c&&SPECIES[c.sp]});if(!g.owned.length)g.owned=d.owned;
+  if(!Array.isArray(g.owned))g.owned=[];g.owned=g.owned.filter(function(c){return c&&typeof c==='object'&&c.sp});if(!g.owned.length)g.owned=d.owned;
   if(!Array.isArray(g.items))g.items=[];['equip','built','food','runs','done','seen','tips'].forEach(function(k){if(typeof g[k]!=='object'||Array.isArray(g[k]))g[k]={}});
   return g})();
 G.seen=G.seen||{};G.tips=G.tips||{};G.restClock=G.restClock||Date.now();
