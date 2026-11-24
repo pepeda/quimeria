@@ -1,6 +1,6 @@
 const ev=require('./harness/h.js');
 function ok(c,m){console.log((c?'ok   ':'FAIL ')+m);if(!c)process.exitCode=1}
-ok(ev("SPECIES.espurnet.evos[0].n")==='Flamàs'&&ev("ELS.foc.mon")==='Brasàlia','council names applied');
+ok(ev("SPECIES.espurnet.evos[0].n")==='Pyropus'&&ev("ELS.foc.mon")==='Brasàlia','council names applied');
 ok(ev("ZONES.foc.length")===5&&ev("ZONE_ROUTES.length")===5&&ev("ZONE_INFO[3]").indexOf('MOLT DIFÍCIL')===0,'zones 4 and 5 exist');
 ok(ev("zoneOpen('foc',3)")===false,'zone 4 locked until zone 3 done');
 ev("G.done['foc:z2']=true");ok(ev("zoneOpen('foc',3)")===true,'zone 4 opens after zone 3');

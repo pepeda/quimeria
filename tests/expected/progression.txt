@@ -16,7 +16,7 @@ ok   forma 3 needs 2 copies of forma 2 (forma-1 copies do not count)
 ok   forma 3 must choose branch 1 or 2
 ok   forma 3: level 10 + 2 forma-2 copies, both used up
 ok   forma 4 needs 2 copies of forma 3
-ok   forma 4: level 15 + 2 forma-3 copies: Electropop Astral
+ok   forma 4: level 15 + 2 forma-3 copies: Voltateuth Astral
 ok   forma 4 is stronger than forma 3 at the same level
 ok   both evolution branches give the same strength
 ok   a critter on an expedition cannot be used
