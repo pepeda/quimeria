@@ -1,5 +1,5 @@
 'use strict';
-/* ================= V13: item powers, legendary sets, secret combos, new statuses, enemies that grow ================= */
+/* ================= ITEM POWERS, LEGEND SETS, SECRET COMBOS, ENEMY STATUSES AND GROWTH, FORGING ================= */
 /* --- powers that forged items gain (one more each time an item is forged) --- */
 var AFFIX={
   vamp:{n:'Xucla vida',d:'L’equip recupera el 4% del mal que fa.',p:{vamp:4}},
@@ -180,29 +180,6 @@ function gearTurnEnd(r,b,ev){
 function buyLegend(el){var miss=missingPieces(el);if(!miss.length){toast('Ja tens totes les peces de '+ELS[el].n+'.');return}
   if(!legendOpen()){toast('Primer has de forjar un objecte fins a Superèpica.');return}if(G.coins<LEGEND_COST){toast('Necessites '+LEGEND_COST+' monedes.');return}
   G.coins-=LEGEND_COST;var id=pickOne(miss);G.items.push(id);toast('Nova peça de llegenda: '+IT(id).n+'!')}
-/* special powers of the gear that is equipped */
-function powersBlock(){
-  var P=powerOf(G.equip),pw=powerText(P);
-  return '<div class="flat" style="gap:6px;background:#F3ECFF"><h2>Poders especials</h2>'+(pw.length?'<p class="small">'+esc(pw.join(' · '))+'</p>':'<p class="muted small">Encara cap. Els objectes forjats i els sets de llegenda en donen.</p>')+'</div>';
-}
-/* legend sets: what you have, what each set does, and the legend workshop. Short text; the details are behind the "?" */
-function setsBlock(){
-  var mine={},n=setCounts(G.equip),total=0;allMine().forEach(function(id){var b=ITEMS[baseOf(id)];if(b&&b.set){mine[b.set]=mine[b.set]||{};mine[b.set][b.slot]=1}});
-  Object.keys(mine).forEach(function(k){total+=Object.keys(mine[k]).length});
-  var list=SET_KEYS.filter(function(k){return mine[k]}).map(function(k){var S=SETS[k],on=n[k]||0;
-    return '<div class="flat" style="background:var(--soft);gap:4px;outline:3px solid '+ELS[S.el].c+'"><div class="row between"><b>'+esc(S.n)+'</b><span class="tag" style="background:'+ELS[S.el].c+';color:#fff">'+on+' de 5 posades</span></div>'+
-      '<span class="small">Peces: '+S.slots.map(function(sl){return (mine[k][sl]?'✓ ':'· ')+SLOT_N[sl]}).join(' · ')+'</span>'+
-      S.b.map(function(x,i){var act=on>=i+2;return '<span class="small" style="'+(act?'font-weight:800;color:#1E7B3A':'opacity:.65')+'">'+(i===3?'5 peces · SUPER: ':(i+2)+' peces: ')+esc(x.d)+(act?' ✓':'')+'</span>'}).join('')+'</div>'}).join('');
-  var shop=ORDER.filter(worldOpen).map(function(el){var m=missingPieces(el).length;
-    return '<button type="button" class="btn sm" style="background:'+ELS[el].c+';color:#fff" data-act="legend" data-el="'+el+'"'+(m&&legendOpen()&&G.coins>=LEGEND_COST?'':' disabled')+'>'+esc(ELS[el].n)+(m?'':' (complet)')+'</button>'}).join(' ');
-  var long='Hi ha 10 sets (2 de cada element) de 5 peces Superèpiques. Amb 2 peces del mateix set posades tens 1 habilitat, amb 3 en tens 2, amb 4 en tens 3, i amb les 5 la super habilitat. Els caps en deixen caure una molt poques vegades (5%). Al Taller de llegendes en pots comprar una per '+LEGEND_COST+' monedes, però només quan has forjat un objecte fins a Superèpica.';
-  return '<div class="flat" style="gap:6px;background:#FFF6D6">'+qHead('Sets de llegenda','Peces Superèpiques que, juntes, donen habilitats. Molt difícils d’aconseguir. En tens '+total+' de 50.',long)+
-    '<p class="small" style="margin-top:6px"><b>Taller de llegendes</b>'+(legendOpen()?' · '+LEGEND_COST+' monedes per peça':' · tancat fins que forgis una Superèpica')+'</p><div class="row" style="gap:6px;flex-wrap:wrap">'+shop+'</div></div>'+list;
-}
-function megaBlock(s){var mine=MEGA.filter(function(m){return m.sp.indexOf(s)>=0});if(!mine.length)return '';var found=G.megas||{},nf=mine.filter(function(m){return found[m.id]}).length;
-  return '<h3>Combos secrets ('+nf+' de '+mine.length+')</h3><div class="flat" style="background:var(--soft);gap:8px">'+mine.map(function(m){
-    if(found[m.id])return '<div style="display:flex;flex-direction:column;gap:2px"><b>'+esc(m.n)+'</b><div class="row" style="gap:4px">'+m.sp.map(function(x){return spArt(x,'',30,false)}).join('')+'</div><span class="small">'+esc(m.sp.map(function(x){return SPECIES[x].n}).join(' + '))+'</span><span class="small">'+esc(m.d)+'</span></div>';
-    return '<div style="display:flex;flex-direction:column;gap:2px;opacity:.7"><b>??? Combo secret de '+m.sp.length+' bestioles</b><span class="small">Pista: posa-la a l’equip amb '+(m.sp.length-1)+' bestiola'+(m.sp.length>2?'es':'')+' de '+esc(m.sp.filter(function(x){return x!==s}).map(function(x){return ELS[SPECIES[x].el].n}).join(' i '))+'.</span></div>'}).join('')+'</div>'}
 function megaCount(){var f=G.megas||{};return MEGA.filter(function(m){return f[m.id]}).length}
 /* --- showing the new events: light for small things, a full comic page for "all together" and secret combos --- */
 function v13Show(e){
@@ -244,15 +221,4 @@ function forgeAll(){var n=0,guard=0,l;while(guard++<200&&(l=forgeReady()).length
 (function(){if(!G||G.v13)return;function up(id){var t=tierOf(id);if(!t||affOf(id).length||!ITEMS[baseOf(id)]||ITEMS[baseOf(id)].set)return id;var a=[];for(var i=0;i<t;i++)a.push(pickOne(AFF_KEYS));return baseOf(id)+'#'+t+'~'+a.join('.')}
   G.items=G.items.map(up);Object.keys(G.equip).forEach(function(s){if(G.equip[s])G.equip[s]=up(G.equip[s])});G.megas=G.megas||{};G.v13=1;persist()})();
 
-/* --- collection sort: normal order, by category (role) or by element --- */
-function sortBar(){var m=G.sortB||'num';return '<div class="row" style="gap:6px;flex-wrap:wrap;margin:6px 0"><span class="small">Ordena per:</span>'+[['num','Número'],['role','Categoria'],['el','Element']].map(function(x){return '<button type="button" class="btn sm'+(m===x[0]?' green':'')+'" data-act="sortB" data-k="'+x[0]+'" aria-pressed="'+(m===x[0])+'">'+x[1]+'</button>'}).join('')+'</div>'}
-function spGrid(tileOf){var m=G.sortB||'num';
-  if(m==='role')return ['Atac','Defensa','Curador'].map(function(r){var l=SP_ORDER.filter(function(s){return SPECIES[s].role===r});return l.length?'<h3 style="margin:10px 0 4px">'+roleTag(r)+' '+l.filter(ownsSp).length+' de '+l.length+'</h3><div class="grid4">'+l.map(tileOf).join('')+'</div>':''}).join('');
-  if(m==='el')return ORDER.map(function(e){var l=SP_ORDER.filter(function(s){return SPECIES[s].el===e});return l.length?'<h3 style="margin:10px 0 4px;color:'+ELS[e].c+'">'+esc(ELS[e].n)+' · '+l.filter(ownsSp).length+' de '+l.length+'</h3><div class="grid4">'+l.map(tileOf).join('')+'</div>':''}).join('');
-  return '<div class="grid4">'+SP_ORDER.map(tileOf).join('')+'</div>'}
-/* --- collection: how close each critter is to evolving (5 dots = can evolve) --- */
-function evoDots(c,S){if(!c)return '';var col=ELS[S.el].c;
-  if(c.stage>=2)return '<span class="small" style="display:block;font-weight:800;color:'+col+'" aria-label="Forma final">Forma final ✓</span>';
-  var n=Math.min(5,c.mill||0),d='';for(var i=0;i<5;i++)d+='<span style="display:inline-block;width:8px;height:8px;margin:0 1.5px;border-radius:50%;border:1.5px solid '+col+';background:'+(i<n?col:'transparent')+'"></span>';
-  return '<span style="display:block;line-height:1;margin-top:3px" aria-label="'+n+' de 5 per evolucionar a la forma '+(c.stage+2)+'">'+d+'<span class="small" style="margin-left:4px;font-weight:800">'+n+'/5</span></span>'}
 

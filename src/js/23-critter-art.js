@@ -1,5 +1,5 @@
 'use strict';
-/* ================= V14 ART: one drawing per species and per form (stage 0/1/2) ================= */
+/* ================= CRITTER ART: one drawing per species and per form (stage 0/1/2) ================= */
 var ART_DK={foc:'#B8431F',aigua:'#1B5FA8',planta:'#24753C',llamp:'#B5850A',psiquic:'#5E2A9E'};
 var ART_AC={foc:'#FFB238',aigua:'#9ED3FF',planta:'#8FE09C',llamp:'#FFE27A',psiquic:'#F0C3FF'};
 var NS=' stroke="none"';

@@ -1,5 +1,5 @@
 'use strict';
-/* ================= V8: 40 critters, shapes, explorer talents ================= */
+/* ================= 40 CRITTERS: the 24 later species, their shapes and abilities; explorer talents ================= */
 
 Object.assign(SPECIES,{
   xurrufet:{n:'Xurrufet',el:'foc',role:'Atac',price:340,shape:'tiny',talent:'tresor',evos:[E('Petardet'),E('Traca'),E('Bengala','llamp')]},

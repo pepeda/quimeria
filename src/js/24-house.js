@@ -1,5 +1,5 @@
 'use strict';
-/* ================= V14: house — more to build and decorate, grouped by area ================= */
+/* ================= HOUSE: builds grouped by area, their effects, the house drawing ================= */
 /* Areas for the build list. Old items get an area too. */
 var H14_AREAS=[['dorm','Dormitori'],['sala','Sala'],['taller','Taller'],['elem','Sales d’element'],['ext','Exterior']];
 var H14_OLD={habitacio:'dorm',mobles:'sala',jardi:'ext',piscina:'ext',spa:'ext',tennis:'ext'};
@@ -191,3 +191,23 @@ function houseSvg(b,home){
   return '<div class="house">'+head+back+o+f+'</svg>'+houseCrew(home)+'</div>';
 }
 
+/* the first house drawing: four rooms, rooms on top, garden, pool, spa, tennis and furniture (inside of the svg) */
+function houseRooms(b){
+  var m=b.mobles||0,h=b.habitacio||0,o='';
+  o+='<rect x="0" y="196" width="366" height="74" fill="#7CC46B"/><path d="M0 196 H366" stroke="#5BA84E" stroke-width="3"/>';
+  if(b.tennis)o+='<rect x="12" y="212" width="130" height="50" rx="4" fill="#E8743B"/><path d="M14 214 H140 V260 H14 Z M77 214 V260 M14 237 H140" stroke="#fff" stroke-width="2" fill="none"/><path d="M77 208 V266" stroke="#1E1B2E" stroke-width="3"/><circle cx="110" cy="228" r="4" fill="#E6F55A"/><text x="16" y="208" font-size="9" font-weight="800" fill="#1E1B2E">Pista de tennis</text>';
+  if(b.spa)o+='<ellipse cx="190" cy="240" rx="34" ry="14" fill="#B58BE6" stroke="#6B2FB3" stroke-width="3"/><ellipse cx="190" cy="238" rx="26" ry="8" fill="#7CC0FF"/><circle cx="180" cy="236" r="2.5" fill="#fff"/><circle cx="196" cy="239" r="2" fill="#fff"/><circle cx="203" cy="235" r="2.5" fill="#fff"/><path d="M178 222 q-4 -6 0 -12 M190 220 q4 -6 0 -12 M202 222 q-4 -6 0 -12" stroke="#fff" stroke-width="2.5" fill="none"/><text x="168" y="266" font-size="9" font-weight="800" fill="#1E1B2E">Spa</text>';
+  if(b.piscina)o+='<rect x="236" y="216" width="110" height="38" rx="12" fill="#2E8BE6" stroke="#fff" stroke-width="4"/><path d="M246 236 q8 -5 16 0 t16 0 t16 0 t16 0 t16 0" stroke="#BFE3F7" stroke-width="2.5" fill="none"/><path d="M336 210 V236 M344 210 V236 M336 218 H344 M336 226 H344" stroke="#9AA3B5" stroke-width="2.5"/><circle cx="300" cy="230" r="7" fill="none" stroke="#F26B3A" stroke-width="4"/><text x="240" y="266" font-size="9" font-weight="800" fill="#1E1B2E">Piscina</text>';
+  for(var k=0;k<h;k++){var y=156-40*k;o+='<rect x="228" y="'+y+'" width="66" height="40" fill="#C98A5A" stroke="#8A5A3C" stroke-width="2"/><rect x="236" y="'+(y+6)+'" width="50" height="28" fill="#FFF1DA"/><rect x="254" y="'+(y+10)+'" width="14" height="10" fill="#BFE3F7" stroke="#8A5A3C" stroke-width="1.5"/>'}
+  if(h)o+='<path d="M222 '+(156-40*(h-1))+' L261 '+(130-40*(h-1))+' L300 '+(156-40*(h-1))+' Z" fill="#E2574C" stroke="#A23A31" stroke-width="3" stroke-linejoin="round"/><text x="232" y="'+(150-40*(h-1)-10)+'" font-size="9" font-weight="800" fill="#fff">Habitacions</text>';
+  if(b.jardi)o+='<path d="M300 186 H364 M300 196 H364" stroke="#fff" stroke-width="2.5"/>'+[304,316,328,340,352,362].map(function(x){return '<rect x="'+x+'" y="180" width="3" height="18" fill="#fff"/>'}).join('')+'<rect x="318" y="140" width="6" height="40" fill="#6B3E26"/><circle cx="321" cy="132" r="20" fill="#3B7D32"/><rect x="346" y="156" width="5" height="26" fill="#6B3E26"/><circle cx="348" cy="150" r="13" fill="#4E9A43"/>'+[[308,190,'#F26B3A'],[336,192,'#F7C948'],[356,190,'#9B59E0']].map(function(f){return '<circle cx="'+f[0]+'" cy="'+f[1]+'" r="3.5" fill="'+f[2]+'"/>'}).join('')+'<text x="304" y="176" font-size="9" font-weight="800" fill="#1E1B2E">Jardí</text>';
+  o+='<path d="M20 86 L130 20 L240 86 Z" fill="#E2574C" stroke="#A23A31" stroke-width="3" stroke-linejoin="round"/><rect x="30" y="86" width="200" height="110" fill="#8A5A3C"/>'+
+    '<rect x="38" y="94" width="88" height="46" fill="#FDE7C8"/><rect x="134" y="94" width="88" height="46" fill="#E8F1FF"/><rect x="38" y="146" width="88" height="46" fill="#FFF7E8"/><rect x="134" y="146" width="88" height="46" fill="#F1E3FF"/>'+
+    '<g font-size="9" font-weight="800" font-family="Nunito,sans-serif"><text x="42" y="104" fill="#6B3E26">Dormitori</text><text x="138" y="104" fill="#1A5FA3">Bany</text><text x="42" y="156" fill="#6B3E26">Sala</text><text x="138" y="156" fill="#5B2A96">Racó de jocs</text></g>';
+  if(m>=1)o+='<rect x="74" y="178" width="46" height="12" rx="4" fill="#C0392B"/><rect x="74" y="170" width="46" height="9" rx="4" fill="#E2574C"/>';
+  if(m>=2)o+='<rect x="84" y="126" width="38" height="12" rx="3" fill="#fff" stroke="#9AA3B5"/><rect x="86" y="124" width="10" height="6" rx="2" fill="#BFE3F7"/>';
+  if(m>=3)o+='<path d="M212 190 V164" stroke="#6B3E26" stroke-width="2"/><path d="M204 166 L212 154 L220 166 Z" fill="#F7C948"/>';
+  if(m>=4)o+='<ellipse cx="82" cy="191" rx="34" ry="3" fill="#9B59E0"/>';
+  if(m>=5)o+='<rect x="206" y="128" width="10" height="10" fill="#B5793E"/><circle cx="211" cy="122" r="8" fill="#3DAA5C"/>';
+  return o;
+}

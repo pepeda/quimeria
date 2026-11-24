@@ -1,11 +1,11 @@
 'use strict';
-/* ================= ROUTE & SCENES ================= */
+/* ================= RUN HELPERS: picking scenes, recruiting and claiming cards ================= */
 function pickScene(pool,w,used){
   var c=Object.keys(SCENES).filter(function(id){var s=SCENES[id];return s.pool===pool&&(!s.world||s.world===w)&&used.indexOf(id)<0});
   if(!c.length)c=Object.keys(SCENES).filter(function(id){return SCENES[id].pool===pool&&(!SCENES[id].world||SCENES[id].world===w)});
   var id=pickOne(c);used.push(id);return id;
 }
-/* ================= BATTLE ================= */
+/* --- small DOM helpers used by the battle animations --- */
 
 function $(id){return document.getElementById(id)}
 function floatNum(host,text,cls){if(!host)return;var s=document.createElement('span');s.className='pop-num '+cls;s.textContent=text;host.appendChild(s);setTimeout(function(){s.remove()},RM?1200:950)}

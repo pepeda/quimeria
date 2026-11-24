@@ -1,5 +1,5 @@
 'use strict';
-/* ================= V12: boss intro comic page and ultimate-attack comic page ================= */
+/* ================= COMIC PAGES: boss intro and ultimate attack ================= */
 var ULT={cavaller:'Tall de les Mil Cendres',gel:'Hivern Etern',gegant:'Terratrèmol Final',eixam:'Pluja de l’Eixam',ombres:'Nit sense Final',tricap:'Triple Alè'};
 var introPlaying=false;
 function foeSvg(en,px){return en.wild?spArt(en.wild,'',px):monster(en.el,px,en.guardian)}

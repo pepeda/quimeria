@@ -1,5 +1,5 @@
 'use strict';
-/* ================= V11: original bosses, group attacks, team meter ================= */
+/* ================= BOSSES, GROUP ATTACKS, TEAM METER ================= */
 var BOSS={
   cavaller:{n:'Cavaller de Cendra',d:'Cada 3 torns fa una estocada que travessa l’escut. A la meitat de la vida es treu l’armadura: té menys defensa però ataca dues vegades.'},
   gel:{n:'Mag de Gel',d:'Cada 3 torns congela una bestiola durant 2 torns: gairebé no fa mal. Les bestioles de Foc no es congelen.'},

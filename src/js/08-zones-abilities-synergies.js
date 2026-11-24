@@ -1,5 +1,5 @@
 'use strict';
-/* ================= V7: zones, abilities, combos, synergies ================= */
+/* ================= ZONES, ABILITIES, COMBOS, SYNERGIES ================= */
 function mult(a,d){if(!a||!d)return 1;if(a===d)return 0.75;if(BEATS[a].indexOf(d)>=0)return 1.5;if(BEATS[d].indexOf(a)>=0)return 0.67;return 1}
 function maxTeam(){return 3+(G.completed>=2?1:0)+(G.completed>=5?1:0)+(G.completed>=9?1:0)}
 function nextTeamAt(){return G.completed<2?2:G.completed<5?5:G.completed<9?9:0}
