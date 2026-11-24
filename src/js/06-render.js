@@ -56,17 +56,8 @@ function scCasa(){
     '<div class="flat"><h3>Partida</h3><p class="muted">La partida es guarda en aquest mòbil o ordinador.</p><button type="button" class="btn light sm" data-act="reset">'+(resetArm?'Segur? Toca un altre cop':'Comença una partida nova')+'</button></div>';
 }
 var resetArm=false,abandonArm=null,restartArm=false;
-/* places the critters that are at home inside the rooms of the house drawing (366x230 coordinates) */
-function houseCrew(home){
-  var b=G.built,spots=[[62,139],[102,139],[158,139],[198,139],[62,191],[102,191],[158,191],[198,191]];
-  for(var k=0;k<(b.habitacio||0);k++){var y=196-40*k;spots.push([248,y-2],[278,y-2])}
-  if(b.jardi)spots.push([318,196],[346,196],[332,182]);
-  if(b.piscina)spots.push([262,244],[306,244]);
-  return home.slice(0,spots.length).map(function(c,i){var s=spots[i];
-    return '<div class="in" style="left:'+(s[0]/366*100)+'%;top:'+(s[1]/270*100)+'%">'+(c.rest>0?'<div style="color:#34405A">z z</div>':'')+cArt(c,30)+'</div>'}).join('');
-}
-/* the house drawing grows with every purchase */
-function houseSvg(b,home){
+/* the first house drawing: four rooms, rooms on top, garden, pool, spa, tennis and furniture (inside of the svg) */
+function houseRooms(b){
   var m=b.mobles||0,h=b.habitacio||0,o='';
   o+='<rect x="0" y="196" width="366" height="74" fill="#7CC46B"/><path d="M0 196 H366" stroke="#5BA84E" stroke-width="3"/>';
   if(b.tennis)o+='<rect x="12" y="212" width="130" height="50" rx="4" fill="#E8743B"/><path d="M14 214 H140 V260 H14 Z M77 214 V260 M14 237 H140" stroke="#fff" stroke-width="2" fill="none"/><path d="M77 208 V266" stroke="#1E1B2E" stroke-width="3"/><circle cx="110" cy="228" r="4" fill="#E6F55A"/><text x="16" y="208" font-size="9" font-weight="800" fill="#1E1B2E">Pista de tennis</text>';
@@ -83,7 +74,7 @@ function houseSvg(b,home){
   if(m>=3)o+='<path d="M212 190 V164" stroke="#6B3E26" stroke-width="2"/><path d="M204 166 L212 154 L220 166 Z" fill="#F7C948"/>';
   if(m>=4)o+='<ellipse cx="82" cy="191" rx="34" ry="3" fill="#9B59E0"/>';
   if(m>=5)o+='<rect x="206" y="128" width="10" height="10" fill="#B5793E"/><circle cx="211" cy="122" r="8" fill="#3DAA5C"/>';
-  return '<div class="house"><svg viewBox="0 0 366 270" aria-hidden="true" style="background:#BFE3F7">'+o+'</svg>'+houseCrew(home)+'</div>';
+  return o;
 }
 function scExplorar(){
   var pos={foc:[145,0],llamp:[290,118],aigua:[236,300],planta:[54,300],psiquic:[0,118]};

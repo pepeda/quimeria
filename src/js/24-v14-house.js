@@ -94,7 +94,8 @@ function h14Builds(){
 function h14Lay(b){var ext=!!(b.skate||b.foguera||b.hort||b.portal),el=ORDER.some(function(w){return b[H14_EL[w]]}),g1=ext?346:270;
   return {ext:ext,el:el,g1:g1,H:el?g1+88:g1}}
 function h14RoomX(w){return 6+ORDER.indexOf(w)*72}
-houseCrew=function(home){
+/* places the critters that are at home inside the rooms of the house drawing */
+function houseCrew(home){
   var b=G.built,L=h14Lay(b),ham=b.hamaca;
   var spots=[[ham?52:62,139],[ham?88:102,139],[158,139],[198,139],[62,191],[102,191],[158,191],[198,191]];
   for(var k=0;k<(b.habitacio||0);k++){var y=196-40*k;spots.push([248,y-2],[278,y-2])}
@@ -105,14 +106,12 @@ houseCrew=function(home){
   if(b.salaAigua){var ax=h14RoomX('aigua');spots.push([ax+18,L.g1+82],[ax+48,L.g1+82])}
   return home.slice(0,spots.length).map(function(c,i){var s=spots[i];
     return '<div class="in" style="left:'+(s[0]/366*100)+'%;top:'+(s[1]/L.H*100)+'%">'+(c.rest>0?'<div style="color:#34405A">z z</div>':'')+cArt(c,30)+'</div>'}).join('');
-};
-var h14HouseSvg=houseSvg;
+}
 function h14Txt(x,y,t,fill,size){return '<text x="'+x+'" y="'+y+'" font-size="'+(size||9)+'" font-weight="800" font-family="Nunito,sans-serif" fill="'+(fill||'#1E1B2E')+'">'+t+'</text>'}
 function h14Anim(attr,vals,dur){return RM?'':'<animate attributeName="'+attr+'" values="'+vals+'" dur="'+dur+'" repeatCount="indefinite"/>'}
-houseSvg=function(b,home){
-  var full=h14HouseSvg.apply(this,arguments),s0=full.indexOf('<svg'),s1=full.indexOf('>',s0)+1,s2=full.indexOf('</svg>');
-  if(s0<0||s2<0)return full;
-  var o=full.slice(s1,s2),L=h14Lay(b),back='',f='',i;
+/* the house drawing grows with every purchase: things behind the house, the first rooms, then the new rooms, garden and underground floor */
+function houseSvg(b,home){
+  var o=houseRooms(b),L=h14Lay(b),back='',f='',i;
   /* --- behind the house: antenna, tree house --- */
   if(b.antena){var dw=ORDER[Math.floor(Date.now()/86400000)%ORDER.length];
     back+='<g stroke="#5E6678" stroke-width="2" fill="none"><path d="M5 196 L12 62 L19 196"/><path d="M7 160 H17 M8 128 H16 M9 98 H15 M7 160 L16 128 M8 128 L15 98"/></g><path d="M12 62 V54" stroke="#34405A" stroke-width="2"/>'+
@@ -190,5 +189,5 @@ houseSvg=function(b,home){
   }
   var head='<svg viewBox="0 0 366 '+L.H+'" aria-hidden="true" style="background:#BFE3F7">';
   return '<div class="house">'+head+back+o+f+'</svg>'+houseCrew(home)+'</div>';
-};
+}
 
