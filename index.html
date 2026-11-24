@@ -1,5 +1,9 @@
 <!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Quimèria</title>
+<meta name="description" content="Videojoc per al mòbil, en català. Recull bestioles, fes-les créixer i explora cinc mons. No cal instal·lar res.">
+<meta property="og:title" content="Quimèria · joc de bestioles">
+<meta property="og:description" content="Videojoc per al mòbil, en català. Recull bestioles, fes-les créixer i explora cinc mons. No cal instal·lar res.">
+<meta property="og:type" content="website">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&family=Bangers&display=swap">
 <style>
@@ -66,6 +70,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .stars{color:#C98A00;letter-spacing:1px;font-size:15px}
 .tip{background:#2F2780;color:#fff;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .tip .btn{align-self:flex-start;min-height:40px;background:#fff;color:var(--ink);box-shadow:0 3px 0 #9C93F5}
+nav.nav[hidden]{display:none}
 nav.nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:8px 8px 10px;background:var(--paper);border-radius:22px 22px 0 0;box-shadow:0 -4px 18px rgba(30,27,46,.1)}
 .navb{border:none;background:none;border-radius:14px;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:12px;color:#5E5A72}
 .navb.on{background:#FFE08A;color:var(--ink)}
@@ -486,7 +491,7 @@ var SCENES={
     b:{t:'Sota el pont hi havia un niu amagat!',secret:1,ch:[{l:'Mira-t’ho',d:'Una bestiola rara.',risk:0,out:{wild:1,rare:1}}]}}},
   castell:{n:'Castell vell',art:'castle',pool:'land',nodes:{
     a:{t:'Un castell vell amb la porta tancada. Hi ha llum a dalt de tot.',ch:[
-      {l:'Truca a la porta',d:'Algu obrirà… i potser no és amable.',risk:1,out:{fight:1,win:{go:'sala'}}},
+      {l:'Truca a la porta',d:'Algú obrirà… i potser no és amable.',risk:1,out:{fight:1,win:{go:'sala'}}},
       {l:'Il·lumina les finestres',d:'Una bestiola de Llamp obre la porta.',risk:0,req:{el:'llamp'},out:{go:'sala'}},
       {l:'Un Defensa empeny la porta',d:'Entreu sense lluitar.',risk:0,req:{role:'Defensa'},out:{go:'sala'}},
       {l:'Fes la volta',d:'No entres.',risk:0,out:{coins:5}}]},
@@ -716,6 +721,8 @@ function fatigueText(c){
   if(c.rest>0)return 'Cansada: ha de descansar '+c.rest+' expedici'+(c.rest>1?'ons':'ó')+' (o una estona)';
   var left=maxFat(c)-c.fat;return 'Pot fer '+left+' expedici'+(left>1?'ons':'ó')+' més';
 }
+/* "de" before a name: d’Aigua, de Foc */
+function deNom(s){return (/^[AEIOUÀÈÉÍÒÓÚaeiouàèéíòóú]/.test(s)?'d’':'de ')+s}
 function tip(key,text){if(G.tips[key])return '';return '<div class="tip"><p>'+text+'</p><button type="button" class="btn sm" data-act="tip" data-k="'+key+'">Entesos</button></div>'}
 function riskHtml(n){var s='<span class="risk" aria-label="Risc '+n+' de 2">';for(var i=0;i<2;i++)s+='<i class="'+(i<n?'on':'')+'"></i>';return s+' '+(n===0?'Segur':n===1?'Una mica arriscat':'Arriscat')+'</span>'}
 function topBar(){
@@ -753,7 +760,7 @@ function menuDots(){try{var nav=$('nav');if(!nav||!nav.querySelector)return;
   var dots={bestioles:allCr().some(function(c){return evoCheck(c).ok}),motxilla:forgeReady().length>0||betterGear()};
   Object.keys(dots).forEach(function(k){if(!dots[k])return;var b=nav.querySelector('[data-to="'+k+'"]');if(b&&!b.querySelector('.rdot')){var s=document.createElement('span');s.className='rdot';s.setAttribute('aria-label','hi ha novetats');b.appendChild(s)}})}catch(e){}}
 
-var resetArm=false,abandonArm=null,restartArm=false;
+var resetArm=false,abandonArm=null,restartArm=false,buildArm=null;
 /* ================= ACTIONS ================= */
 /* one tap on a button with data-act: a is the action, d its data-* values */
 function act(a,d){
@@ -774,7 +781,7 @@ function act(a,d){
   if(a==='chestTap'){chestTap();persist();render();return}
   /* every other action changes the game, then the screen is drawn again */
   var r=run();
-  if(a!=='reset')resetArm=false;if(a!=='abandon')abandonArm=null;if(a!=='restart')restartArm=false;
+  if(a!=='reset')resetArm=false;if(a!=='abandon')abandonArm=null;if(a!=='restart')restartArm=false;if(a!=='build')buildArm=null;
   if(a==='chat'){$('chat').classList.add('open');$('fbText').focus();return}
   switch(a){
     case 'tip':G.tips[d.k]=1;break;
@@ -802,7 +809,7 @@ function act(a,d){
     case 'claim':claimCard();if(r.event.last){r.i=r.slots.length;finishRun(true)}else advance();break;
     case 'join':var nu=r.event.uid;if(r.team.length<3){r.team.push(nu)}else{var kou=r.team.filter(function(u){return r.hp[u]<=0})[0];if(kou){r.team[r.team.indexOf(kou)]=nu;delete r.hp[kou]}}if(r.team.indexOf(nu)>=0)r.hp[nu]=stats(byUid(nu)).hp;advance();break;
     case 'nap':G.owned.forEach(function(c){if(!busyWorld(c)){c.rest=0;c.fat=0}});toast('Han fet la migdiada. Ja estan a punt!');break;
-    case 'build':var bd=BUILD.filter(function(x){return x.k===d.k})[0];if(bd&&G.coins>=bd.price&&(G.built[bd.k]||0)<bd.max){G.coins-=bd.price;G.built[bd.k]=(G.built[bd.k]||0)+1;toast(bd.n+': fet!')}break;
+    case 'build':if(buildArm!==d.k){buildArm=d.k;break}buildArm=null;var bd=BUILD.filter(function(x){return x.k===d.k})[0];if(bd&&G.coins>=bd.price&&(G.built[bd.k]||0)<bd.max){G.coins-=bd.price;G.built[bd.k]=(G.built[bd.k]||0)+1;toast(bd.n+': fet!')}break;
     case 'detail':G.detail=d.s;break;
     case 'close':G.detail=null;break;
     case 'adopt':var Sp=SPECIES[d.s];if(G.coins>=Sp.price&&G.owned.length<cap()&&worldOpen(Sp.el)){G.coins-=Sp.price;G.owned.push(mk(d.s));toast(Sp.n+' viu ara a casa teva!')}break;
@@ -1063,7 +1070,7 @@ function makeBattle(o){
   if(o.wild){var s=SPECIES[o.wild],base=ROLE[s.role],k=0.8+0.3*L;b={n:s.n+' salvatge',el:s.el,hp:Math.round(base.hp*k*1.8),atk:Math.round(base.atk*k),def:Math.round(base.def*k),wild:o.wild}}
   else{var es=enemyStats(L,o.guardian,ts);b={n:o.n||MONSTERS[o.el],el:o.el,hp:es.hp,atk:es.atk,def:es.def}}
   b.max=b.hp;b.L=L;b.guardian=!!o.guardian;b.final=!!o.final;
-  if(o.guardian){var others=ORDER.filter(function(e){return e!==b.el&&BEATS[e].indexOf(b.el)<0});b.resist=pickOne(others)}
+  if(o.guardian){var others=ORDER.filter(function(e){return e!==b.el&&BEATS[e].indexOf(b.el)<0});/* chosen once per place on the path and kept in the run, so the preview and the battle show the same element */var rk=r?(r.cave?'c'+r.cave.i:'')+'@'+r.i+b.el:null;if(r&&r.gres&&r.gres.k===rk)b.resist=r.gres.v;else{b.resist=pickOne(others);if(r)r.gres={k:rk,v:b.resist}}}
   var ch={};if(r)r.team.forEach(function(u,idx){var c=byUid(u);ch[u]=c?abilities(c).map(function(a){return a.cd+(idx%3)}):[]});
   var bt={type:'battle',enemy:b,waves:o.waves||1,wavesTotal:o.waves||1,turn:0,ch:ch,shield:0,warn:false,over:null,rare:!!o.rare,win:o.win||null,caption:'Comença la batalla!',
     st:{burn:null,poison:null,stun:0,soak:0,weak:0},tm:{buff:0,regen:null,reflect:{}},syn:r?synergies(r.team.map(byUid)):{},aura:r?teamAura(r.team.map(byUid)):{}};
@@ -2464,7 +2471,7 @@ function h14Folded(a){var f=G.hFold&&G.hFold[a];if(f!==undefined)return !!f;
 function h14Btn(x){
   var n=G.built[x.k]||0,full=n>=x.max,lock=!h14Open(x),poor=G.coins<x.price,
     stripe=x.el?' border-top:6px solid '+ELS[x.el].c+';':'';
-  var tag=full?'<span class="tag good">Fet</span>':lock?'<span class="tag">Tancada</span>':'<span class="tag mid">'+x.price+' monedes</span>';
+  var tag=full?'<span class="tag good">Fet</span>':lock?'<span class="tag">Tancada</span>':buildArm===x.k?'<span class="tag bad">Segur? Toca un altre cop</span>':'<span class="tag mid">'+x.price+' monedes</span>';
   var what=lock?'Cal acabar: '+ELS[x.el].mon:x.what;
   return '<button type="button" class="tap'+(lock?' h14lock':'')+'" data-act="build" data-k="'+x.k+'"'+(full||poor||lock?' disabled':'')+' style="'+stripe+'"'+(lock?' aria-label="'+esc(x.n+': tancada. '+what)+'"':'')+'>'+
     '<span style="font-size:14px;text-align:center;line-height:1.15">'+esc(x.n)+(x.max>1&&n?' ('+n+')':'')+'</span><span class="muted small" style="text-align:center;font-weight:700">'+esc(what)+'</span>'+tag+'</button>';
@@ -2633,7 +2640,7 @@ function scMon(){
   else body=ZONES[w].map(function(zn,i){var open=zoneOpen(w,i),done=G.done[w+':z'+i];
     return '<button type="button" class="opt" data-act="path" data-p="'+i+'"'+(open?'':' disabled')+'><b>Zona '+(i+1)+': '+esc(zn)+(done?' ✓':'')+'</b><span class="d">'+starStr(starsN(zoneL(w,i)))+' · '+ZONE_ROUTES[i].length+' llocs</span><span class="d">'+esc(ZONE_INFO[i])+'</span>'+(i===2?'<span class="need">Cal portar: '+esc(TALENT[ZONE_NEED[w]].n)+'</span>':i===1?'<span class="d">Recomanat: '+esc(TALENT[ZONE_REC[w]].n)+'</span>':'')+(open?'':'<span class="need">Tancada: acaba primer la zona '+i+'</span>')+'</button>'}).join('');
   return '<div class="flat" style="background:'+A.c+';color:'+(w==='llamp'?'#1E1B2E':'#fff')+'"><div class="row"><button type="button" class="btn sm light" data-act="nav" data-to="explorar">Enrere</button><h1>'+esc(A.mon)+'</h1></div>'+
-    '<p>Explorat: <b>'+pct+'%</b> · Llocs vistos '+seen+' de '+sc.length+' · Bestioles '+sps.filter(ownsSp).length+' de '+sps.length+'</p><p>Aquí hi viuen bestioles de '+esc(A.n.toLowerCase())+'. Els monstres resisteixen el seu propi element. Consell: porta bestioles de '+esc(goodAgainst(w))+'.</p></div>'+
+    '<p>Explorat: <b>'+pct+'%</b> · Llocs vistos '+seen+' de '+sc.length+' · Bestioles '+sps.filter(ownsSp).length+' de '+sps.length+'</p><p>Aquí hi viuen bestioles de '+esc(A.n.toLowerCase())+'. Els monstres resisteixen el seu propi element. Consell: porta bestioles '+esc(deNom(goodAgainst(w)))+'.</p></div>'+
     tip('mon','Cada món té 5 zones. Quan acabes una zona, s’obre la següent. Les estrelles ★ diuen com és de difícil.')+
     '<h3>Bestioles d’aquest món</h3><div class="grid4">'+spsH+'</div>'+body;
 }
@@ -2650,7 +2657,7 @@ function teamSummary(){
 function scEquip(){
   var w=G.world,z=G.zone||0,mx=maxTeam(),nx=nextTeamAt();
   var rows=G.owned.map(function(c){
-    var bw=busyWorld(c),blocked=!!bw||c.rest>0,on=G.pick.indexOf(c.uid)>=0,m=mult(sp(c).el,w),adv=m>1?'<span class="tag good">Avantatge aquí</span>':m<1?'<span class="tag bad">'+(m===0.75?'Resisteixen el seu element':'Desavantatge aquí')+'</span>':'';
+    var bw=busyWorld(c),blocked=!!bw||c.rest>0,on=G.pick.indexOf(c.uid)>=0,m=mult(sp(c).el,w),adv=m>1?'<span class="tag good">Avantatge aquí</span>':m<1?'<span class="tag bad">'+(m===0.75?'Aquí li costarà':'Desavantatge aquí')+'</span>':'';
     var left=c.rest>0?0:Math.round((maxFat(c)-c.fat)*100/maxFat(c));
     return '<button type="button" class="tap'+(on?' sel':'')+'" data-act="pick" data-u="'+c.uid+'"'+(blocked?' disabled':'')+' aria-pressed="'+on+'" style="flex-direction:row;justify-content:flex-start;gap:10px;padding:8px">'+cArt(c,48)+
       '<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;text-align:left"><span class="row" style="gap:6px"><b style="font-size:15px">'+esc(cName(c))+'</b>'+adv+'</span><span class="row" style="gap:6px">'+roleTag(sp(c).role)+'<span class="muted small">'+esc(ELS[sp(c).el].n+' · forma '+form(c)+' · nivell '+lvl(c)+' · '+abilities(c).length+' habilitats')+'</span>'+talentTag(sp(c).talent)+'</span>'+bar(left,hpColor(left))+'<span class="muted small">'+esc(fatigueText(c))+'</span></span>'+(on?'<b style="color:var(--accent)">✓</b>':'')+'</button>'}).join('');
@@ -2692,7 +2699,7 @@ function scRun(){
   else if(e.type==='note')body='<div class="event"><h2>'+esc(e.title||'D’acord')+'</h2><p>'+esc(e.text)+'</p><button type="button" class="btn green" data-act="next">Continua</button></div>';
   else if(e.type==='card'){body=bigCard(e);showTeam=false}
   var leave=e&&e.type==='battle'?'':'<div class="row"><button type="button" class="btn light sm" data-act="pause">Surt i guarda</button><button type="button" class="btn light sm" data-act="restart">'+(restartArm?'Segur? Toca un altre cop':'Torna a començar la zona')+'</button><button type="button" class="btn light sm" data-act="abandon" data-w="'+r.world+'">'+(abandonArm===r.world?'Segur? Toca un altre cop':'Abandona')+'</button></div>';
-  return head+tip('run','Les boles de dalt són el camí: la que es mou és on ets. Les opcions amb fletxa ▸ es poden tocar. Els punts vermells diuen el risc.')+body+(showTeam?teamMini(r):'')+leave;
+  return head+(e&&e.type==='battle'?'':tip('run','Les boles de dalt són el camí: la que es mou és on ets. Les opcions amb fletxa ▸ es poden tocar. Els punts vermells diuen el risc.'))+body+(showTeam?teamMini(r):'')+leave;
 }
 function routeStrip(r){
   return '<div class="route" aria-label="El camí: lloc '+(r.i+1)+' de '+r.slots.length+'">'+r.slots.map(function(s,i){
@@ -2715,9 +2722,9 @@ function bigCard(e){
     sub=itemStats(it)+' · per a la motxilla';}
   else if(e.kind==='food'){art=elIcon(e.el,100,ELS[e.el].c);title=FOOD[e.el]+' ×'+e.n;sub='Menjar per a bestioles de '+ELS[e.el].n.toLowerCase();bg=ELS[e.el].soft;border=ELS[e.el].c}
   else if(e.kind==='coins'){art='<svg class="cr" width="100" height="100" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.5" fill="#F7C948" stroke="#C98A00" stroke-width="1.5"/><circle cx="10" cy="10" r="4" fill="none" stroke="#C98A00" stroke-width="1.5"/></svg>';title='+'+e.n+' monedes';border='#C98A00'}
-  var head=e.kind==='critter'?'Bestiola nova!':e.kind==='item'?(IT(e.item).relic?'Tresor rar!':'Has trobat un objecte!'):e.kind==='food'?'Menjar!':e.kind==='coins'?'Monedes!':e.kind==='niu'?'Al Niu!':'Vaja…';
+  var head=e.kind==='critter'?'Bestiola nova!':e.kind==='item'?(IT(e.item).relic?'Tresor del guardià!':'Has trobat un objecte!'):e.kind==='food'?'Menjar!':e.kind==='coins'?'Monedes!':e.kind==='niu'?'Al Niu!':'Vaja…';
   return '<div class="reveal'+(muted?' muted-panel':'')+'"><h2>'+esc(head)+'</h2>'+
-    '<div class="bigcard" style="border-color:'+border+'"><div class="art" style="background:'+bg+'"><span class="sfx stay">'+(e.kind==='critter'?'NOVA!':e.kind==='item'?'TXAN!':e.kind==='coins'?'DING!':e.kind==='food'?'ÑAM!':e.kind==='niu'?'NIU!':'OH!')+'</span>'+(rar?'<span class="rar" style="background:'+border+'">'+esc(rar)+'</span>':'')+art+'</div><h2 style="color:var(--ink)">'+esc(title)+'</h2><div class="muted" style="text-align:center;padding:0 12px">'+esc(sub)+'</div><div class="muted" style="text-align:center;padding:0 12px">'+esc(e.why||'')+'</div></div>'+
+    '<div class="bigcard" style="border-color:'+border+'"><div class="art" style="background:'+bg+'"><span class="sfx stay">'+(e.kind==='critter'?'NOVA!':e.kind==='item'?'TXAN!':e.kind==='coins'?'DING!':e.kind==='food'?'NYAM!':e.kind==='niu'?'NIU!':'OH!')+'</span>'+(rar?'<span class="rar" style="background:'+border+'">'+esc(rar)+'</span>':'')+art+'</div><h2 style="color:var(--ink)">'+esc(title)+'</h2><div class="muted" style="text-align:center;padding:0 12px">'+esc(sub)+'</div><div class="muted" style="text-align:center;padding:0 12px">'+esc(e.why||'')+'</div></div>'+
     '<div style="display:flex;flex-direction:column;gap:10px;width:min(300px,100%)">'+btns+'</div></div>';
 }
 /* ================= SCREEN: the battle stage inside an expedition ================= */
@@ -2731,7 +2738,7 @@ function battleStage(r,b){
   else if(b.over==='lose')res=en.wild?'<div class="event result" style="color:var(--ink)"><h2>Heu perdut</h2><p>La bestiola salvatge marxa corrents. Les bestioles KO es desperten amb una mica de vida i seguiu el camí.</p><button type="button" class="btn" data-act="blose">Continua</button></div>':
     '<div class="event result" style="color:var(--ink)"><h2>Heu perdut</h2><p>Podeu tornar a començar la zona amb tota la vida, o tornar a casa amb la meitat de les monedes.</p><button type="button" class="btn green" data-act="restartNow">Torna a començar la zona</button><button type="button" class="btn light" data-act="blose">Torna a casa</button></div>';
   var order=r.team.slice().sort(function(a,z){var ra=byUid(a),rz=byUid(z);return (ra&&sp(ra).role==='Defensa'?0:1)-(rz&&sp(rz).role==='Defensa'?0:1)});
-  return tip('battle','La batalla va sola. Cada bestiola té 2 o 3 habilitats que es carreguen a velocitats diferents (les barres grogues) i les fa soles. Si dues bestioles d’elements diferents tenen un atac a punt alhora, fan un ATAC COMBINAT.')+
+  return '<p class="small" style="text-align:center;margin:0 0 4px;font-weight:700">Les teves bestioles lluiten soles. Tu només mires.</p>'+
     '<div class="stage" id="stage"><div class="banner" id="banner"></div>'+
     '<div class="foe"><div class="foe-art" id="foe-art">'+art+'</div><div class="foe-info"><h2 id="foe-name">'+esc(en.n)+'</h2><div>'+starStr(starsN(en.L))+' <span class="tag" style="background:'+ELS[en.el].c+';color:'+(en.el==='llamp'?'#1E1B2E':'#fff')+'">'+esc(ELS[en.el].n)+'</span>'+(b.wavesTotal>1?' <span class="tag">Onada '+(b.wavesTotal-b.waves+1)+' de '+b.wavesTotal+'</span>':'')+'</div>'+
     '<span class="small">Feble a: <b>'+esc(weak)+'</b>'+(en.resist?' · Resisteix: <b>'+esc(ELS[en.resist].n)+'</b>':'')+'</span><span class="tag '+d.cls+'" style="align-self:flex-start">'+esc(d.t)+'</span>'+bar(p,hpColor(p),'foe-hp')+'<span class="small" id="foe-hpt">'+en.hp+'/'+en.max+'</span><div class="stchips" id="foe-st"></div><span class="warn" id="warn">'+(b.warn==='area'?'Prepara un ATAC A TOTHOM!':'Prepara un COP FORT!')+'</span></div></div>'+
@@ -2888,7 +2895,7 @@ function detailSheet(){
   var adopt='';
   if(!own){var open=worldOpen(S.el);
     adopt=open?'<button type="button" class="btn gold" data-act="adopt" data-s="'+s+'"'+(G.coins<S.price||G.owned.length>=cap()?' disabled':'')+'>Adopta-la · '+S.price+' monedes</button>'+(G.owned.length>=cap()?'<p class="muted">La casa és plena.</p>':G.coins<S.price?'<p class="muted">No tens prou monedes (en tens '+G.coins+').</p>':''):'<p class="flat" style="background:var(--soft)">Primer has de descobrir aquest món.</p>';}
-  return '<div class="modal" data-act="closeBg"><div class="sheet" role="dialog" aria-label="Fitxa de la bestiola" data-s="'+s+'"><div class="row" style="gap:12px;align-items:flex-start"><div style="background:'+(own?ELS[S.el].soft:'#E9E5F0')+';border-radius:20px;padding:6px">'+spArt(s,'',90,!own)+'</div><div style="flex:1;min-width:0"><h1>'+(own?esc(S.n):'???')+'</h1><div class="muted">'+(own?esc(ELS[S.el].n):'Encara no l’has trobada')+'</div><div class="muted">Viu al '+esc(worldOpen(S.el)?ELS[S.el].mon.replace('Món ','món '):'món desconegut')+'</div></div><button type="button" class="btn sm light" data-act="close">Tanca</button></div>'+
+  return '<div class="modal" data-act="closeBg"><div class="sheet" role="dialog" aria-label="Fitxa de la bestiola" data-s="'+s+'"><div class="row" style="gap:12px;align-items:flex-start"><div style="background:'+(own?ELS[S.el].soft:'#E9E5F0')+';border-radius:20px;padding:6px">'+spArt(s,'',90,!own)+'</div><div style="flex:1;min-width:0"><h1>'+(own?esc(S.n):'???')+'</h1><div class="muted">'+(own?esc(ELS[S.el].n):'Encara no l’has trobada')+'</div><div class="muted">'+esc(worldOpen(S.el)?'Viu a '+ELS[S.el].mon:'Viu en un món desconegut')+'</div></div><button type="button" class="btn sm light" data-act="close">Tanca</button></div>'+
     '<div class="row" style="gap:8px;align-items:flex-start">'+roleTag(S.role)+'<p class="small" style="flex:1;min-width:0">'+esc(ROLE_DESC[S.role])+'</p></div>'+'<div class="row" style="gap:8px;align-items:flex-start">'+talentTag(S.talent)+'<p class="small" style="flex:1;min-width:0">'+esc(TALENT[S.talent].d)+'</p></div>'+
     copies+inst+adopt+abil+'<h3>Arbre d’evolucions</h3>'+evos+megaBlock(s)+'</div></div>';
 }
