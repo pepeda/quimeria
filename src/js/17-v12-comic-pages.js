@@ -32,8 +32,9 @@ function mangaUlt(e,done){
     {wide:1,at:1800,bg:'#fff',html:'<svg class="mcrack" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true"><path d="M150 60 L20 10 M150 60 L60 115 M150 60 L280 20 M150 60 L250 118 M150 60 L150 0 M150 60 L0 70 M150 60 L300 75 M95 38 L80 70 M210 40 L235 70" stroke="#111" stroke-width="4" fill="none"/></svg><span class="sfx r big" style="left:50%;top:30%;animation-delay:'+(RM?0:1900)+'ms">KRA-KA-BOOOM!</span>'}
   ],RM?900:3300,done);
 }
-function battleTick2(){
-  var ev=battleTick1(),r=run(),b=r.event,en=b.enemy;
+/* a boss under 35% of its life does its ultimate attack once */
+function bossUltimate(r,b,ev){
+  var en=b.enemy;
   if(en&&en.boss&&!b.over&&!b.ultDone&&en.hp>0&&en.hp<en.max*0.35&&alive(r).length){
     b.ultDone=true;var hits=[],sh=b.shield>0;
     alive(r).forEach(function(t){var d=inDmg(b,t,1.1);if(sh)d=Math.ceil(d/2);r.hp[t.uid]=Math.max(0,r.hp[t.uid]-d);hits.push({uid:t.uid,n:d,after:r.hp[t.uid]})});
@@ -41,6 +42,5 @@ function battleTick2(){
     ev.push({t:'ult',name:ULT[en.boss]||'Atac definitiu',hits:hits,txt:en.n+' fa el seu atac definitiu: '+(ULT[en.boss]||'')+'!'+(sh?' L’escut en para la meitat.':'')});
     if(!alive(r).length){b.over='lose';ev.push({t:'teamDown',txt:'Tot l’equip ha caigut.'})}
   }
-  return ev;
 }
 

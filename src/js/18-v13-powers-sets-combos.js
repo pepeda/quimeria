@@ -142,11 +142,16 @@ function doMega(x,r,b){var m=x.mega;b.megaUsed[m.id]=1;
     txt:'COMBO SECRET! '+x.parts.map(function(p){return cName(p.c)}).join(', ')+' fan '+m.n+': -'+n+'. '+m.d+(isNew?' Nou combo descobert: queda apuntat a la fitxa!':'')}}
 /* --- battle start and each turn --- */
 var V13_ADJ={boss:{atk:0.78,hp:0.85},guardian:{atk:0.85,hp:0.9},normal:{atk:0.92,hp:1}};
-function battleTick3(){
-  var r=run(),b=r.event;if(!b.P)b.P=powerOf(G.equip);var P=b.P;b._procs=[];b._vamp=0;b._thorn=0;
+/* gear powers at the start of a turn: abilities charge faster (haste), the team meter fills more */
+function gearTurnStart(r,b){
+  if(!b.P)b.P=powerOf(G.equip);var P=b.P;b._procs=[];b._vamp=0;b._thorn=0;
   if(P.haste)r.team.forEach(function(u){(b.ch[u]||[]).forEach(function(v,i){if(v>1&&Math.random()*100<P.haste)b.ch[u][i]=v-1})});
   if(P.meter)b.meter=(b.meter||0)+P.meter;
-  var ev=battleTick2(),en=b.enemy;
+}
+/* gear powers at the end of a turn: the phoenix saves a lost battle, spells, life drain, regeneration, thorns,
+   revive, status chances. Returns the events. */
+function gearTurnEnd(r,b,ev){
+  var P=b.P,en=b.enemy;
   if(b.over==='lose'&&P.phoenix&&!b.phoenixUsed){ev=ev.filter(function(x){return x.t!=='teamDown'});b.over=null}
   if(b.over==='win')return ev;
   if(!b.over){

@@ -107,7 +107,20 @@ function foeCheck(r,b,ev){
     ev.push({t:'wave',txt:'Arriba un altre monstre! Onada '+(b.wavesTotal-b.waves+1)+' de '+b.wavesTotal+'.',name:b.enemy.n,max:es.hp});return false}
   b.over='win';ev.push({t:'foeDown',txt:b.enemy.n+' ha perdut!'});return true;
 }
-function battleTick0(){
+/* one battle turn; returns the events to show. The order: gear powers, team meter attack, the normal moves,
+   the boss moves, a boss ultimate attack, gear powers at the end. A battle never continues with the whole team
+   down, and an error in a turn ends the battle instead of freezing the game. */
+function battleTick(){var r=run(),b=r&&r.event;
+  if(b&&!b.over&&!alive(r).length){b.over='lose';return [{t:'teamDown',txt:'Tot l’equip ha caigut.'}]}
+  try{
+    gearTurnStart(r,b);
+    var ev=[];
+    if(!teamMeterAttack(r,b,ev)){var before=b.enemy.hp;ev=bossMoves(r,b,ev.concat(turnMoves()),before)}
+    bossUltimate(r,b,ev);
+    return gearTurnEnd(r,b,ev);
+  }catch(e){if(b){b.over='lose'}return [{t:'teamDown',txt:'Alguna cosa ha fallat en aquest torn. La batalla s’acaba.'}]}}
+/* the normal moves of a turn: burn and poison, regeneration, combined attacks, each critter acts, then the enemy */
+function turnMoves(){
   var r=run(),b=r.event,ev=[];b.turn++;
   r.team.forEach(function(u){(b.ch[u]||[]).forEach(function(v,i){if(v>0)b.ch[u][i]=v-1})});
   ['burn','poison'].forEach(function(k){var s=b.st[k];if(s&&s.t>0&&b.enemy.hp>0){b.enemy.hp=Math.max(0,b.enemy.hp-s.n);s.t--;ev.push({t:'dot',kind:k,n:s.n,after:b.enemy.hp,txt:b.enemy.n+(k==='burn'?' es crema':' està enverinat')+': -'+s.n});if(s.t<=0)b.st[k]=null}});

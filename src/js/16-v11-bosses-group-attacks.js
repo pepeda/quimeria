@@ -47,14 +47,18 @@ function showCombo(e){
   setTimeout(function(){ci.remove();var fa=$('foe-art'),rr=run();particles(fa,e.els,Math.min(16,6+ids.length*2));
     setTimeout(function(){anim(fa,'shake');anim(fa,'flash');anim(st,'flash');floatNum(fa,'-'+e.n,'dmg big');floatNum(fa,e.group?'CONJUNT!':'COMBO!','tagtxt');if(rr&&rr.event&&rr.event.enemy)setBar('foe-hp',e.after,rr.event.enemy.max);updateStatus()},RM?0:450)},RM?150:950);
 }
-function battleTick1(){
-  var r=run(),b=r.event,ev=[];
+/* the team meter fills one step each turn; when it is full the whole team attacks together. true if the enemy falls */
+function teamMeterAttack(r,b,ev){
   b.meter=(b.meter||0)+1;
   if(b.meter>=TEAM_METER&&alive(r).length>=2&&b.enemy.hp>0){
     b.meter=0;ev.push(doCombo({parts:alive(r).map(function(c){return {c:c,a:bestOff(c)}}),group:true,all:true},r,b));
-    if(foeCheck(r,b,ev))return ev;
+    if(foeCheck(r,b,ev))return true;
   }
-  var before=b.enemy.hp;ev=ev.concat(battleTick0());
+  return false;
+}
+/* what a boss does after the normal moves (before: enemy life before them): its soldiers take half the damage,
+   and each boss has its own moves (knight, ice, giant, swarm, shadows, three heads). Returns the events. */
+function bossMoves(r,b,ev,before){
   var en=b.enemy,boss=en.boss;if(!boss)return ev;
   var after=en.hp;
   if(b.minions>0&&before>after){var dealt=before-after,abs=Math.round(dealt*0.5),died=0;en.hp=Math.min(en.max,en.hp+abs);b.mcur-=abs;
