@@ -8,12 +8,10 @@ function tierOf(id){return Math.min(4,parseInt(String(id).split('#')[1],10)||0)}
 function baseOf(id){return String(id).split('#')[0]}
 function IT(id){if(id==null)return null;var b=ITEMS[baseOf(id)];if(!b)return null;var t=tierOf(id),m=TIER_M[t];
   return {aff:affOf(id),set:b.set,n:b.n+(t&&!b.set?' '+'★'.repeat(t):''),slot:b.slot,atk:b.atk*m,def:b.def*m,hp:b.hp*m,rar:(b.set?'Set de llegenda · ':b.relic?'Tresor · ':'')+TIER_N[t],relic:b.relic,tier:t,base:baseOf(id)}}
-function itemStats0(it){return [it.atk?'Atac +'+Math.round(it.atk*3)+'%':'',it.def?'Defensa +'+Math.round(it.def*3)+'%':'',it.hp?'Vida +'+Math.round(it.hp*2)+'%':''].filter(Boolean).join(' · ')}
+/* an item's bonuses as text, with its powers and its legend set */
+function itemStats(it){var s=[it.atk?'Atac +'+Math.round(it.atk*3)+'%':'',it.def?'Defensa +'+Math.round(it.def*3)+'%':'',it.hp?'Vida +'+Math.round(it.hp*2)+'%':''].filter(Boolean).join(' · ');if(it.aff&&it.aff.length)s+=' · Poders: '+it.aff.map(function(a){return AFFIX[a].n}).join(', ');if(it.set)s+=' · '+SETS[it.set].n;return s}
 function itemGroups(){var g={},order=[];G.items.forEach(function(id){if(!IT(id))return;if(!g[id]){g[id]=0;order.push(id)}g[id]++});
   return order.sort(function(a,b){var A=IT(a),B=IT(b);return (A.slot>B.slot?1:A.slot<B.slot?-1:0)||(A.base>B.base?1:A.base<B.base?-1:0)||tierOf(b)-tierOf(a)}).map(function(id){return {id:id,n:g[id]}})}
-function forgeOnceV9(id){var t=tierOf(id);if(t>=4)return false;var cnt=G.items.filter(function(x){return x===id}).length;if(cnt<4||G.coins<FORGE_COST[t])return false;
-  for(var k=0;k<4;k++)G.items.splice(G.items.indexOf(id),1);G.coins-=FORGE_COST[t];G.items.push(baseOf(id)+'#'+(t+1));return true}
-function forgeAllV9(){var n=0,again=true,guard=0;while(again&&guard++<200){again=false;var gs=itemGroups();for(var i=0;i<gs.length;i++){if(gs[i].n>=4&&forgeOnce(gs[i].id)){n++;again=true;break}}}return n}
 function scMotxilla(){
   var q=bonusPct(G.equip);
   var slots=SLOTS.filter(function(x){return x[0]!=='vestit'}).map(function(x){var id=G.equip[x[0]],it=IT(id);return '<div class="box" style="min-height:96px;'+(it?'border:3px solid '+TIER_C[it.tier]:'border:2px dashed #B9B3C6')+'"><span class="muted small">'+x[1]+'</span>'+(it?'<b style="font-size:13px;text-align:center">'+esc(it.n)+'</b><span class="muted small" style="text-align:center">'+esc(itemStats(it))+'</span><button type="button" class="btn sm light" style="min-height:36px" data-act="unequip" data-slot="'+x[0]+'">Treu</button>':'<span class="muted small">buit</span>')+'</div>'}).join('');
@@ -40,7 +38,12 @@ function scMotxilla(){
 }
 /* who is acting: green for your team, red for the enemy; big enemy moves get their own cut-in */
 var US_EV=['hit','heal','regen','special','combo','dot','stunned','foeDown'],THEM_EV=['ehit','aoe','warn','enrage','wave','teamDown','boss','minion'];
+/* shows one battle event: sound, caption, animations, cut-ins and comic pages */
 function showEvent(e){
+  try{
+  if(e.mega||e.all||e.t==='ult'){snd('big');buzz([60,40,120])}else if(e.t==='combo')snd('combo');
+  else if(e.t==='hit')snd(e.eff==='super'||e.crit?'crit':'hit');else if(e.t==='heal'||e.t==='regen')snd('heal');
+  else if(e.t==='foeDown')snd('win');else if(e.t==='teamDown')snd('lose');}catch(x){}
   if(v13Show(e))return;
   if(e.t==='ult'){var c0=$('caption');if(c0){c0.classList.add('them');c0.classList.remove('us');c0.textContent=e.txt}mangaUlt(e,function(){bossFx(e);impact();sfx($('squad'),'KRAAAAK!','w',1);anim($('squad'),'shake')});return}
   var cap=$('caption');if(cap){cap.classList.toggle('them',THEM_EV.indexOf(e.t)>=0);cap.classList.toggle('us',US_EV.indexOf(e.t)>=0)}

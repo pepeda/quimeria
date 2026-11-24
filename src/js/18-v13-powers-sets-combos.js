@@ -104,14 +104,6 @@ function foeSkip(b,r,ev){var en=b.enemy,f=en.boss?0.6:1;
 /* --- enemies grow stronger every turn: bosses 5% (×1,05 each turn), guardians 3%, the rest 2% --- */
 function growRate(en){return en.boss?1.05:en.guardian?1.03:1.02}
 function growF(b){return Math.pow(growRate(b.enemy),Math.max(0,(b.turn||0)-1))}
-function inDmg(b,t,x){var d=inDmg0(b,t,(x||1)*growF(b));if(b.P&&b.P.thorns)b._thorn=(b._thorn||0)+d*b.P.thorns/100;return d}
-/* --- our damage: element bonus of group attacks, item powers, crits, status chances --- */
-function outDmg(c,pow,b,r){var o=outDmg1(c,pow,b,r),P=b.P||emptyP(),f=(b._elb||1)*(1+(P.el[sp(c).el]||0)/100);
-  if(P.crit&&Math.random()*100<P.crit){f*=2;procAdd(b,'crit')}
-  o.n=Math.max(1,Math.round(o.n*f));
-  var boss=b.enemy.boss?0.6:1,pw=stats(c).atk*0.35;
-  ['poison','burn','slow','dist','dizzy','stun'].forEach(function(k){if(P[k]&&Math.random()*100<P[k]*boss){applyFx(b,k,pw);procAdd(b,k)}});
-  if(P.vamp)b._vamp=(b._vamp||0)+o.n*P.vamp/100;return o}
 function procAdd(b,k){b._procs=b._procs||[];if(b._procs.indexOf(k)<0)b._procs.push(k)}
 /* --- secret combos: specific critters together. Once found, they stay written in the critter's card --- */
 var MEGA=[
@@ -136,13 +128,8 @@ function megaReady(r,b){var al=alive(r);b.megaUsed=b.megaUsed||{};if(b.turn<3)re
     m.sp.forEach(function(s){var c=al.filter(function(x){return x.sp===s})[0];if(!c){ok=false;return}var a=abilities(c).filter(function(x){return (b.ch[c.uid]||[])[x.i]===0})[0]||bestOff(c);parts.push({c:c,a:a})});
     if(ok)return {parts:parts,mega:m}}
   return null}
-function findCombo(r,b){return megaReady(r,b)||findCombo0(r,b)}
 function elsOf(parts){var l=[];parts.forEach(function(p){var e=sp(p.c).el;if(l.indexOf(e)<0)l.push(e)});return l}
 function elBonus(n){return 1+0.1*Math.max(0,n-1)}
-function doCombo(x,r,b){
-  if(x.mega)return doMega(x,r,b);
-  var els=elsOf(x.parts),eb=elBonus(els.length);b._elb=eb;var e=doCombo0(x,r,b);b._elb=1;
-  e.elb=eb;e.nEl=els.length;e.all=!!x.all;if(eb>1)e.txt+=' Bonus de '+els.length+' elements: +'+Math.round((eb-1)*100)+'%.';return e}
 function doMega(x,r,b){var m=x.mega;b.megaUsed[m.id]=1;
   x.parts.forEach(function(p){if(p.a.i>=0)b.ch[p.c.uid][p.a.i]=p.a.cd});
   var els=elsOf(x.parts),eb=elBonus(els.length),n=0;b._elb=eb;x.parts.forEach(function(p){n+=outDmg(p.c,m.pow*0.75,b,r).n});b._elb=1;
@@ -184,10 +171,6 @@ function battleTick3(){
   if(b._procs.length)ev.push({t:'proc',tags:b._procs.slice(),txt:'Efectes dels objectes: '+b._procs.map(function(k){return FX_N[k]}).join(', ')+'.'});
   ['slow','dist','dizzy'].forEach(function(k){if(b.st[k]>0)b.st[k]--});
   return ev}
-function battleWon3(){var r=run(),b=r.event,en=b.enemy,P=b.P||emptyP();battleWon0();var ev=r.event;
-  if(ev&&ev.type==='card'&&ev.kind==='coins'&&P.coins)ev.n=Math.round(ev.n*(1+P.coins/100));
-  var ch=en.boss?0.05:0;
-  if(ch&&ev&&ev.type==='card'&&ev.kind==='item'&&Math.random()<ch){var miss=missingPieces(r.world);if(miss.length){ev.item=pickOne(miss);ev.why='Una peça d’un SET DE LLEGENDA! '+ev.why}}}
 /* --- legend workshop --- */
 function buyLegend(el){var miss=missingPieces(el);if(!miss.length){toast('Ja tens totes les peces de '+ELS[el].n+'.');return}
   if(!legendOpen()){toast('Primer has de forjar un objecte fins a Superèpica.');return}if(G.coins<LEGEND_COST){toast('Necessites '+LEGEND_COST+' monedes.');return}
@@ -245,9 +228,6 @@ function teamPage(e,done){
     {at:1200,bg:'#fff',html:'<div class="row" style="gap:4px;z-index:2;position:relative">'+e.els.map(function(x){return elIcon(x,26,ELS[x].c)}).join('')+'</div>'+(bonus?'<div class="mname" style="font-size:40px">'+bonus+'</div><div class="mdesc">Bonus de '+e.nEl+' elements</div>':'<div class="mdesc">Tots a la vegada!</div>')},
     {wide:1,at:1800,bg:'#fff',html:'<svg class="mcrack" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true"><path d="M150 60 L20 10 M150 60 L60 115 M150 60 L280 20 M150 60 L250 118 M150 60 L150 0 M150 60 L0 70 M150 60 L300 75" stroke="#111" stroke-width="4" fill="none"/></svg><div class="mscared" style="z-index:2">'+foeSvg(en,90)+'</div><span class="sfx r big" style="left:50%;top:20%;animation-delay:'+(RM?0:1900)+'ms">KA-BOOOOM!</span>'}
   ],RM?900:3300,done)}
-function updateStatus(){updateStatus1();var r=run(),b=r&&r.event;if(!b||b.type!=='battle')return;var f=$('foe-st');if(!f)return;var s='';
-  if(b.st.slow>0)s+='<span class="stchip soak">Lent '+b.st.slow+'</span>';if(b.st.dist>0)s+='<span class="stchip weak">Distret '+b.st.dist+'</span>';if(b.st.dizzy>0)s+='<span class="stchip stun">Marejat '+b.st.dizzy+'</span>';
-  var g=growF(b);if(g>=1.01&&b.enemy.hp>0)s+='<span class="stchip burn">Més fort ×'+g.toFixed(2).replace('.',',')+'</span>';f.innerHTML+=s}
 /* --- old forged items get their powers too (save from before this version) --- */
 function fkey(id){return baseOf(id)+'#'+tierOf(id)}
 function fcount(id){var k=fkey(id);return G.items.filter(function(x){return fkey(x)===k}).length}
@@ -256,7 +236,6 @@ function forgeOnce(id,pw){var t=tierOf(id),it=IT(id);if(!it||it.set||t>=4||fcoun
   var i=G.items.indexOf(id);G.items.splice(i,1);for(var n=0;n<3;n++){for(var j=0;j<G.items.length;j++)if(fkey(G.items[j])===k){G.items.splice(j,1);break}}
   G.coins-=FORGE_COST[t];aff.push(pw&&AFFIX[pw]?pw:pickOne(AFF_KEYS));var nid=baseOf(id)+'#'+(t+1)+'~'+aff.join('.');G.items.push(nid);G.lastForge=nid;if(t+1>=4&&!G.superForged){G.superForged=1;setTimeout(function(){toast('Has forjat la teva primera Superèpica! El Taller de llegendes ja és obert.')},1600)}return true}
 function forgeAll(){var n=0,guard=0,l;while(guard++<200&&(l=forgeReady()).length){if(!forgeOnce(l[0]))break;n++}return n}
-function itemStats(it){var s=itemStats0(it);if(it.aff&&it.aff.length)s+=' · Poders: '+it.aff.map(function(a){return AFFIX[a].n}).join(', ');if(it.set)s+=' · '+SETS[it.set].n;return s}
 (function(){if(!G||G.v13)return;function up(id){var t=tierOf(id);if(!t||affOf(id).length||!ITEMS[baseOf(id)]||ITEMS[baseOf(id)].set)return id;var a=[];for(var i=0;i<t;i++)a.push(pickOne(AFF_KEYS));return baseOf(id)+'#'+t+'~'+a.join('.')}
   G.items=G.items.map(up);Object.keys(G.equip).forEach(function(s){if(G.equip[s])G.equip[s]=up(G.equip[s])});G.megas=G.megas||{};G.v13=1;persist()})();
 

@@ -33,14 +33,25 @@ function alive(r){return r.team.map(byUid).filter(function(c){return c&&r.hp[c.u
 function lowest(r){return alive(r).sort(function(a,z){return r.hp[a.uid]/stats(a).hp-r.hp[z.uid]/stats(z).hp})[0]}
 function sameEl(r,el){return alive(r).filter(function(c){return sp(c).el===el}).length}
 function resistF(b,c){return b.enemy.resist&&sp(c).el===b.enemy.resist?0.5:1}
-function outDmg0(c,pow,b,r){
+/* damage of critter c hitting the enemy with power pow: {n: damage, m: element multiplier, zap: lightning on a soaked enemy} */
+function outDmg(c,pow,b,r){
   var s=stats(c),atk=s.atk*pow*(b.tm.buff>0?1.3:1)*(b.syn.germans&&sameEl(r,sp(c).el)>=2?1.15:1);
   var def=b.enemy.def*(b.st.soak>0?0.5:1),m=effMult(c,b.enemy.el)*resistF(b,c);
   var zap=(sp(c).el==='llamp'||cEl2(c)==='llamp')&&b.st.soak>0?(b.syn.tempesta?1.6:1.3):1;
-  return {n:Math.max(1,Math.round((atk*m-def*0.5)*zap*caveF(r)*huntF(b,c))),m:m,zap:zap>1};
+  var o={n:Math.max(1,Math.round((atk*m-def*0.5)*zap*caveF(r)*huntF(b,c))),m:m,zap:zap>1};
+  /* a critter frozen by the ice boss hardly hurts */
+  if(b.frozen&&b.frozen[c.uid]>0){o.n=1;o.m=1;o.zap=false}
+  /* element bonus of group attacks, gear powers: element damage, crits, status chances, life drain */
+  var P=b.P||emptyP(),f=(b._elb||1)*(1+(P.el[sp(c).el]||0)/100);
+  if(P.crit&&Math.random()*100<P.crit){f*=2;procAdd(b,'crit')}
+  o.n=Math.max(1,Math.round(o.n*f));
+  var boss=b.enemy.boss?0.6:1,pw=stats(c).atk*0.35;
+  ['poison','burn','slow','dist','dizzy','stun'].forEach(function(k){if(P[k]&&Math.random()*100<P[k]*boss){applyFx(b,k,pw);procAdd(b,k)}});
+  if(P.vamp)b._vamp=(b._vamp||0)+o.n*P.vamp/100;return o;
 }
-function inDmg0(b,t,x){var s=stats(t),def=s.def*(b.syn.complet?1.1:1),atk=b.enemy.atk*(b.st.weak>0?0.7:1)*(b.enemy.enraged?1.3:1)*(x||1);
-  return Math.max(1,Math.round(atk*mult(b.enemy.el,sp(t).el)-def*0.5))}
+/* damage of the enemy hitting critter t (x: strength of the move). Enemies grow stronger every turn (growF); thorns on the gear hurt back */
+function inDmg(b,t,x){x=(x||1)*growF(b);var s=stats(t),def=s.def*(b.syn.complet?1.1:1),atk=b.enemy.atk*(b.st.weak>0?0.7:1)*(b.enemy.enraged?1.3:1)*(x||1);
+  var d=Math.max(1,Math.round(atk*mult(b.enemy.el,sp(t).el)-def*0.5));if(b.P&&b.P.thorns)b._thorn=(b._thorn||0)+d*b.P.thorns/100;return d}
 function danger(enemy){
   var r=run(),team=alive(r);if(!team.length)return {cls:'bad',t:'Perillós'};
   var out=0,hp=0,tank=team.filter(function(c){return sp(c).role==='Defensa'})[0];
@@ -137,7 +148,12 @@ function battleTick0(){
   return ev;
 }
 var battleTimer=null,playing=false;
-function scheduleTick0(){
+/* the next battle turn, about one second from now (a boss first shows its intro comic page) */
+function scheduleTick(){
+  if(introPlaying)return;
+  var r0=run(),b0=r0&&r0.event;
+  if(b0&&b0.type==='battle'&&b0.enemy&&b0.enemy.boss&&!b0.introDone&&!b0.over&&G.screen==='run'){b0.introDone=true;persist();introPlaying=true;
+    bossIntro(b0,function(){introPlaying=false;scheduleTick()});return}
   if(battleTimer||playing)return;
   battleTimer=setTimeout(function(){battleTimer=null;var r=run();if(!r||G.screen!=='run'||!r.event||r.event.type!=='battle'||r.event.over)return;
     var ev=battleTick();persist();playEvents(ev,function(){var b=r.event;if(b.over){render();var sc=$('screen');if(sc)sc.scrollTop=0}else scheduleTick()})},RM?600:1050);
@@ -148,7 +164,8 @@ function playEvents(ev,done){
   (function next(){var rr=run();if(!rr||!rr.event||rr.event.type!=='battle'){playing=false;return}if(i>=ev.length){playing=false;done();return}var e=ev[i++];showEvent(e);
     setTimeout(next,(e.t==='ult'||e.mega||e.all)?(RM?500:3700):(e.t==='spell'||e.t==='revive')?(RM?150:900):(e.t==='proc'||e.t==='drain'||e.t==='skip')?(RM?60:550):((e.t==='ehit'&&e.strong)||e.t==='aoe'||e.t==='enrage'||e.t==='boss')?(RM?200:1500):e.t==='combo'?(RM?300:1500):e.t==='special'?(RM?200:750):(RM?60:320))})();
 }
-function updateStatus0(){
+/* the chips under the enemy and the team: statuses, shield, team meter, boss state, how much the enemy has grown */
+function updateStatus(){
   var r=run(),b=r&&r.event;if(!b||b.type!=='battle')return;var f=$('foe-st'),t=$('team-st');
   if(f){var s=[];if(b.st.burn)s.push('<span class="stchip burn">Cremat '+b.st.burn.t+'</span>');if(b.st.poison)s.push('<span class="stchip poison">Enverinat '+b.st.poison.t+'</span>');
     if(b.st.stun)s.push('<span class="stchip stun">Atordit</span>');if(b.st.soak>0)s.push('<span class="stchip soak">Mullat '+b.st.soak+'</span>');if(b.st.weak>0)s.push('<span class="stchip weak">Debilitat '+b.st.weak+'</span>');
@@ -157,6 +174,15 @@ function updateStatus0(){
     if(b.tm.regen&&b.tm.regen.t>0)q.push('<span class="stchip good">Regeneració '+b.tm.regen.t+'</span>');
     Object.keys(b.tm.reflect).forEach(function(u){if(b.tm.reflect[u]>0&&byUid(u))q.push('<span class="stchip good">Mirall: '+esc(cName(byUid(u)))+'</span>')});t.innerHTML=q.join('')}
   var sh=$('shield');if(sh)sh.classList.toggle('on',b.shield>0);
+  /* team meter, soldiers, charging, heads, frozen critters */
+  var m=$('team-meter');
+  if(m){m.style.width=Math.round(Math.min(1,(b.meter||0)/TEAM_METER)*100)+'%';m.parentNode.classList.toggle('full',(b.meter||0)>=TEAM_METER-1)}
+  if(f){var bs='';if(b.minions>0)bs+='<span class="stchip weak">Soldats '+b.minions+'</span>';if(b.charging>0)bs+='<span class="stchip stun">Carregant '+b.charging+'</span>';if(b.enemy.boss==='tricap')bs+='<span class="stchip burn">Caps '+b.heads+'</span>';f.innerHTML+=bs}
+  if(t&&b.frozen){var q='';Object.keys(b.frozen).forEach(function(u){if(b.frozen[u]>0&&byUid(u))q+='<span class="stchip soak">Congelat: '+esc(cName(byUid(u)))+' '+b.frozen[u]+'</span>'});t.innerHTML+=q}
+  /* statuses from gear powers and how much the enemy has grown */
+  if(!f)return;var gs='';
+  if(b.st.slow>0)gs+='<span class="stchip soak">Lent '+b.st.slow+'</span>';if(b.st.dist>0)gs+='<span class="stchip weak">Distret '+b.st.dist+'</span>';if(b.st.dizzy>0)gs+='<span class="stchip stun">Marejat '+b.st.dizzy+'</span>';
+  var g=growF(b);if(g>=1.01&&b.enemy.hp>0)gs+='<span class="stchip burn">Més fort ×'+g.toFixed(2).replace('.',',')+'</span>';f.innerHTML+=gs
 }
 function updateAbilities(){
   var r=run(),b=r&&r.event;if(!b||b.type!=='battle')return;
@@ -202,13 +228,23 @@ function showSpecial(e){
 }
 function abandonRun(w){var r=G.runs[w];if(!r)return;stopBattle();G.coins+=Math.floor(r.coins/2);delete G.runs[w];if(G.active===w)G.active=null;G.world=w;G.screen='mon';toast('Aventura abandonada. Pots tornar a començar quan vulguis.')}
 function restartRun(){var r=run();if(!r)return;var w=r.world,z=r.zone||0,team=r.team.slice();stopBattle();G.coins+=Math.floor(r.coins/2);delete G.runs[w];G.active=null;G.world=w;G.zone=z;G.pick=team.filter(function(u){return byUid(u)});startRun();toast('Torneu a començar la zona amb tota la vida.')}
-function battleWon0(){
-  var r=run(),b=r.event,L=b.enemy.L||1;
-  if(b.enemy.final){r.coins+=60+20*Math.round(L);r.event={type:'card',kind:'item',item:pickOne(RELICS),why:'El guardià deixa caure un tresor rar. +'+(60+20*Math.round(L))+' monedes.',last:true};return}
-  if(b.enemy.wild){recruitCard(b.enemy.wild,b.rare);return}
-  if(b.enemy.guardian)r.coins+=60;
-  if(b.win){applyEffect(b.win);return}
-  r.event={type:'card',kind:'coins',n:Math.round((15+10*L)*(teamTalent('tresor')?1.5:1)),why:'Has guanyat la batalla!'};
+/* the battle is won: the reward card (or the next step of the scene) */
+function battleWon(){
+  var r=run(),b=r.event,en=b.enemy,P=b.P||emptyP(),L=b.enemy.L||1;
+  if(b.enemy.final){r.coins+=60+20*Math.round(L);r.event={type:'card',kind:'item',item:pickOne(RELICS),why:'El guardià deixa caure un tresor rar. +'+(60+20*Math.round(L))+' monedes.',last:true}}
+  else if(b.enemy.wild)recruitCard(b.enemy.wild,b.rare);
+  else{
+    if(b.enemy.guardian)r.coins+=60;
+    if(b.win)applyEffect(b.win);
+    else r.event={type:'card',kind:'coins',n:Math.round((15+10*L)*(teamTalent('tresor')?1.5:1)),why:'Has guanyat la batalla!'};
+  }
+  /* gear with the coins power gives more coins; a boss treasure is a legend set piece 5% of the times */
+  var ev=r.event;
+  if(ev&&ev.type==='card'&&ev.kind==='coins'&&P.coins)ev.n=Math.round(ev.n*(1+P.coins/100));
+  var ch=en.boss?0.05:0;
+  if(ch&&ev&&ev.type==='card'&&ev.kind==='item'&&Math.random()<ch){var miss=missingPieces(r.world);if(miss.length){ev.item=pickOne(miss);ev.why='Una peça d’un SET DE LLEGENDA! '+ev.why}}
+  /* never leave the whole team down after a win (a mirror can win while the last critter falls) */
+  var r2=run();if(r2&&r2.team&&!r2.team.some(function(u){return r2.hp[u]>0}))r2.team.forEach(function(u){r2.hp[u]=1});
 }
 function finishRun(ok,keepAll){
   var r=run();if(!r)return;

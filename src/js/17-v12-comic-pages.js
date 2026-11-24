@@ -32,13 +32,6 @@ function mangaUlt(e,done){
     {wide:1,at:1800,bg:'#fff',html:'<svg class="mcrack" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true"><path d="M150 60 L20 10 M150 60 L60 115 M150 60 L280 20 M150 60 L250 118 M150 60 L150 0 M150 60 L0 70 M150 60 L300 75 M95 38 L80 70 M210 40 L235 70" stroke="#111" stroke-width="4" fill="none"/></svg><span class="sfx r big" style="left:50%;top:30%;animation-delay:'+(RM?0:1900)+'ms">KRA-KA-BOOOM!</span>'}
   ],RM?900:3300,done);
 }
-function scheduleTick(){
-  if(introPlaying)return;
-  var r=run(),b=r&&r.event;
-  if(b&&b.type==='battle'&&b.enemy&&b.enemy.boss&&!b.introDone&&!b.over&&G.screen==='run'){b.introDone=true;persist();introPlaying=true;
-    bossIntro(b,function(){introPlaying=false;scheduleTick0()});return}
-  scheduleTick0();
-}
 function battleTick2(){
   var ev=battleTick1(),r=run(),b=r.event,en=b.enemy;
   if(en&&en.boss&&!b.over&&!b.ultDone&&en.hp>0&&en.hp<en.max*0.35&&alive(r).length){

@@ -11,16 +11,20 @@ var BOSS_W={foc:'cavaller',aigua:'gel',planta:'gegant',llamp:'eixam',psiquic:'om
 var TEAM_METER=7;
 var GROUP_NAMES={'aigua+foc+llamp':'Tempesta de vapor elèctric','foc+llamp+planta':'Bosc en flames','aigua+planta+psiquic':'Pluja de somnis','foc+llamp+psiquic':'Llamp de foc mental',
   'aigua+llamp+planta':'Tempesta verda','aigua+foc+planta':'Gèiser del bosc','foc+planta+psiquic':'Flor de foc','aigua+llamp+psiquic':'Mar de llamps','llamp+planta+psiquic':'Arbre del tro','aigua+foc+psiquic':'Boira de foc'};
-function outDmg1(c,pow,b,r){var o=outDmg0(c,pow,b,r);if(b.frozen&&b.frozen[c.uid]>0){o.n=1;o.m=1;o.zap=false}return o}
 function bestOff(c){var l=abilities(c).filter(function(a){return OFFENSIVE.indexOf(a.kind)>=0}).sort(function(x,y){return y.pow-x.pow});var a=l[0]||{kind:'hit',pow:1,cd:0};return {i:-1,cd:0,kind:a.kind,pow:Math.max(1,a.pow)}}
-function findCombo0(r,b){
+/* who attacks together this turn: a secret combo, 3 or more critters with an attack ready, or 2 of elements that combine (COMBOS) */
+function findCombo(r,b){
+  var mega=megaReady(r,b);if(mega)return mega;
   var ready=alive(r).map(function(c){var a=abilities(c).filter(function(x){return OFFENSIVE.indexOf(x.kind)>=0&&(b.ch[c.uid]||[])[x.i]===0})[0];return a?{c:c,a:a}:null}).filter(Boolean);
   if(ready.length>=3)return {parts:ready,group:true};
   for(var i=0;i<ready.length;i++)for(var j=i+1;j<ready.length;j++){var e1=sp(ready[i].c).el,e2=sp(ready[j].c).el,cb=COMBOS[comboKey(e1,e2)];
     if(e1!==e2&&cb)return {parts:[ready[i],ready[j]],cb:cb}}
   return null;
 }
-function doCombo0(x,r,b){
+/* a combined attack; more different elements give a bonus (+10% for each one after the first) */
+function doCombo(x,r,b){
+  if(x.mega)return doMega(x,r,b);
+  var nEl=elsOf(x.parts).length,eb=elBonus(nEl);b._elb=eb;
   x.parts.forEach(function(p){if(p.a.i>=0)b.ch[p.c.uid][p.a.i]=p.a.cd});
   var k=x.parts.length,n=0,els=[],kinds=[],pow=x.group?1.3*(1+0.15*(k-2)):x.cb[2]*1.3;
   x.parts.forEach(function(p){n+=outDmg(p.c,pow,b,r).n;var e=sp(p.c).el;if(els.indexOf(e)<0)els.push(e);if(kinds.indexOf(p.a.kind)<0)kinds.push(p.a.kind)});
@@ -28,8 +32,10 @@ function doCombo0(x,r,b){
   var pw=Math.max(3,Math.round(x.parts.reduce(function(a,p){return a+stats(p.c).atk},0)*0.25));
   (x.group?kinds:[x.cb[1]]).forEach(function(q){if(q==='burn')b.st.burn={t:4+(b.syn.incendi?2:0),n:pw};if(q==='poison')b.st.poison={t:4,n:pw};if(q==='stun')b.st.stun=1;if(q==='weaken')b.st.weak=3;if(q==='soak')b.st.soak=3});
   var name=!x.group?x.cb[0]:x.all?'Atac de tot l’equip':(els.length===3&&GROUP_NAMES[els.slice().sort().join('+')])||(els.length>=4?'Tempesta de '+els.length+' elements':els.length===1?'Triple '+ELS[els[0]].n:'Atac de '+(k===3?'tres':k===4?'quatre':k));
-  return {t:'combo',ids:x.parts.map(function(p){return p.c.uid}),els:els,name:name,n:n,after:b.enemy.hp,group:!!x.group,
+  b._elb=1;
+  var e={t:'combo',ids:x.parts.map(function(p){return p.c.uid}),els:els,name:name,n:n,after:b.enemy.hp,group:!!x.group,
     txt:(x.group?'ATAC CONJUNT! ':'ATAC COMBINAT! ')+x.parts.map(function(p){return cName(p.c)}).join(', ')+' fan '+name+': -'+n+'.'};
+  e.elb=eb;e.nEl=nEl;e.all=!!x.all;if(eb>1)e.txt+=' Bonus de '+nEl+' elements: +'+Math.round((eb-1)*100)+'%.';return e;
 }
 function showCombo(e){
   var st=$('stage');if(!st)return;var ids=e.ids||[],px=ids.length<=2?84:ids.length<=4?62:50;
@@ -90,11 +96,5 @@ function bossFx(e){
   if(e.hits)e.hits.forEach(function(h){var m=$('m-'+h.uid);if(!m)return;anim(m,'shake');floatNum(m,'-'+h.n,'dmg');setBar('hp-'+h.uid,h.after,stats(byUid(h.uid)).hp);if(h.after===0)m.classList.add('ko')});
   var r=run(),b=r&&r.event;if(e.foeAfter!=null&&b&&b.enemy)setBar('foe-hp',e.foeAfter,b.enemy.max);
   if(e.t==='boss'||e.t==='minion')updateStatus();
-}
-function updateStatus1(){
-  updateStatus0();var r=run(),b=r&&r.event;if(!b||b.type!=='battle')return;var f=$('foe-st'),t=$('team-st'),m=$('team-meter');
-  if(m){m.style.width=Math.round(Math.min(1,(b.meter||0)/TEAM_METER)*100)+'%';m.parentNode.classList.toggle('full',(b.meter||0)>=TEAM_METER-1)}
-  if(f){var s='';if(b.minions>0)s+='<span class="stchip weak">Soldats '+b.minions+'</span>';if(b.charging>0)s+='<span class="stchip stun">Carregant '+b.charging+'</span>';if(b.enemy.boss==='tricap')s+='<span class="stchip burn">Caps '+b.heads+'</span>';f.innerHTML+=s}
-  if(t&&b.frozen){var q='';Object.keys(b.frozen).forEach(function(u){if(b.frozen[u]>0&&byUid(u))q+='<span class="stchip soak">Congelat: '+esc(cName(byUid(u)))+' '+b.frozen[u]+'</span>'});t.innerHTML+=q}
 }
 

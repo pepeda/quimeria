@@ -57,7 +57,7 @@ E("G.screen='run'");try{E("render()");res.ev.slice(0,80).forEach(e=>{E("showEven
 // old save migration
 console.log(fails?fails+' FAILED':'ALL OK');
 // drop chance 5% on bosses
-{let hits=0;const src=E("battleWon3.toString()");ok(src.indexOf('en.boss?0.05:0')>=0,'boss legend drop is 5%');}
+{let hits=0;const src=E("battleWon.toString()");ok(src.indexOf('en.boss?0.05:0')>=0,'boss legend drop is 5%');}
 // forging to Superepica opens the workshop
 E("G.superForged=0;G.coins=99999;G.items=['espasaFusta#3~vamp.veri.crit','espasaFusta#3~vamp','espasaFusta#3~sort','espasaFusta#3~rapid']");E("forgeOnce(G.items[0])");ok(E("G.superForged")===1&&E("legendOpen()")===true,'forging a Superepica opens the workshop');
 console.log('ALL OK');
