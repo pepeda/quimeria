@@ -39,8 +39,6 @@ function h14Open(x){return !x.el||h14WorldDone(x.el)}
 /* forge discount: FORGE_COST is read everywhere, so keep it in step with the build */
 var H14_FC=FORGE_COST.slice();
 function h14Forge(){for(var i=0;i<H14_FC.length;i++)FORGE_COST[i]=G.built.forja?Math.round(H14_FC[i]*0.8):H14_FC[i]}
-var h14Render=render;
-render=function(){h14Forge();return h14Render.apply(this,arguments)};
 
 /* after each expedition: extra rest, extra coins and food from the house */
 var h14FinishRun=finishRun;

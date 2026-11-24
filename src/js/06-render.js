@@ -15,6 +15,7 @@ function topBar(){
     '<button type="button" class="btn sm light mob" style="margin-left:auto;min-height:40px" data-act="chat">Comentaris ('+(F.items.length)+')</button>';
 }
 function render(){
+  h14Forge();
   applyRestClock();
   $('top').innerHTML=topBar();
   var s=G.screen,h='';
@@ -36,7 +37,12 @@ function render(){
   var r=run();
   if(s==='run'&&r&&r.event&&r.event.type==='battle'&&!r.event.over){updateAbilities();$('shield').classList.toggle('on',r.event.shield>0);$('warn').classList.toggle('on',!!r.event.warn);scheduleTick()}else stopBattle();
   persist();
+  menuDots();
 }
+/* red dots on the menu: a critter can evolve, something can be forged, better gear is in the backpack */
+function menuDots(){try{var nav=$('nav');if(!nav||!nav.querySelector)return;
+  var dots={bestioles:G.owned.some(function(c){return c.stage<2&&c.mill>=5}),motxilla:forgeReady().length>0||betterGear()};
+  Object.keys(dots).forEach(function(k){if(!dots[k])return;var b=nav.querySelector('[data-to="'+k+'"]');if(b&&!b.querySelector('.rdot')){var s=document.createElement('span');s.className='rdot';s.setAttribute('aria-label','hi ha novetats');b.appendChild(s)}})}catch(e){}}
 
 function scCasa(){
   var b=G.built,home=G.owned.filter(function(c){return !busyWorld(c)}),none=G.owned.filter(available).length===0&&!Object.keys(G.runs).length;

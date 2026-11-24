@@ -49,11 +49,6 @@ scMotxilla=function(){var h=scMotxillaV13();
   var body=tabs[t],k=body.indexOf(h1);if(k>=0)body=body.slice(0,k+h1.length)+bar+(t==='obj'?forgeChoiceBlock():'')+body.slice(k+h1.length);else body=bar+body;
   return body};
 function betterGear(){try{var b=bestEquipSet().equip;return SLOTS.some(function(x){return (b[x[0]]||'')!==(G.equip[x[0]]||'')&&itemScore(b[x[0]]||'')>itemScore(G.equip[x[0]]||'')})}catch(e){return false}}
-/* --- red dots on the menu: a critter can evolve, something can be forged, better gear is in the backpack --- */
-var renderV13=render;
-render=function(){renderV13();try{var nav=$('nav');if(!nav||!nav.querySelector)return;
-  var dots={bestioles:G.owned.some(function(c){return c.stage<2&&c.mill>=5}),motxilla:forgeReady().length>0||betterGear()};
-  Object.keys(dots).forEach(function(k){if(!dots[k])return;var b=nav.querySelector('[data-to="'+k+'"]');if(b&&!b.querySelector('.rdot')){var s=document.createElement('span');s.className='rdot';s.setAttribute('aria-label','hi ha novetats');b.appendChild(s)}})}catch(e){}};
 /* --- short sounds (WebAudio, under 0.2 s), vibration on big moments, a switch to turn them off --- */
 var AC=null;
 function snd(kind){if(G.mute)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var t=AC.currentTime;
