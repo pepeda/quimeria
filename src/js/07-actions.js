@@ -1,6 +1,21 @@
 'use strict';
 /* ================= ACTIONS ================= */
-function act0(a,d){
+/* one tap on a button with data-act: a is the action, d its data-* values */
+function act(a,d){
+  /* house: element rooms stay locked until that world is finished; area headings fold */
+  if(a==='build'){var bd=h14Item(d.k);if(bd&&!h14Open(bd)){toast('Primer has d’acabar: '+ELS[bd.el].mon+'.');return}}
+  if(a==='hfold'){G.hFold=G.hFold||{};G.hFold[d.k]=!h14Folded(d.k);persist();render();return}
+  /* forge: choose 1 power out of 3 */
+  if(a==='forge'){var t=tierOf(d.id);if(t<4&&fcount(d.id)>=4&&G.coins>=FORGE_COST[t]){G.forgeChoice={id:d.id,opts:shuffle(AFF_KEYS).slice(0,3)};G.mtab='obj';snd('tap')}else toast('Et falten objectes o monedes.');render();scrollTop0();return}
+  if(a==='forgePick'){var fc=G.forgeChoice;G.forgeChoice=null;if(fc&&fc.opts.indexOf(d.k)>=0&&forgeOnce(fc.id,d.k)){var lf=IT(G.lastForge);snd('forge');toast('Forjat: '+lf.n+' ('+TIER_N[lf.tier]+') amb '+AFFIX[d.k].n+'!')}persist();render();return}
+  if(a==='forgeCancel'){G.forgeChoice=null;render();return}
+  if(a==='forgeAll'){var n=forgeAll();if(n)snd('forge');toast(n?'Has forjat '+n+' objecte'+(n>1?'s':'')+' (poders a l’atzar).':'No hi ha res per forjar.');persist();render();return}
+  /* backpack tabs, sound switch, collection order, legend workshop */
+  if(a==='mtab'){G.mtab=d.k;render();scrollTop0();return}
+  if(a==='mute'){G.mute=!G.mute;persist();render();if(!G.mute)snd('tap');return}
+  if(a==='sortB'){G.sortB=d.k;persist();render();return}
+  if(a==='legend'){buyLegend(d.el);persist();render();return}
+  /* every other action changes the game, then the screen is drawn again */
   var r=run();
   if(a!=='reset')resetArm=false;if(a!=='abandon')abandonArm=null;if(a!=='restart')restartArm=false;
   if(a==='chat'){$('chat').classList.add('open');$('fbText').focus();return}
@@ -35,10 +50,8 @@ function act0(a,d){
     case 'close':G.detail=null;break;
     case 'adopt':var Sp=SPECIES[d.s];if(G.coins>=Sp.price&&G.owned.length<cap()&&worldOpen(Sp.el)){G.coins-=Sp.price;G.owned.push(mk(d.s));toast(Sp.n+' viu ara a casa teva!')}break;
     case 'feed':var c=byUid(d.u);if(c&&G.food[d.el]>0&&c.mill<5){G.food[d.el]--;c.mill=Math.min(5,c.mill+(d.el===sp(c).el?2:1));toast(cName(c)+' ha menjat: '+c.mill+' de 5 estrelles.')}break;
-    case 'evolve':var c2=byUid(d.u),ei=+d.i;if(c2&&c2.stage<2&&c2.mill>=5&&((c2.stage===0&&ei===0)||(c2.stage===1&&ei>0))){c2.stage++;c2.evo=ei;c2.mill=0;toast('Ara és '+cName(c2)+'!')}break;
+    case 'evolve':var c2=byUid(d.u),ei=+d.i;if(c2&&c2.stage<2&&c2.mill>=5&&((c2.stage===0&&ei===0)||(c2.stage===1&&ei>0))){c2.stage++;c2.evo=ei;c2.mill=0;toast('Ara és '+cName(c2)+'!');snd('evolve');buzz([40,40,80])}break;
     case 'equip':var ix=G.items.indexOf(d.id);if(ix<0||!IT(d.id))break;var sl=d.slot;G.items.splice(ix,1);if(G.equip[sl])G.items.push(G.equip[sl]);G.equip[sl]=d.id;toast(IT(d.id).n+' equipat.');break;
-    case 'forge':var nid=baseOf(d.id)+'#'+(tierOf(d.id)+1);if(forgeOnce(d.id)){var lf=IT(G.lastForge);toast('Forjat: '+lf.n+' ('+TIER_N[lf.tier]+'). Nou poder: '+AFFIX[lf.aff[lf.aff.length-1]].n+'!')}break;
-    case 'forgeAll':var nf=forgeAll();toast(nf?'Has forjat '+nf+' objecte'+(nf>1?'s':'')+'!':'No hi ha res per forjar.');break;
     case 'bestEquip':var be=bestEquipSet();G.equip=be.equip;G.items=be.items;toast('Ara portes el millor equipament.');break;
     case 'unequip':if(G.equip[d.slot]){G.items.push(G.equip[d.slot]);delete G.equip[d.slot]}break;
     case 'reset':if(!resetArm){resetArm=true;break}resetArm=false;stopBattle();G=newGame();toast('Partida nova!');break;

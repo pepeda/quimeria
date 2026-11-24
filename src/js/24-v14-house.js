@@ -84,12 +84,6 @@ applyRestClock=function(){
 /* locked element rooms cannot be bought; area headings fold */
 function h14Folded(a){var f=G.hFold&&G.hFold[a];if(f!==undefined)return !!f;
   return BUILD.filter(function(x){return x.area===a}).every(function(x){return (G.built[x.k]||0)>=x.max})}
-var h14Act=act;
-act=function(a,d){
-  if(a==='build'){var bd=h14Item(d.k);if(bd&&!h14Open(bd)){toast('Primer has d’acabar: '+ELS[bd.el].mon+'.');return}}
-  if(a==='hfold'){G.hFold=G.hFold||{};G.hFold[d.k]=!h14Folded(d.k);persist();render();return}
-  return h14Act.apply(this,arguments);
-};
 
 /* ---------- build list, grouped by area ---------- */
 (function(){if(!document.head||!document.head.appendChild)return;var st=document.createElement('style');st.textContent=

@@ -21,16 +21,6 @@ makeBattle=function(o){var bt=makeBattleV13(o),r=run();
   if(ZONE_BONUS.length===3)ZONE_BONUS.push(260);
   if(ZONE_INFO.length===3)ZONE_INFO.push('MOLT DIFÍCIL. Els enemics no s’adapten al teu equip: calen bestioles de nivell 3 i equip Èpic o millor. Tres campaments, una cova i el guardià més fort del món.');})();
 /* --- forge: choose 1 power out of 3 --- */
-var actV13=act;
-act=function(a,d){
-  if(a==='forge'){var t=tierOf(d.id);if(t<4&&fcount(d.id)>=4&&G.coins>=FORGE_COST[t]){G.forgeChoice={id:d.id,opts:shuffle(AFF_KEYS).slice(0,3)};G.mtab='obj';snd('tap')}else toast('Et falten objectes o monedes.');render();scrollTop0();return}
-  if(a==='forgePick'){var fc=G.forgeChoice;G.forgeChoice=null;if(fc&&fc.opts.indexOf(d.k)>=0&&forgeOnce(fc.id,d.k)){var lf=IT(G.lastForge);snd('forge');toast('Forjat: '+lf.n+' ('+TIER_N[lf.tier]+') amb '+AFFIX[d.k].n+'!')}persist();render();return}
-  if(a==='forgeCancel'){G.forgeChoice=null;render();return}
-  if(a==='mtab'){G.mtab=d.k;render();scrollTop0();return}
-  if(a==='mute'){G.mute=!G.mute;persist();render();if(!G.mute)snd('tap');return}
-  if(a==='evolve'){var c=byUid(d.u),before=c&&c.stage;actV13(a,d);if(c&&c.stage!==before){snd('evolve');buzz([40,40,80])}return}
-  if(a==='forgeAll'){var n=forgeAll();if(n)snd('forge');toast(n?'Has forjat '+n+' objecte'+(n>1?'s':'')+' (poders a l’atzar).':'No hi ha res per forjar.');persist();render();return}
-  return actV13(a,d)};
 function scrollTop0(){try{var sc=$('screen');if(sc&&sc.scrollTo)sc.scrollTo(0,0);window.scrollTo&&window.scrollTo(0,0)}catch(e){}}
 function forgeChoiceBlock(){var fc=G.forgeChoice;if(!fc)return '';var it=IT(fc.id);if(!it){G.forgeChoice=null;return ''}
   return '<div class="flat" style="gap:8px;background:#1E1B2E;color:#fff;outline:3px solid #F2B705"><h2 style="color:#fff">Tria el poder nou</h2><p class="small">'+esc(it.n)+' → '+esc(TIER_N[it.tier+1])+' · '+FORGE_COST[it.tier]+' monedes</p>'+

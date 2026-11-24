@@ -193,7 +193,6 @@ function battleWon3(){var r=run(),b=r.event,en=b.enemy,P=b.P||emptyP();battleWon
 function buyLegend(el){var miss=missingPieces(el);if(!miss.length){toast('Ja tens totes les peces de '+ELS[el].n+'.');return}
   if(!legendOpen()){toast('Primer has de forjar un objecte fins a Superèpica.');return}if(G.coins<LEGEND_COST){toast('Necessites '+LEGEND_COST+' monedes.');return}
   G.coins-=LEGEND_COST;var id=pickOne(miss);G.items.push(id);toast('Nova peça de llegenda: '+IT(id).n+'!')}
-function act(a,d){if(a==='sortB'){G.sortB=d.k;persist();render();return}if(a==='legend'){buyLegend(d.el);persist();render();return}return act0(a,d)}
 function setsBlock(){
   var mine={},n=setCounts(G.equip),total=0;allMine().forEach(function(id){var b=ITEMS[baseOf(id)];if(b&&b.set){mine[b.set]=mine[b.set]||{};mine[b.set][b.slot]=1}});
   Object.keys(mine).forEach(function(k){total+=Object.keys(mine[k]).length});
