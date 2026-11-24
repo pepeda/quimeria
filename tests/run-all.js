@@ -15,14 +15,14 @@ const { spawnSync } = require('child_process');
 
 const DIR = __dirname;
 const RUNS = [
-  ['test13', 'test13.js'], ['test13d', 'test13d.js'], ['test14', 'test14.js'],
+  ['test13', 'test13.js'], ['test13d', 'test13d.js'], ['test14', 'test14.js'], ['progression', 'test-progression.js'],
   ['h-t1', 'harness/t1.js'], ['h-t1b', 'harness/t1b.js'], ['h-t2', 'harness/t2.js'], ['h-t3', 'harness/t3.js'], ['h-t3b', 'harness/t3b.js'],
   ['h-t4', 'harness/t4.js'], ['h-t5', 'harness/t5.js'], ['h-t6', 'harness/t6.js'], ['h-tclock', 'harness/tclock.js'], ['h-tsafe', 'harness/tsafe.js'],
-  ['sim14', 'sim14.js'], ['sim14f', 'sim14f.js'], ['sim14z', 'sim14z.js']
+  ['sim14', 'sim14.js'], ['sim14z', 'sim14z.js']
 ];
 const args = process.argv.slice(2);
 const record = args.indexOf('--record') >= 0;
-const SLOW = ['h-t3', 'h-t3b', 'sim14', 'sim14f', 'sim14z'];
+const SLOW = ['h-t3', 'h-t3b', 'sim14', 'sim14z'];
 const quick = args.indexOf('--quick') >= 0 && !record;
 const game = path.resolve(args.find(a => /\.html$/.test(a)) || path.join(DIR, '..', 'dist', 'index.html'));
 const EXP = path.join(DIR, 'expected');

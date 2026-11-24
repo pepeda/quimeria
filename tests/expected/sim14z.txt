@@ -1,44 +1,80 @@
-== HARD_TP 2.2
-foc guard, lvl2 team, Magica gear                    win 0% turns 23.0
-foc guard, lvl3 team, Magica gear                    win 100% turns 18.0
-foc guard, lvl3 team, Epica gear                     win 100% turns 14.6
-foc guard, lvl3 team, Superepica gear                win 100% turns 13.6
-aigua guard, lvl2 team, Magica gear                  win 0% turns 34.0
-aigua guard, lvl3 team, Magica gear                  win 100% turns 28.8
-aigua guard, lvl3 team, Epica gear                   win 100% turns 23.1
-aigua guard, lvl3 team, Superepica gear              win 100% turns 19.9
-planta guard, lvl2 team, Magica gear                 win 0% turns 22.5
-planta guard, lvl3 team, Magica gear                 win 0% turns 21.2
-planta guard, lvl3 team, Epica gear                  win 100% turns 23.7
-planta guard, lvl3 team, Superepica gear             win 100% turns 20.6
-llamp guard, lvl2 team, Magica gear                  win 0% turns 32.4
-llamp guard, lvl3 team, Magica gear                  win 0% turns 31.8
-llamp guard, lvl3 team, Epica gear                   win 65% turns 35.8
-llamp guard, lvl3 team, Superepica gear              win 100% turns 28.2
-psiquic guard, lvl2 team, Magica gear                win 0% turns 28.9
-psiquic guard, lvl3 team, Magica gear                win 0% turns 27.6
-psiquic guard, lvl3 team, Epica gear                 win 34% turns 33.4
-psiquic guard, lvl3 team, Superepica gear            win 100% turns 28.0
-== HARD_TP 2.6
-foc guard, lvl2 team, Magica gear                    win 0% turns 22.7
-foc guard, lvl3 team, Magica gear                    win 100% turns 17.7
-foc guard, lvl3 team, Epica gear                     win 100% turns 14.6
-foc guard, lvl3 team, Superepica gear                win 100% turns 13.6
-aigua guard, lvl2 team, Magica gear                  win 0% turns 34.0
-aigua guard, lvl3 team, Magica gear                  win 100% turns 28.5
-aigua guard, lvl3 team, Epica gear                   win 100% turns 22.9
-aigua guard, lvl3 team, Superepica gear              win 100% turns 19.9
-planta guard, lvl2 team, Magica gear                 win 0% turns 22.6
-planta guard, lvl3 team, Magica gear                 win 0% turns 21.1
-planta guard, lvl3 team, Epica gear                  win 100% turns 23.8
-planta guard, lvl3 team, Superepica gear             win 100% turns 20.6
-llamp guard, lvl2 team, Magica gear                  win 0% turns 32.4
-llamp guard, lvl3 team, Magica gear                  win 0% turns 31.8
-llamp guard, lvl3 team, Epica gear                   win 58% turns 35.7
-llamp guard, lvl3 team, Superepica gear              win 100% turns 28.1
-psiquic guard, lvl2 team, Magica gear                win 0% turns 28.9
-psiquic guard, lvl3 team, Magica gear                win 0% turns 27.1
-psiquic guard, lvl3 team, Epica gear                 win 31% turns 33.6
-psiquic guard, lvl3 team, Superepica gear            win 100% turns 28.0
+Chest gear after 3 days x 4 wins: Bastó màgic ★★ (Màgica), Escut de closca ★★ (Màgica), Collaret de petxina ★★★ (Èpica), Anell de molsa ★★★ (Èpica), Anell de foc ★★★ (Èpica), Botes de núvol ★★★★ (Superèpica), Vestit d’explorador ★★★★ (Superèpica)
+Chest gear after 14 days x 4 wins: Casc de cristall ★★★ (Èpica), Arc de caça ★★★★ (Superèpica), Escut del Drac Roig (Superèpica), Collaret de petxina ★★★ (Èpica), Anell de foc ★ (Refinada), Capa de fulles ★★★ (Èpica), Botes de núvol ★★ (Màgica), Vestit de ninja ★★★★ (Superèpica)
+Final guardian win rate per zone, 100 battles per cell
+== foc                     Z4    Z5
+Inicials F1 nv1, 3            0%    0%
+Inicials F1 nv5, 4            0%    0%
+F1 nv5, 4, Normal             0%    0%
+F2 nv10, 4, Normal            0%    0%
+F2 nv8, 4, cofres 3 dies      0%    0%
+F2 nv10, 4, cofres 3 dies     0%    0%
+F2 nv10, 4, Refinada          0%    0%
+F2 nv10, 4, Màgica            0%    0%
+F3 nv15, 5, Màgica           97%    0%
+F3 nv15, 5, cofres 2 setm.   98%    0%
+F3 nv15, 5, Èpica           100%    0%
+F4 nv20, 5, Èpica           100%  100%
+F4 nv20, 5, cofres 2 setm.  100%  100%
+F4 nv20, 6, Superèpica      100%  100%
+== aigua                   Z4    Z5
+Inicials F1 nv1, 3            0%    0%
+Inicials F1 nv5, 4            0%    0%
+F1 nv5, 4, Normal             0%    0%
+F2 nv10, 4, Normal            0%    0%
+F2 nv8, 4, cofres 3 dies      0%    0%
+F2 nv10, 4, cofres 3 dies     0%    0%
+F2 nv10, 4, Refinada          0%    0%
+F2 nv10, 4, Màgica            0%    0%
+F3 nv15, 5, Màgica           46%    0%
+F3 nv15, 5, cofres 2 setm.   98%    8%
+F3 nv15, 5, Èpica            95%    0%
+F4 nv20, 5, Èpica           100%   95%
+F4 nv20, 5, cofres 2 setm.  100%   99%
+F4 nv20, 6, Superèpica      100%  100%
+== planta                  Z4    Z5
+Inicials F1 nv1, 3            0%    0%
+Inicials F1 nv5, 4            0%    0%
+F1 nv5, 4, Normal             0%    0%
+F2 nv10, 4, Normal            0%    0%
+F2 nv8, 4, cofres 3 dies      0%    0%
+F2 nv10, 4, cofres 3 dies     0%    0%
+F2 nv10, 4, Refinada          0%    0%
+F2 nv10, 4, Màgica            0%    0%
+F3 nv15, 5, Màgica          100%    1%
+F3 nv15, 5, cofres 2 setm.   99%   39%
+F3 nv15, 5, Èpica           100%   36%
+F4 nv20, 5, Èpica           100%  100%
+F4 nv20, 5, cofres 2 setm.  100%  100%
+F4 nv20, 6, Superèpica      100%  100%
+== llamp                   Z4    Z5
+Inicials F1 nv1, 3            0%    0%
+Inicials F1 nv5, 4            0%    0%
+F1 nv5, 4, Normal             0%    0%
+F2 nv10, 4, Normal            0%    0%
+F2 nv8, 4, cofres 3 dies      0%    0%
+F2 nv10, 4, cofres 3 dies     0%    0%
+F2 nv10, 4, Refinada          0%    0%
+F2 nv10, 4, Màgica            0%    0%
+F3 nv15, 5, Màgica           50%    0%
+F3 nv15, 5, cofres 2 setm.   97%    0%
+F3 nv15, 5, Èpica            72%    0%
+F4 nv20, 5, Èpica           100%   67%
+F4 nv20, 5, cofres 2 setm.  100%   59%
+F4 nv20, 6, Superèpica      100%  100%
+== psiquic                 Z4    Z5
+Inicials F1 nv1, 3            0%    0%
+Inicials F1 nv5, 4            0%    0%
+F1 nv5, 4, Normal             0%    0%
+F2 nv10, 4, Normal            0%    0%
+F2 nv8, 4, cofres 3 dies      0%    0%
+F2 nv10, 4, cofres 3 dies     0%    0%
+F2 nv10, 4, Refinada          0%    0%
+F2 nv10, 4, Màgica            0%    0%
+F3 nv15, 5, Màgica           95%    0%
+F3 nv15, 5, cofres 2 setm.   83%    0%
+F3 nv15, 5, Èpica           100%    0%
+F4 nv20, 5, Èpica           100%  100%
+F4 nv20, 5, cofres 2 setm.  100%   93%
+F4 nv20, 6, Superèpica      100%  100%
 
 [exit 0]

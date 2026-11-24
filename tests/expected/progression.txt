@@ -1,0 +1,59 @@
+ok   XP needed: level 1->2 is 10, each level +12% (10, 11, 16)
+ok   forma 1 stops at level 5 with a full bar
+ok   after evolving the full bar counts: level 6
+ok   forma 2 stops at level 10
+ok   forma 3 stops at level 15
+ok   forma 4 stops at level 20
+ok   level caps per form 5/10/15/20
+ok   a food ration gives 16 XP
+ok   food of its own element gives 24 XP
+ok   forma 2 without level and copy: both missing, in words
+ok   missing copy blocks forma 2
+ok   the message says exactly what is missing
+ok   forma 2: level 5 + 1 copy, the copy is used up
+ok   the lowest-level copy is used (from the Niu)
+ok   forma 3 needs 2 copies of forma 2 (forma-1 copies do not count)
+ok   forma 3 must choose branch 1 or 2
+ok   forma 3: level 10 + 2 forma-2 copies, both used up
+ok   forma 4 needs 2 copies of forma 3
+ok   forma 4: level 15 + 2 forma-3 copies: Electropop Astral
+ok   forma 4 is stronger than forma 3 at the same level
+ok   both evolution branches give the same strength
+ok   a critter on an expedition cannot be used
+ok   a critter that does not fit goes to the Niu
+ok   the Niu has no limit
+ok   a Niu critter swaps with a house critter
+ok   chest tiers over 20000 chests: 19.61% / 31.95% / 28.97% / 15.45% / 4.03% (expected 20 / 32 / 28.8 / 15.36 / 3.84)
+ok   tapping until the chest opens (3 taps, tier Màgic)
+   Normal    food avg 1.01 (any 51%), critters avg 0.60 (any 40%), items avg 0.15 (any 15%), top item tier 0
+   Refinat   food avg 3.01 (any 75%), critters avg 2.01 (any 80%), items avg 0.40 (any 40%), top item tier 1
+   Màgic     food avg 4.99 (any 100%), critters avg 2.98 (any 100%), items avg 1.50 (any 100%), top item tier 2
+   Èpic      food avg 6.98 (any 100%), critters avg 5.01 (any 100%), items avg 2.50 (any 100%), top item tier 3
+   Superèpic food avg 10.00 (any 100%), critters avg 8.00 (any 100%), items avg 4.00 (any 100%), top item tier 4, legend pieces 1564
+ok   coins always inside the range of the tier
+ok   Normal: food 50% of the time, about 1 on average
+ok   Normal: about 0.6 critters, 15% one Normal item
+ok   Refinat: about 3 food, 2 critters, items up to Refinada
+ok   Màgic: always food 4-6, critters 2-4, 1-2 items up to Màgica
+ok   Normal chest item tiers: Normal 100.0% (expected 100%)
+ok   Refinat chest item tiers: Normal 58.3%, Refinada 41.7% (expected 60% / 40%)
+ok   Màgic chest item tiers: Refinada 69.7%, Màgica 30.3% (expected 70% / 30%)
+ok   Èpic chest item tiers: Màgica 69.7%, Èpica 30.3% (expected 70% / 30%)
+ok   Superèpic chest item tiers: Èpica 60.0%, Superèpica 30.2%, legend 9.8% (expected 60% / 30% / 10%)
+ok   critters are of the world just played
+ok   forma 4 aura: {"foc":8}
+ok   the aura makes a team mate of its element hit harder (11 -> 12)
+ok   and take less damage (8 -> 7)
+ok   aura of a dual-element forma 4 is split: {"aigua":5,"psiquic":5}
+ok   forma 4 drawing has an aura, forma 3 not
+ok   every world has 5 zones (zone 5: Tron de Cendra, Corona de Llamps, Fossa de l’Oblit, Arrels del Món, Ment Primordial)
+ok   zone 5 is closed until zone 4 is done
+ok   zone 5 opens after zone 4
+ok   zone 5 enemies are much stronger than zone 1 at the same level
+ok   difficulty is fixed: a stronger team does not make enemies stronger
+ok   an old-version save is copied to bestioles-joc-v1.bak-1795514400000
+ok   and a new game starts
+ok   reload keeps every critter of all 40 species, at home and in the Niu, with form, level and XP
+ALL OK
+
+[exit 0]

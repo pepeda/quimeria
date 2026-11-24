@@ -35,9 +35,9 @@ ok   element headings
 ok   three category headings
 ALL OK 2
 ok   sort button sets order
-ok   collection shows evolution dots
-ok   dots show 3/5
-ok   final form label
+ok   collection shows form and level
+ok   shows forma 1, level 3
+ok   shows forma 4, level 20
 ok   ok
 ok   comment export counts 40 species
 

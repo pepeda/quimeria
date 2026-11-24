@@ -35,7 +35,7 @@ E("G.detail='espurnet'");ok(E("detailSheet()").indexOf('Combos secrets')>=0,'cri
 ok(E("scBestioles()").indexOf('Combos secrets descoberts')>=0,'collection shows secret combo count');
 // secret combo in battle
 function battle(team,equip,o){E("G.owned=[];G.runs={};G.active=null;G.equip="+JSON.stringify(equip||{}));
-  team.forEach(([s,st])=>E("(function(){var c=mk('"+s+"');c.stage="+(st||0)+";c.evo="+(st?0:-1)+";G.owned.push(c)})()"));
+  team.forEach(([s,st])=>E("(function(){var c=mk('"+s+"');c.stage="+(st||0)+";c.evo="+(st?0:-1)+";c.lvl=BAL.FORM_CAP[c.stage];G.owned.push(c)})()"));
   E("G.world='planta';G.zone=1;G.pick=G.owned.map(function(c){return c.uid});startRun();startBattle("+JSON.stringify(o)+")");
   const ev=[];let n=0;while(!E('run().event.over')&&n<200){ev.push(...E('battleTick()'));n++}return {ev,n,over:E('run().event.over')}}
 E("G.megas={}");
@@ -67,9 +67,9 @@ console.log('ALL OK');
 {E("G.sortB='role'");const h=E("scBestioles()");ok((h.match(/<h3/g)||[]).length===3,'three category headings');}
 console.log('ALL OK 2');
 E("act('sortB',{k:'role'})");ok(E('G.sortB')==='role','sort button sets order');
-// evolution dots on the collection
-{E("G.sortB='num'");const h=E("scBestioles()");ok(h.indexOf('per evolucionar a la forma')>=0,'collection shows evolution dots');
- const c=E("(function(){var c=Object.assign({},G.owned[0],{stage:0,mill:3});return evoDots(c,SPECIES[c.sp])})()");ok(c.indexOf('3/5')>=0,'dots show 3/5');
- const f=E("(function(){var c=Object.assign({},G.owned[0],{stage:2,evo:0});return evoDots(c,SPECIES[c.sp])})()");ok(f.indexOf('Forma final')>=0,'final form label');
+// form and level on the collection (they replaced the 5 evolution dots)
+{E("G.sortB='num'");const h=E("scBestioles()");ok(h.indexOf('F1 · niv. ')>=0,'collection shows form and level');
+ const c=E("(function(){var c=Object.assign({},G.owned[0],{stage:0,lvl:3});return evoDots(c,SPECIES[c.sp])})()");ok(c.indexOf('F1 · niv. 3')>=0,'shows forma 1, level 3');
+ const f=E("(function(){var c=Object.assign({},G.owned[0],{stage:3,evo:1,lvl:20});return evoDots(c,SPECIES[c.sp])})()");ok(f.indexOf('F4 · niv. 20')>=0,'shows forma 4, level 20');
  const x=E("scBestioles()");ok(x.indexOf(' de 40 bestioles')<0||true,'ok');}
 {const t=E("exportText()");ok(t.indexOf('de 40 bestioles')>=0,'comment export counts 40 species');}

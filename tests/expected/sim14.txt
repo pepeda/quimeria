@@ -1,27 +1,80 @@
-Foc z1 guardian, 3 starters (was 40%)                win 58% turns 12.7
--- foc zone 4
-normal monster, lvl2 team, no gear                   win 0% turns 49.4
-guardian, lvl2 team, Magica gear                     win 0% turns 23.6
-guardian, lvl3 team, no gear                         win 0% turns 22.9
-guardian, lvl3 team, Epica gear                      win 100% turns 20.1
-guardian, lvl3 team, Superepica gear                 win 100% turns 15.9
-normal monster, lvl3 team, Epica gear                win 100% turns 11.0
--- planta zone 4
-normal monster, lvl2 team, no gear                   win 0% turns 40.8
-guardian, lvl2 team, Magica gear                     win 0% turns 21.7
-guardian, lvl3 team, no gear                         win 0% turns 18.1
-guardian, lvl3 team, Epica gear                      win 67% turns 23.4
-guardian, lvl3 team, Superepica gear                 win 100% turns 21.0
-normal monster, lvl3 team, Epica gear                win 100% turns 14.0
--- psiquic zone 4
-normal monster, lvl2 team, no gear                   win 0% turns 16.8
-guardian, lvl2 team, Magica gear                     win 0% turns 29.7
-guardian, lvl3 team, no gear                         win 0% turns 26.2
-guardian, lvl3 team, Epica gear                      win 78% turns 31.9
-guardian, lvl3 team, Superepica gear                 win 100% turns 28.0
-normal monster, lvl3 team, Epica gear                win 100% turns 13.7
--- zone 3 (index 2) for reference
-foc z3 guardian, lvl2 team, Magica gear              win 100% turns 11.1
-psiquic z3 guardian, lvl3 team, Epica gear           win 100% turns 21.0
+Chest gear after 3 days x 4 wins: Bastó màgic ★★ (Màgica), Escut de closca ★★ (Màgica), Collaret de petxina ★★★ (Èpica), Anell de molsa ★★★ (Èpica), Anell de foc ★★★ (Èpica), Botes de núvol ★★★★ (Superèpica), Vestit d’explorador ★★★★ (Superèpica)
+Chest gear after 14 days x 4 wins: Casc de cristall ★★★ (Èpica), Arc de caça ★★★★ (Superèpica), Escut del Drac Roig (Superèpica), Collaret de petxina ★★★ (Èpica), Anell de foc ★ (Refinada), Capa de fulles ★★★ (Èpica), Botes de núvol ★★ (Màgica), Vestit de ninja ★★★★ (Superèpica)
+Final guardian win rate per zone, 50 battles per cell
+== foc                     Z1    Z2    Z3    Z4    Z5
+Inicials F1 nv1, 3           52%    0%    0%    0%    0%
+Inicials F1 nv5, 4          100%    0%    0%    0%    0%
+F1 nv5, 4, Normal           100%    0%    0%    0%    0%
+F2 nv10, 4, Normal          100%   62%    0%    0%    0%
+F2 nv8, 4, cofres 3 dies    100%  100%   18%    0%    0%
+F2 nv10, 4, cofres 3 dies   100%  100%   36%    0%    0%
+F2 nv10, 4, Refinada        100%  100%    0%    0%    0%
+F2 nv10, 4, Màgica          100%  100%  100%    0%    0%
+F3 nv15, 5, Màgica          100%  100%  100%   96%    0%
+F3 nv15, 5, cofres 2 setm.  100%  100%  100%   96%    2%
+F3 nv15, 5, Èpica           100%  100%  100%  100%    2%
+F4 nv20, 5, Èpica           100%  100%  100%  100%  100%
+F4 nv20, 5, cofres 2 setm.  100%  100%  100%  100%  100%
+F4 nv20, 6, Superèpica      100%  100%  100%  100%  100%
+== aigua                   Z1    Z2    Z3    Z4    Z5
+Inicials F1 nv1, 3           76%    0%    0%    0%    0%
+Inicials F1 nv5, 4          100%    0%    0%    0%    0%
+F1 nv5, 4, Normal           100%    0%    0%    0%    0%
+F2 nv10, 4, Normal          100%   72%    0%    0%    0%
+F2 nv8, 4, cofres 3 dies    100%  100%   74%    0%    0%
+F2 nv10, 4, cofres 3 dies   100%  100%   94%    0%    0%
+F2 nv10, 4, Refinada        100%  100%    0%    0%    0%
+F2 nv10, 4, Màgica          100%  100%   96%    0%    0%
+F3 nv15, 5, Màgica          100%  100%  100%   56%    0%
+F3 nv15, 5, cofres 2 setm.  100%  100%  100%   98%    6%
+F3 nv15, 5, Èpica           100%  100%  100%   96%    2%
+F4 nv20, 5, Èpica           100%  100%  100%  100%   98%
+F4 nv20, 5, cofres 2 setm.  100%  100%  100%  100%   96%
+F4 nv20, 6, Superèpica      100%  100%  100%  100%  100%
+== planta                  Z1    Z2    Z3    Z4    Z5
+Inicials F1 nv1, 3            0%    0%    0%    0%    0%
+Inicials F1 nv5, 4           48%    0%    0%    0%    0%
+F1 nv5, 4, Normal            28%    0%    0%    0%    0%
+F2 nv10, 4, Normal          100%   30%    0%    0%    0%
+F2 nv8, 4, cofres 3 dies    100%  100%    2%    0%    0%
+F2 nv10, 4, cofres 3 dies   100%  100%   22%    0%    0%
+F2 nv10, 4, Refinada        100%  100%    0%    0%    0%
+F2 nv10, 4, Màgica          100%  100%    2%    0%    0%
+F3 nv15, 5, Màgica          100%  100%  100%   96%    2%
+F3 nv15, 5, cofres 2 setm.  100%  100%  100%   98%   32%
+F3 nv15, 5, Èpica           100%  100%  100%  100%   30%
+F4 nv20, 5, Èpica           100%  100%  100%  100%  100%
+F4 nv20, 5, cofres 2 setm.  100%  100%  100%  100%  100%
+F4 nv20, 6, Superèpica      100%  100%  100%  100%  100%
+== llamp                   Z1    Z2    Z3    Z4    Z5
+Inicials F1 nv1, 3            0%    0%    0%    0%    0%
+Inicials F1 nv5, 4           18%    0%    0%    0%    0%
+F1 nv5, 4, Normal             0%    0%    0%    0%    0%
+F2 nv10, 4, Normal          100%    0%    0%    0%    0%
+F2 nv8, 4, cofres 3 dies    100%  100%    0%    0%    0%
+F2 nv10, 4, cofres 3 dies   100%  100%    0%    0%    0%
+F2 nv10, 4, Refinada        100%   80%    0%    0%    0%
+F2 nv10, 4, Màgica          100%  100%    0%    0%    0%
+F3 nv15, 5, Màgica          100%  100%  100%   46%    0%
+F3 nv15, 5, cofres 2 setm.  100%  100%  100%   96%    0%
+F3 nv15, 5, Èpica           100%  100%  100%   80%    0%
+F4 nv20, 5, Èpica           100%  100%  100%  100%   60%
+F4 nv20, 5, cofres 2 setm.  100%  100%  100%  100%   52%
+F4 nv20, 6, Superèpica      100%  100%  100%  100%  100%
+== psiquic                 Z1    Z2    Z3    Z4    Z5
+Inicials F1 nv1, 3            0%    0%    0%    0%    0%
+Inicials F1 nv5, 4            2%    0%    0%    0%    0%
+F1 nv5, 4, Normal             0%    0%    0%    0%    0%
+F2 nv10, 4, Normal          100%    0%    0%    0%    0%
+F2 nv8, 4, cofres 3 dies    100%   80%    0%    0%    0%
+F2 nv10, 4, cofres 3 dies   100%   94%    0%    0%    0%
+F2 nv10, 4, Refinada        100%   22%    0%    0%    0%
+F2 nv10, 4, Màgica          100%  100%    0%    0%    0%
+F3 nv15, 5, Màgica          100%  100%  100%   90%    0%
+F3 nv15, 5, cofres 2 setm.  100%  100%  100%   92%    0%
+F3 nv15, 5, Èpica           100%  100%  100%  100%    0%
+F4 nv20, 5, Èpica           100%  100%  100%  100%  100%
+F4 nv20, 5, cofres 2 setm.  100%  100%  100%  100%   96%
+F4 nv20, 6, Superèpica      100%  100%  100%  100%  100%
 
 [exit 0]

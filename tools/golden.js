@@ -245,12 +245,13 @@ function play(game, emit) {
   function startZone(w, z, tag) {
     step('nav', { to: 'explorar' }); step('world', { w }); step('path', { p: z });
     const uids = E(`(function(){var need=${z === 2} ?ZONE_NEED[G.world]:null,av=G.owned.filter(function(c){return !busyWorld(c)&&c.rest===0});
-      av.sort(function(a,b){return (b.stage*10+b.mill)-(a.stage*10+a.mill)});
+      av.sort(function(a,b){return (b.stage*100+b.lvl)-(a.stage*100+a.lvl)});
       if(need){var i=av.findIndex(function(c){return sp(c).talent===need});if(i>0)av.unshift(av.splice(i,1)[0])}
       return av.slice(0,maxTeam()).map(function(c){return c.uid})})()`);
     uids.forEach(u => step('pick', { u }, tag + ' pick'));
     step('go', null, tag + ' go');
     autoRun(tag);
+    for (let k = 0; k < 8 && E('!!(G.chest&&!G.chest.open)'); k++) step('chestTap', null, tag + ' chest');
   }
 
   rec('init');
@@ -275,7 +276,7 @@ function play(game, emit) {
   step('go'); step('pause'); step('resume', { w: 'llamp' }); step('restart'); step('restart'); step('pause');
   step('nav', { to: 'explorar' }); step('abandon', { w: 'llamp' }); step('abandon', { w: 'llamp' });
   // a richer game: coins, food, items, many critters
-  exec("G.coins=20000;G.food={foc:6,aigua:6,planta:6,llamp:6,psiquic:6};G.psiquic=true;['petxina','arrel','trona','mentoli','somni','fantasmet','cranquet','boleto'].forEach(function(s){if(SPECIES[s])G.owned.push(mk(s))});G.owned.forEach(function(c){c.rest=0;c.fat=0})", 'rich');
+  exec("G.coins=20000;G.food={foc:6,aigua:6,planta:6,llamp:6,psiquic:6};G.psiquic=true;['petxina','arrel','trona','mentoli','somni','fantasmet','cranquet','boleto'].forEach(function(s){if(SPECIES[s])G.owned.push(mk(s))});G.owned.forEach(function(c){c.rest=0;c.fat=0});Object.keys(G.runs).forEach(abandonRun)", 'rich');
   ['habitacio', 'habitacio', 'jardi', 'piscina', 'spa', 'tennis', 'mobles', 'mobles', 'llit', 'neo', 'posters', 'hamaca', 'consola', 'pufs', 'pingpong', 'trofeus', 'peixera',
     'cuina', 'forja', 'lab', 'salaFoc', 'skate', 'arbre', 'foguera', 'hort', 'antena', 'portal'].forEach(k => step('build', { k }));
   ['dorm', 'sala', 'ext', 'dorm'].forEach(k => step('hfold', { k }));
@@ -286,9 +287,18 @@ function play(game, emit) {
   step('detail', { s: E("G.owned[0].sp") });
   for (let i = 0; i < 4; i++) step('feed', { u: u0, el: E("SPECIES[G.owned[0].sp].el") });
   step('evolve', { u: u0, i: 0 });
-  exec(`byUid('${u0}').mill=5`); step('evolve', { u: u0, i: 2 });
-  exec(`byUid('${u1}').mill=5`); step('detail', { s: E("G.owned[1].sp") }); step('evolve', { u: u1, i: 0 });
-  exec(`byUid('${u1}').mill=5`); step('evolve', { u: u1, i: 1 }); step('close');
+  exec(`byUid('${u0}').lvl=5;G.niu.push(mk(byUid('${u0}').sp))`, 'level 5 + copy'); step('evolve', { u: u0, i: 0 });
+  exec(`byUid('${u0}').lvl=10;var a=mk(byUid('${u0}').sp);a.stage=1;a.evo=0;G.owned.push(a)`, 'level 10 + 1 copy'); step('evolve', { u: u0, i: 2 });
+  exec(`var b=mk(byUid('${u0}').sp);b.stage=1;b.evo=0;b.lvl=7;G.niu.push(b)`, '2nd copy'); step('evolve', { u: u0, i: 2 });
+  exec(`byUid('${u0}').lvl=15;[1,2].forEach(function(i){var c=mk(byUid('${u0}').sp);c.stage=2;c.evo=i;c.lvl=10+i;G.niu.push(c)})`, 'level 15 + 2 form-3 copies'); step('evolve', { u: u0, i: 2 });
+  for (let i = 0; i < 3; i++) step('feed', { u: u0, el: 'planta' });
+  step('detail', { s: E("G.owned[1].sp") }); step('evolve', { u: u1, i: 0 }); step('close');
+  // the Niu: a full house, swap, bring home, send away
+  exec("while(G.owned.length<cap())G.owned.push(mk('bufa'));['bombolli','popet','medusina'].forEach(function(s){addCritter(mk(s))})", 'full house');
+  step('nav', { to: 'bestioles' }); const nu = E('G.niu[G.niu.length-1].uid'), hu = E('G.owned[G.owned.length-1].uid');
+  step('niuPick', { u: nu }); step('niuPick', { u: nu }); step('niuPick', { u: nu }); step('niuSwap', { u: nu, h: hu });
+  step('toNiu', { u: nu }); step('niuHome', { u: nu });
+  exec("G.owned.splice(-4,4).forEach(function(c){G.niu.push(c)})", 'room at home'); step('niuHome', { u: E('G.niu[0].uid') });
   // forge with a choice of powers, cancel, forge all
   exec("G.items=G.items.concat(['espasaFusta','espasaFusta','espasaFusta','espasaFusta','cascPetxina','cascPetxina','cascPetxina','cascPetxina','anellFoc','anellFoc','anellFoc','anellFoc','anellFoc','anellFoc','anellFoc','anellFoc'])", 'items');
   step('nav', { to: 'motxilla' }); step('mtab', { k: 'obj' });
@@ -307,12 +317,14 @@ function play(game, emit) {
   // sound switch
   step('nav', { to: 'casa' }); step('mute'); step('mute');
   // harder zones: zone 3 (needs a talent, has a cave) and zone 4
-  exec("G.done['planta:z0']=true;G.done['planta:z1']=true;G.owned.forEach(function(c){c.rest=0;c.fat=0;c.mill=5;if(c.stage<1){c.stage=1;c.evo=0}})", 'strong');
+  exec("G.done['planta:z0']=true;G.done['planta:z1']=true;G.owned.forEach(function(c){c.rest=0;c.fat=0;c.lvl=10;if(c.stage<1){c.stage=1;c.evo=0}})", 'strong');
   step('nav', { to: 'explorar' }); step('world', { w: 'planta' });
   startZone('planta', 2, 'planta z3');
-  exec("G.done['planta:z2']=true;G.owned.forEach(function(c){c.rest=0;c.fat=0;c.stage=2;c.evo=1})", 'z4 ready');
+  exec("G.done['planta:z2']=true;G.owned.forEach(function(c){c.rest=0;c.fat=0;c.stage=2;c.evo=1;c.lvl=15})", 'z4 ready');
   step('nav', { to: 'casa' });
   startZone('planta', 3, 'planta z4');
+  exec("G.done['planta:z3']=true;G.owned.forEach(function(c){c.rest=0;c.fat=0;c.stage=3;c.evo=2;c.lvl=20})", 'z5 ready');
+  startZone('planta', 4, 'planta z5');
   exec("G.owned.forEach(function(c){c.rest=0;c.fat=0})", 'rest');
   // a cave from a scene, a boss with an intro and ultimate attack
   startZone('psiquic', 0, 'psiquic z1');
@@ -331,6 +343,8 @@ function play(game, emit) {
   // comments panel
   S.statics.fbText.value = 'M’agrada molt';
   (S.statics.fbForm.listeners.submit || []).forEach(f => f({ preventDefault() {} })); S.flush(); rec('comment sent');
+  // every species, at home and in the Niu, then save and load again
+  exec("SP_ORDER.forEach(function(s,i){var c=mk(s);if(i%2)G.niu.push(c);else G.owned.push(c)});persist()", 'all species');
   // save and load again
   const saved = Object.assign({}, S.store);
   const before = E('JSON.stringify(G)');
@@ -343,7 +357,8 @@ function play(game, emit) {
   const cases = {
     corrupt: '{bad json', wrongVersion: JSON.stringify({ v: 99, coins: 5 }), notObject: '"hola"',
     old: JSON.stringify({ v: 1, coins: 77, equip: { anell: 'anellFoc' }, owned: [{ uid: 'a1', sp: 'brotet', stage: 1, evo: 1, mill: 0, fat: 0, rest: 0 }] }),
-    partial: JSON.stringify({ v: 2, coins: 'x', owned: [{ uid: 'z', sp: 'nope' }], items: 'no', equip: [] })
+    v2: JSON.stringify({ v: 2, coins: 500, owned: [{ uid: 'a1', sp: 'popet', stage: 2, evo: 1, mill: 3, fat: 0, rest: 0 }] }),
+    partial: JSON.stringify({ v: 3, coins: 'x', owned: [{ uid: 'z', sp: 'nope' }, { uid: 'y', sp: 'popet', lvl: 'x' }], niu: 'x', items: 'no', equip: [] })
   };
   Object.keys(cases).forEach(k => { S = makeSession(game, { seed: 3003, store: { 'bestioles-joc-v1': cases[k] } }); rec('load ' + k); step('nav', { to: 'casa' }); });
   S = makeSession(game, { seed: 4004, full: true }); rec('storage full'); step('nav', { to: 'casa' });
