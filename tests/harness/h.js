@@ -1,7 +1,7 @@
 const fs=require('fs');
 const html=require('../game-source.js').html;
 let js=html.slice(html.indexOf('<script>')+8,html.lastIndexOf('</script>'));
-js=js.replace(/renderTypes\(\);render\(\);renderF\(\);\s*\}\)\(\);\s*$/,'globalThis.__ev=function(s){return eval(s)};})();');
+js=js.replace(/renderTypes\(\);render\(\);renderF\(\);\s*(?:showTitle\(\);)?\s*\}\)\(\);\s*$/,'globalThis.__ev=function(s){return eval(s)};})();');
 function el(){const e={innerHTML:'',textContent:'',value:'',hidden:false,style:{setProperty(){}},dataset:{},children:[],
  classList:{add(){},remove(){},toggle(){},contains(){return false}},appendChild(c){return c},replaceChildren(){},remove(){},addEventListener(){},
  setAttribute(){},querySelector(){return null},contains(){return true},focus(){},select(){},parentNode:null,scrollTop:0,scrollHeight:0,offsetWidth:0};e.parentNode={classList:e.classList};return e}

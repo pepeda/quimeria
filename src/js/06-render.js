@@ -14,7 +14,7 @@ function riskHtml(n){var s='<span class="risk" aria-label="Risc '+n+' de 2">';fo
 function topBar(){
   var r=G.screen==='run'&&run();
   return (r?'<span class="pill">'+esc(ELS[r.world].mon)+'</span><span class="pill">'+COIN+'+'+r.coins+'</span>':'<span class="pill">'+COIN+G.coins+'</span><span class="pill">Places '+G.owned.length+'/'+cap()+'</span>')+
-    '<button type="button" class="btn sm light mob" style="margin-left:auto;min-height:40px" data-act="chat">Comentaris ('+(F.items.length)+')</button>';
+    '<button type="button" class="btn sm light helpbtn" style="margin-left:auto" data-act="help" aria-label="Com es juga">?</button><button type="button" class="btn sm light mob" style="min-height:40px" data-act="chat">Comentaris ('+(F.items.length)+')</button>';
 }
 function render(){
   h14Forge();

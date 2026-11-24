@@ -255,6 +255,8 @@ function play(game, emit) {
   }
 
   rec('init');
+  // the title screen shows at start; open the help once, then close both
+  step('help'); exec("if(typeof closeStory==='function')closeStory()", 'close title and help');
   // first look at every screen
   step('tip', { k: 'explorar' });
   ['casa', 'bestioles', 'motxilla', 'explorar'].forEach(to => step('nav', { to }));

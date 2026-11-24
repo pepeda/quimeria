@@ -23,6 +23,7 @@ function act(a,d){
   if(a==='chat'){$('chat').classList.add('open');$('fbText').focus();return}
   switch(a){
     case 'tip':G.tips[d.k]=1;break;
+    case 'help':showHelp(false);return;
     case 'nav':G.screen=d.to;G.detail=null;break;
     case 'world':if(!worldOpen(d.w)){toast('Aquest món encara és desconegut. Completa 3 expedicions.');break}G.world=d.w;G.screen='mon';break;
     case 'path':G.zone=+d.p;G.pick=[];G.screen='equip';break;

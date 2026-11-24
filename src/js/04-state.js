@@ -6,7 +6,7 @@ function mk(sp){return {uid:'c'+Date.now().toString(36)+Math.random().toString(3
 var SAVE_V=3;
 function newGame(){
   return {v:SAVE_V,niu:[],chest:null,megas:{},coins:150,built:{},owned:[mk('brotet'),mk('gotim'),mk('espurnet'),mk('xispa')],food:{planta:1,aigua:1},items:[],equip:{},runs:{},active:null,done:{},completed:0,psiquic:false,
-    screen:'explorar',world:null,path:null,pick:[],detail:null,summary:null,seen:{},tips:{},restClock:Date.now(),started:new Date().toISOString()};
+    screen:'explorar',world:null,path:null,pick:[],detail:null,summary:null,seen:{},tips:{},story:{},restClock:Date.now(),started:new Date().toISOString()};
 }
 var G=(function(){var raw=null,g=null;try{raw=localStorage.getItem(S_KEY)}catch(e){storageOk=false}
   try{g=raw?JSON.parse(raw):null}catch(e){g=null}
@@ -17,9 +17,9 @@ var G=(function(){var raw=null,g=null;try{raw=localStorage.getItem(S_KEY)}catch(
   ['owned','niu'].forEach(function(k){if(!Array.isArray(g[k]))g[k]=[];g[k]=g[k].filter(function(c){return c&&typeof c==='object'&&c.sp});
     g[k].forEach(function(c){c.stage=Math.max(0,Math.min(3,c.stage|0));c.lvl=Math.max(1,Math.min(BAL.LEVEL_MAX,c.lvl|0||1));c.xp=Math.max(0,+c.xp||0);c.fat=c.fat|0;c.rest=c.rest|0})});
   if(!g.owned.length)g.owned=d.owned;
-  if(!Array.isArray(g.items))g.items=[];['equip','built','food','runs','done','seen','tips'].forEach(function(k){if(typeof g[k]!=='object'||Array.isArray(g[k]))g[k]={}});
+  if(!Array.isArray(g.items))g.items=[];['equip','built','food','runs','done','seen','tips','story'].forEach(function(k){if(typeof g[k]!=='object'||Array.isArray(g[k]))g[k]={}});
   return g})();
-G.seen=G.seen||{};G.tips=G.tips||{};G.restClock=G.restClock||Date.now();
+G.seen=G.seen||{};G.tips=G.tips||{};G.story=G.story||{};G.restClock=G.restClock||Date.now();
 function persist(){save(S_KEY,G)}
 
 function sp(c){return SPECIES[c.sp]}
