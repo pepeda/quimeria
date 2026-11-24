@@ -1,0 +1,31 @@
+'use strict';
+/* ================= SCREEN: a critter's card (overlay sheet) ================= */
+function detailSheet(){
+  var s=G.detail,S=SPECIES[s],mine=G.owned.filter(function(c){return c.sp===s}),own=mine.length>0;
+  var evoOwned={};mine.forEach(function(c){if(c.stage)evoOwned[c.evo]=true});
+  function node(i){var e=i<0?{n:S.n,el2:''}:S.evos[i],ok=i<0?own:!!evoOwned[i];
+    return '<div class="box'+(ok?'':' off')+'" style="padding:8px">'+spArt(s,e.el2,52,!ok,i<0?0:i===0?1:2)+(ok?esc(e.n):'???')+'<span class="muted small" style="text-align:center">'+(i<0?'Nivell 1':i===0?'Nivell 2':'Nivell 3')+' · '+esc(ELS[S.el].n+(e.el2?' + '+ELS[e.el2].n:''))+'</span></div>'}
+  var line='<svg width="40" height="20" viewBox="0 0 40 20" aria-hidden="true"><path d="M20 0 V20" stroke="#B9B3C6" stroke-width="3"/></svg>';
+  var fork='<svg width="200" height="22" viewBox="0 0 200 22" aria-hidden="true" style="max-width:70%"><path d="M100 0 V8 M50 8 H150 M50 8 V22 M150 8 V22" stroke="#B9B3C6" stroke-width="3" fill="none"/></svg>';
+  var evos='<div class="tree"><div class="lvl">'+node(-1)+'</div>'+line+'<div class="lvl">'+node(0)+'</div>'+fork+'<div class="lvl">'+node(1)+node(2)+'</div></div>';
+  var best=mine.sort(function(a,z){return z.stage-a.stage})[0],have=best?abilities(best).length:0;
+  var abil='<div class="flat" style="background:var(--soft);gap:6px"><h3>Habilitats</h3>'+(ABIL[s]||[]).map(function(a,i){var open=own&&i<have;
+    return '<div style="display:flex;flex-direction:column;gap:1px;'+(open?'':'opacity:.6')+'"><b>'+esc(a[0])+' <span class="muted small">· cada '+a[1]+' torns</span></b><span class="small">'+esc(KIND_DESC[a[2]])+'</span>'+(open?'':'<span class="muted small">'+(i===2?'S’obre al nivell 2 (primera evolució).':'S’obre quan la tinguis.')+'</span>')+'</div>'}).join('')+'<p class="muted small">Al nivell 3, les habilitats fan més efecte.</p></div>';
+  var inst=mine.map(function(c){var st=stats(c),full=c.mill>=5;
+    var foods=Object.keys(G.food).filter(function(k){return G.food[k]>0}).map(function(k){return '<button type="button" class="btn sm light" data-act="feed" data-u="'+c.uid+'" data-el="'+k+'"'+(full?' disabled':'')+'>'+esc(FOOD[k])+' ('+G.food[k]+') '+(k===S.el?'+2':'+1')+'</button>'}).join('');
+    var opts=c.stage===0?[0]:c.stage===1?[1,2]:[];
+    var evoBtns=full&&opts.length?'<p><b>'+(opts.length>1?'Pot evolucionar! Tria la branca:':'Pot evolucionar!')+'</b></p><div class="grid2">'+opts.map(function(i){var e=S.evos[i];return '<button type="button" class="tap" data-act="evolve" data-u="'+c.uid+'" data-i="'+i+'">'+spArt(s,e.el2,52,false,i===0?1:2)+esc(e.n)+'<span class="muted small" style="text-align:center">'+(e.el2?'70% '+esc(ELS[S.el].n)+' + 30% '+esc(ELS[e.el2].n):esc(ELS[S.el].n))+'</span></button>'}).join('')+'</div>':'';
+    return '<div class="flat" style="background:var(--soft)"><div class="row" style="gap:10px">'+cArt(c,58)+'<div style="flex:1;min-width:0"><b style="font-size:16px">'+esc(cName(c))+'</b> <span class="muted small">nivell '+lvl(c)+'</span><div class="muted small">Vida '+st.hp+' · Atac '+st.atk+' · Defensa '+st.def+(st.heal?' · Cura '+st.heal:'')+'</div><div class="muted small">'+esc(fatigueText(c))+'</div></div></div>'+
+      '<div class="row between small" style="font-weight:800"><span>Estrelles de força</span><span>'+Math.min(c.mill,5)+' de 5</span></div>'+bar(Math.min(c.mill,5)*20,ELS[S.el].c)+
+      (full?(c.stage>=2?'<p class="muted small">Ja té totes les estrelles.</p>':''):(foods?'<p class="muted small">Dona-li menjar per guanyar estrelles. El menjar del seu element en dona 2.</p><div class="row">'+foods+'</div>':'<p class="muted small">No tens menjar. En trobaràs pel camí.</p>'))+evoBtns+'</div>'}).join('');
+  var adopt='';
+  if(!own){var open=worldOpen(S.el);
+    adopt=open?'<button type="button" class="btn gold" data-act="adopt" data-s="'+s+'"'+(G.coins<S.price||G.owned.length>=cap()?' disabled':'')+'>Adopta-la · '+S.price+' monedes</button>'+(G.owned.length>=cap()?'<p class="muted">La casa és plena.</p>':G.coins<S.price?'<p class="muted">No tens prou monedes (en tens '+G.coins+').</p>':''):'<p class="flat" style="background:var(--soft)">Primer has de descobrir aquest món.</p>';}
+  return '<div class="modal" data-act="closeBg"><div class="sheet" role="dialog" aria-label="Fitxa de la bestiola" data-s="'+s+'"><div class="row" style="gap:12px;align-items:flex-start"><div style="background:'+(own?ELS[S.el].soft:'#E9E5F0')+';border-radius:20px;padding:6px">'+spArt(s,'',90,!own)+'</div><div style="flex:1;min-width:0"><h1>'+(own?esc(S.n):'???')+'</h1><div class="muted">'+(own?esc(ELS[S.el].n):'Encara no l’has trobada')+'</div><div class="muted">Viu al '+esc(worldOpen(S.el)?ELS[S.el].mon.replace('Món ','món '):'món desconegut')+'</div></div><button type="button" class="btn sm light" data-act="close">Tanca</button></div>'+
+    '<div class="row" style="gap:8px;align-items:flex-start">'+roleTag(S.role)+'<p class="small" style="flex:1;min-width:0">'+esc(ROLE_DESC[S.role])+'</p></div>'+'<div class="row" style="gap:8px;align-items:flex-start">'+talentTag(S.talent)+'<p class="small" style="flex:1;min-width:0">'+esc(TALENT[S.talent].d)+'</p></div>'+
+    inst+adopt+abil+'<h3>Arbre d’evolucions</h3>'+evos+megaBlock(s)+'</div></div>';
+}
+function megaBlock(s){var mine=MEGA.filter(function(m){return m.sp.indexOf(s)>=0});if(!mine.length)return '';var found=G.megas||{},nf=mine.filter(function(m){return found[m.id]}).length;
+  return '<h3>Combos secrets ('+nf+' de '+mine.length+')</h3><div class="flat" style="background:var(--soft);gap:8px">'+mine.map(function(m){
+    if(found[m.id])return '<div style="display:flex;flex-direction:column;gap:2px"><b>'+esc(m.n)+'</b><div class="row" style="gap:4px">'+m.sp.map(function(x){return spArt(x,'',30,false)}).join('')+'</div><span class="small">'+esc(m.sp.map(function(x){return SPECIES[x].n}).join(' + '))+'</span><span class="small">'+esc(m.d)+'</span></div>';
+    return '<div style="display:flex;flex-direction:column;gap:2px;opacity:.7"><b>??? Combo secret de '+m.sp.length+' bestioles</b><span class="small">Pista: posa-la a l’equip amb '+(m.sp.length-1)+' bestiola'+(m.sp.length>2?'es':'')+' de '+esc(m.sp.filter(function(x){return x!==s}).map(function(x){return ELS[SPECIES[x].el].n}).join(' i '))+'.</span></div>'}).join('')+'</div>'}

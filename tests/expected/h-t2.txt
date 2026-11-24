@@ -1,0 +1,3 @@
+storageOk= true saved v13= 1 coins= 150 first 40 of store: {"v":2,"coins":150,"built":{},"owned":[{
+
+[exit 0]

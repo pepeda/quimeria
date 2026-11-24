@@ -1,0 +1,15 @@
+/* route strip */
+.route{display:flex;align-items:center;gap:0;overflow-x:auto;padding:4px 2px}
+.node{flex:0 0 auto;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#E3E0EA;color:#5E5A72;font-weight:800;font-size:13px;border:2px solid #fff}
+.node.done{color:#fff}
+.node.cur{animation:pulse 1.2s ease-in-out infinite;box-shadow:0 0 0 4px rgba(74,63,181,.35)}
+.link{flex:1 0 8px;height:4px;background:#D9D4E3;min-width:6px}
+.link.done{background:#9C93F5}
+/* scenes */
+.scene{position:relative;border-radius:20px;overflow:hidden;line-height:0}
+.scene .crew{position:absolute;left:8px;bottom:6px;display:flex;align-items:flex-end;gap:2px;line-height:1}
+.scene .label{position:absolute;left:10px;top:8px;line-height:1.2;background:rgba(255,255,255,.92);border-radius:999px;padding:2px 10px;font-weight:800;font-size:14px}
+.event{background:#fff;border-radius:22px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.risk{display:inline-flex;gap:3px;align-items:center;font-size:13px;font-weight:800}
+.risk i{width:10px;height:10px;border-radius:50%;display:inline-block;background:#E3E0EA}
+.risk i.on{background:#C0392B}

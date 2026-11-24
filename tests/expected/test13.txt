@@ -1,0 +1,44 @@
+ok   bonus percentages are whole numbers {"atk":29,"def":19,"hp":6}
+ok   delta chips have no long decimals
+ok   forge 4 normal swords
+ok   forged item has tier 1 and 1 power: espasaFusta#1~lluentor
+ok   forge 4 different Refinada swords gives Màgica with 2 powers: espasaFusta#2~vamp.rosada
+ok   item text lists powers
+ok   legend shop locked before a forged Superepica
+ok   legend shop gives a set piece Casc del Drac Roig
+ok   legend costs 900
+ok   5 Fènix pieces give all 4 set bonuses
+ok   2 pieces give only first bonus
+ok   backpack shows sets and powers
+ok   critter card shows secret combos
+ok   collection shows secret combo count
+ok   secret combo espurnet+petxina fires and is discovered
+ok   discovery saved
+ok   discovered combo shown in card
+   turns 8 lose Jardí del tro | Incendi del bosc | Incendi del bosc | Atac de tot l’equip(all 3)
+ok   all-together attack gets +10% per extra element
+ok   4 starters fire Els quatre vents
+ok   slow/distracted/dizzy make the enemy lose turns
+ok   spell power casts
+ok   status chance events appear
+ok   boss grows ×1,05 each turn
+ok   Fènix full set revives once (lose)
+ok   events display without errors
+ALL OK
+ok   boss legend drop is 5%
+ok   forging a Superepica opens the workshop
+ALL OK
+ok   collection sorted by num shows all critters
+ok   collection sorted by role shows all critters
+ok   collection sorted by el shows all critters
+ok   element headings
+ok   three category headings
+ALL OK 2
+ok   sort button sets order
+ok   collection shows evolution dots
+ok   dots show 3/5
+ok   final form label
+ok   ok
+ok   comment export counts 40 species
+
+[exit 0]

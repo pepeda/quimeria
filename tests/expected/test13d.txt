@@ -1,0 +1,12 @@
+ok   forge short text with ?
+ok   sets short text, details behind ?
+ok   weapon slot is Arma
+ok   outfit box beside character
+ok   set weapons have their own kind: Martell del Gegant del Tro
+ok   outfit equips and colours the character
+ok   outfit gives stats
+ok   best equip includes outfit
+ok   build section right under the house
+ok   new weapons and outfits can drop
+
+[exit 0]

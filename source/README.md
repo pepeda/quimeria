@@ -1,4 +1,14 @@
-# Quimèria source
+# Quimèria source history
+
+> **The game's source now lives in [`../src`](../src/README.md)** as separate, readable files
+> (one file per screen and per topic), built into one page with `node tools/build.js`
+> (output `dist/index.html`). The tests and battle simulations moved to [`../tests`](../tests) and run
+> against `dist/index.html`. Use `node tools/verify.js` before publishing a change.
+>
+> This folder is kept as history: it is how the game was built up to version 14, by applying text
+> patches one after the other. The text below describes that old process; nothing in it is needed
+> to build the game any more.
+
 
 The playable game is `../index.html`, built from the files here. Everything is plain JavaScript run with Node; no build tools.
 

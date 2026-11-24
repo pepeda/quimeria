@@ -1,0 +1,85 @@
+<!doctype html><html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Quimèria</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@600;700;800&family=Bangers&display=swap">
+<!-- build:css -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/run.css">
+<link rel="stylesheet" href="css/battle.css">
+<link rel="stylesheet" href="css/cards.css">
+<link rel="stylesheet" href="css/comments.css">
+<link rel="stylesheet" href="css/responsive.css">
+<!-- /build:css -->
+
+<div class="app">
+  <div class="phone" id="phone">
+    <div class="top" id="top"></div>
+    <div class="screen" id="screen"></div>
+    <nav class="nav" id="nav" aria-label="Menú del joc"></nav>
+    <div id="overlay"></div>
+    <div id="toastSlot" aria-live="polite"></div>
+  </div>
+
+  <aside class="chat" id="chat" aria-label="Comentaris mentre jugues">
+    <div class="row between">
+      <h2>Comentaris mentre jugues</h2>
+      <button class="btn sm light mob" id="chatClose" type="button">Tanca</button>
+    </div>
+    <p class="muted">Escriu què t’agrada, què no, què canviaries o quina idea tens. Cada comentari guarda on eres del joc.</p>
+    <label for="who">Qui ets?<input id="who" type="text" placeholder="El teu nom" maxlength="40"></label>
+    <div class="types" id="types" role="group" aria-label="Tipus de comentari"></div>
+    <div class="fb-list" id="fbList" aria-live="polite"></div>
+    <form id="fbForm" style="display:flex;flex-direction:column;gap:6px">
+      <label for="fbText">Comentari</label>
+      <textarea id="fbText" maxlength="1500" placeholder="Què t’agrada, què no, què canviaries…"></textarea>
+      <div class="muted small" id="fbCtx"></div>
+      <button class="btn" type="submit">Envia el comentari</button>
+    </form>
+    <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:8px">
+      <button class="btn green" id="fbCopy" type="button">He acabat: copia tots els comentaris</button>
+      <a class="btn light" id="fbWa" href="#" target="_blank" rel="noopener" style="text-decoration:none">Envia’ls per WhatsApp</a>
+      <textarea id="fbOut" readonly hidden style="min-height:120px"></textarea>
+      <p class="muted" id="fbMsg"></p>
+      <button class="btn sm light" id="fbClear" type="button">Esborra tots els comentaris</button>
+    </div>
+  </aside>
+</div>
+
+<!-- build:js -->
+<script src="js/00-util.js"></script>
+<script src="js/01-data.js"></script>
+<script src="js/02-scenes-data.js"></script>
+<script src="js/03-drawing.js"></script>
+<script src="js/04-state.js"></script>
+<script src="js/05-run-helpers.js"></script>
+<script src="js/06-render.js"></script>
+<script src="js/07-actions.js"></script>
+<script src="js/08-zones-abilities-synergies.js"></script>
+<script src="js/09-route-and-effects.js"></script>
+<script src="js/10-more-scenes.js"></script>
+<script src="js/11-battle.js"></script>
+<script src="js/13-more-critters-and-talents.js"></script>
+<script src="js/14-items-tiers-forge.js"></script>
+<script src="js/15-comic-effects.js"></script>
+<script src="js/16-bosses-and-group-attacks.js"></script>
+<script src="js/17-comic-pages.js"></script>
+<script src="js/18-powers-sets-combos.js"></script>
+<script src="js/20-weapons-outfits-help.js"></script>
+<script src="js/21-council-names.js"></script>
+<script src="js/22-zone4-and-sound.js"></script>
+<script src="js/23-critter-art.js"></script>
+<script src="js/24-house.js"></script>
+<script src="js/screens/casa.js"></script>
+<script src="js/screens/explorar.js"></script>
+<script src="js/screens/mon.js"></script>
+<script src="js/screens/equip.js"></script>
+<script src="js/screens/run.js"></script>
+<script src="js/screens/battle-stage.js"></script>
+<script src="js/screens/resum.js"></script>
+<script src="js/screens/bestioles.js"></script>
+<script src="js/screens/motxilla.js"></script>
+<script src="js/screens/detail.js"></script>
+<script src="js/25-comments.js"></script>
+<script src="js/99-boot.js"></script>
+<!-- /build:js -->
