@@ -113,6 +113,6 @@ addCh('mina','a',{l:'Segueix la veta brillant',d:'L’Espeleòleg troba la millo
 addCh('cova','a',{l:'Busca el pas secret',d:'L’Espeleòleg troba un tresor a l’entrada.',risk:0,req:{talent:'cova'},out:{loot:'common'}});
 addCh('cova-tunels','a',{l:'Il·lumina els dos túnels',d:'L’Espeleòleg veu on s’amaga la bestiola rara.',risk:0,req:{talent:'cova'},out:{wild:1,rare:1}});
 addCh('cova-cofre','a',{l:'Busca el doble fons del cofre',d:'L’Ensumatresors el troba.',risk:0,req:{talent:'tresor'},out:{loot:'relic'}});
-addCh('mercader','a',{l:'Compra un tresor rar (100 monedes)',d:'Un objecte de tresor.',risk:0,out:{buyItem:'RELIC',price:100}});
+addCh('mercader','a',{l:'Compra un tresor rar',d:'Pagues 100 monedes i reps un objecte de tresor.',risk:0,out:{buyItem:'RELIC',price:100}});
 addCh('poble','a',{l:'Busca monedes perdudes a la plaça',d:'L’Ensumatresors en troba.',risk:0,req:{talent:'tresor'},out:{coins:25}});
 

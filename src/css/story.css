@@ -39,3 +39,12 @@
 .quimera-tile{display:flex;flex-direction:row;align-items:center;gap:12px;width:100%;text-align:left;margin:10px 0;padding:10px 12px;border-radius:18px;border:3px solid transparent;
   background:linear-gradient(var(--paper),var(--paper)) padding-box,conic-gradient(#F26B3A,#F2B90F,#3DAA5C,#2E8BE6,#9B59E0,#F26B3A) border-box}
 .quimera-tile.off{background:#ECE9F2;border:2px dashed #B9B2CC}
+/* guide v2: the framed button is lit, the rest of the screen is dark; the arrow and the sign */
+.coach-on{box-shadow:0 0 0 4px #FFD54A,0 0 0 9999px rgba(20,16,40,.6)!important;border-radius:14px}
+.tut-arrow{position:absolute;z-index:56;pointer-events:none;display:none;animation:tutBob 1s ease-in-out infinite}
+.tut-arrow.up svg{transform:rotate(180deg)}
+@keyframes tutBob{0%,100%{margin-top:0}50%{margin-top:-8px}}
+@media (prefers-reduced-motion: reduce){.tut-arrow{animation:none}}
+.coach-top .coach{bottom:auto;top:70px}
+.coach{border:3px solid #FFD54A}
+.mem .syn,.box .syn{font-size:10.5px;padding:1px 6px;line-height:1.3}

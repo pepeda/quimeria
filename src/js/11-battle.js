@@ -264,7 +264,7 @@ function battleWon(){
   var r2=run();if(r2&&r2.team&&!r2.team.some(function(u){return r2.hp[u]>0}))r2.team.forEach(function(u){r2.hp[u]=1});
 }
 function finishRun(ok,keepAll){
-  var r=run();if(!r)return;if(r.tut&&G.tut)G.tut.done=1;
+  var r=run();if(!r)return;if(r.tut&&G.tut)G.tut.ran=1;
   var team=r.team.slice(),c0=G.coins;stopBattle();
   var z=r.zone||0,bonus=ok?ZONE_BONUS[z]:0,coins=ok||keepAll?r.coins+bonus:Math.floor(r.coins/2);
   G.coins+=coins;

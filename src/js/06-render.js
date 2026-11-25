@@ -13,7 +13,7 @@ function tip(key,text){if(G.tips[key])return '';return '<div class="tip"><p>'+te
 function riskHtml(n){var s='<span class="risk" aria-label="Risc '+n+' de 2">';for(var i=0;i<2;i++)s+='<i class="'+(i<n?'on':'')+'"></i>';return s+' '+(n===0?'Segur':n===1?'Una mica arriscat':'Arriscat')+'</span>'}
 function topBar(){
   var r=G.screen==='run'&&run();
-  return (r?'<span class="pill">'+esc(ELS[r.world].mon)+'</span><span class="pill">'+COIN+'+'+r.coins+'</span>':'<span class="pill">'+COIN+G.coins+'</span><span class="pill">Places '+G.owned.length+'/'+cap()+'</span>')+
+  return (r?'<span class="pill">'+esc(ELS[r.world].mon)+'</span><span class="pill">'+COIN+'+'+r.coins+'</span>':'<span class="pill">'+COIN+G.coins+'</span>'+(navOpen('casa')?'<span class="pill">Places '+G.owned.length+'/'+cap()+'</span>':''))+
     '<button type="button" class="btn sm light helpbtn" style="margin-left:auto" data-act="help" aria-label="Com es juga">?</button><button type="button" class="btn sm light mob" style="min-height:40px" data-act="chat">Comentaris ('+(F.items.length)+')</button>';
 }
 function render(){
@@ -28,7 +28,8 @@ function render(){
   var navOn=s!=='run';$('nav').hidden=!navOn;
   if(navOn){
     var cur=s==='mon'||s==='equip'||s==='resum'?'explorar':s;
-    $('nav').innerHTML=['casa','explorar','bestioles','motxilla'].map(function(k){var lbl={casa:'Casa',explorar:'Explorar',bestioles:'Bestioles',motxilla:'Motxilla'}[k];
+    var navK=['casa','explorar','bestioles','motxilla'].filter(navOpen);navAnnounce();$('nav').style.gridTemplateColumns='repeat('+navK.length+',minmax(0,1fr))';
+    $('nav').innerHTML=navK.map(function(k){var lbl={casa:'Casa',explorar:'Explorar',bestioles:'Bestioles',motxilla:'Motxilla'}[k];
       var hint=k==='explorar'&&G.completed===0&&cur!=='explorar';
       return '<button type="button" class="navb'+(cur===k?' on':'')+(hint?' hint':'')+'" data-act="nav" data-to="'+k+'"'+(cur===k?' aria-current="page"':'')+'><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="'+NAV_ICONS[k]+'"/></svg>'+lbl+'</button>'}).join('');
   }

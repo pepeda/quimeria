@@ -6,8 +6,8 @@ Object.assign(SCENES,{
     {l:'Busca un gual',d:'Tranquil, però no trobes res.',risk:0,out:{note:'Trobeu un lloc on l’aigua és baixa i passeu.'}},
     {l:'Una bestiola d’Aigua us porta',d:'I pesca de passada.',risk:0,req:{el:'aigua'},out:{food:3}}]}}},
   mercader:{n:'Mercader ambulant',art:'village',pool:'gen',nodes:{a:{t:'Un mercader amb un carro ple de coses.',ch:[
-    {l:'Compra menjar (20 monedes)',d:'3 de menjar d’aquest món.',risk:0,out:{buyFood:20}},
-    {l:'Compra un objecte (40 monedes)',d:'Un objecte per a la motxilla.',risk:0,out:{shop:40}},
+    {l:'Compra 3 de menjar',d:'Pagues 20 monedes i reps 3 de menjar d’aquest món.',risk:0,out:{buyFood:20}},
+    {l:'Compra un objecte',d:'Pagues 40 monedes i reps un objecte per a la motxilla.',risk:0,out:{shop:40}},
     {l:'Saluda i segueix',d:'',risk:0,out:{note:'El mercader us desitja bon viatge.'}}]}}},
   trampa:{n:'Pas de pedres',art:'rocks',pool:'gen',nodes:{a:{t:'Un pas estret. Des de dalt cauen pedres de tant en tant.',ch:[
     {l:'Corre!',d:'Potser us cau alguna pedra.',risk:1,out:{rand:[[0.5,{note:'Passeu sense que us caigui res!'}],[0.5,{dmgTeam:20}]]}},
@@ -42,7 +42,7 @@ Object.assign(SCENES,{
     {l:'Acompanya-la a casa',d:'La seva família us ho agraïrà.',risk:0,out:{rand:[[0.5,{bless:1}],[0.5,{coins:20}]]}},
     {l:'Juga amb ella',d:'Potser vol venir amb tu.',risk:0,out:{wild:1}}]}}},
   forja:{n:'Forja antiga',art:'castle',pool:'sig',world:'foc',nodes:{a:{t:'Una forja que encara crema. Hi ha eines i metall.',ch:[
-    {l:'Fes una espasa (40 monedes)',d:'Una Espasa de llamp.',risk:0,out:{buyItem:'espasaLlamp',price:40}},
+    {l:'Fes una espasa',d:'Pagues 40 monedes i reps una Espasa de llamp.',risk:0,out:{buyItem:'espasaLlamp',price:40}},
     {l:'Escalfa’t',d:'L’equip recupera vida.',risk:0,out:{heal:30}},
     {l:'Una bestiola de Foc aviva el foc',d:'Fa un tresor.',risk:0,req:{el:'foc'},out:{loot:'relic'}}]}}},
   tortugues:{n:'Illa de les tortugues',art:'lake',pool:'sig',world:'aigua',nodes:{a:{t:'Tortugues gegants dormen a la platja d’una illa.',ch:[

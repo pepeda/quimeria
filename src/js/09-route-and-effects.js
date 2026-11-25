@@ -14,7 +14,7 @@ function startRun(){
   var w=G.world,z=G.zone||0,hp={};
   G.pick.forEach(function(u){hp[u]=stats(byUid(u)).hp});
   var tu=tutOn()&&w==='aigua'&&!z;
-  G.runs[w]={world:w,zone:z,L:zoneL(w,z),i:0,slots:tu?TUT_ROUTE.map(function(k,i){return k==='gen'?{k:k,scene:pickScene('gen',w,[])}:k==='spring'?{k:k,scene:'font'}:k==='wild'?{k:k,sp:tutWild()}:{k:k}}):buildRoute(w,z),tut:tu?1:0,team:G.pick.slice(),hp:hp,coins:0,cave:null,scene:null,node:'a',event:null,reveal:0,bless:0};
+  G.runs[w]={world:w,zone:z,L:zoneL(w,z),i:0,slots:tu?tutRoute():buildRoute(w,z),tut:tu?1:0,team:G.pick.slice(),hp:hp,coins:0,cave:null,scene:null,node:'a',event:null,reveal:0,bless:0};
   G.active=w;G.pick=[];G.screen='run';arrive();
 }
 function arrive(){

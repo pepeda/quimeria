@@ -43,7 +43,7 @@ function routeStrip(r){
 function crew(r){return '<div class="crew">'+hero(34)+r.team.map(function(u){var c=byUid(u);return c?cArt(c,34,false):''}).join('')+'</div>'}
 function teamMini(r){
   return '<div class="grid3">'+r.team.map(function(u){var c=byUid(u);if(!c)return '';var mx=stats(c).hp,p=Math.round(r.hp[u]*100/mx);
-    return '<div class="box" style="'+(r.hp[u]<=0?'opacity:.5':'')+'">'+cArt(c,32)+'<span>'+esc(cName(c))+'</span>'+roleTag(sp(c).role,true)+'<div style="width:100%">'+bar(p,hpColor(p))+'</div><span class="muted small">'+r.hp[u]+'/'+mx+'</span></div>'}).join('')+'</div>';
+    return '<div class="box" style="'+(r.hp[u]<=0?'opacity:.5':'')+'">'+cArt(c,32)+'<span>'+esc(cName(c))+'</span>'+roleTag(sp(c).role,true)+talentTag(sp(c).talent)+'<div style="width:100%">'+bar(p,hpColor(p))+'</div><span class="muted small">'+r.hp[u]+'/'+mx+'</span></div>'}).join('')+'</div>';
 }
 function bigCard(e){
   var art='',title='',sub='',btns='<button type="button" class="btn gold" data-act="claim">Continua</button>',border='var(--accent)',bg='#F4F1FA',rar='',muted=false;

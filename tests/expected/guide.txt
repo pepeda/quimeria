@@ -1,0 +1,16 @@
+ok   a new game starts the guide
+ok   at the start the menu shows only Explorar
+ok   the guided scenes have one choice and nothing to pay
+ok   guided scenes do not count for exploring
+ok   during the guide only the Water world opens
+ok   the team is chosen for the player
+ok   the guided route
+ok   Motxilla opens with the first item
+ok   Bestioles opens with the first new critter
+ok   after the guided expedition: chest, then Casa
+ok   the guide ends
+ok   skipping the guide opens Casa and brings the tips back
+ok   a save with finished expeditions never sees the guide
+ok   old saves see the whole menu
+
+[exit 0]
