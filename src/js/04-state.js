@@ -44,7 +44,7 @@ function addXp(c,n){var up=0;c.xp=(c.xp||0)+n;
   if(c.lvl>=levelCap(c))c.xp=Math.min(c.xp,xpNeed(c.lvl));return up}
 function maxFat(c){return BAL.FATIGUE[c.stage]}
 /* evolving: the rule for this critter's next form, and the copies it would use (lowest form and level first) */
-function evoRule(c){return BAL.EVOLVE[c.stage]||null}
+function evoRule(c){return sp(c).legend?null:BAL.EVOLVE[c.stage]||null}
 function copyPool(c){var R=evoRule(c);if(!R)return [];
   return allCr().filter(function(x){return x!==c&&x.sp===c.sp&&x.stage>=R.copyForm-1&&!busyWorld(x)&&G.pick.indexOf(x.uid)<0})
     .sort(function(a,b){return a.stage-b.stage||a.lvl-b.lvl||(a.xp||0)-(b.xp||0)})}
@@ -56,11 +56,11 @@ function evoCheck(c){var R=evoRule(c);if(!R)return {ok:false,final:true,missing:
   return {ok:!miss.length&&!busyWorld(c),rule:R,copies:pool.slice(0,R.copies),missing:miss}}
 function cap(){var n=6;BUILD.forEach(function(b){n+=(G.built[b.k]||0)*b.cap});return n}
 function bonusPct(eq){var b={atk:0,def:0,hp:0};Object.keys(eq).forEach(function(s){var it=IT(eq[s]);if(it){b.atk+=it.atk*3;b.def+=it.def*3;b.hp+=it.hp*2}});var P=powerOf(eq);return {atk:Math.round(b.atk+P.atk),def:Math.round(b.def+P.def),hp:Math.round(b.hp+P.hp)}}
-function stats(c,eq){var b=ROLE[sp(c).role],k=(1+BAL.STAT_PER_LEVEL*(lvl(c)-1))*BAL.FORM_MULT[c.stage],q=bonusPct(eq||G.equip);
+function stats(c,eq){var b=ROLE[sp(c).role],k=(1+BAL.STAT_PER_LEVEL*(lvl(c)-1))*BAL.FORM_MULT[c.stage]*(sp(c).legend?BAL.LEGEND_MULT:1),q=bonusPct(eq||G.equip);
   return {hp:Math.round(b.hp*k*(1+q.hp/100)),atk:Math.round(b.atk*k*(1+q.atk/100)),def:Math.round(b.def*k*(1+q.def/100)),heal:Math.round(b.heal*k)}}
 function busyWorld(c){for(var w in G.runs)if(G.runs[w].team.indexOf(c.uid)>=0)return w;return null}
 function run(){return G.active?G.runs[G.active]:null}
-function effMult(c,d){var a=sp(c).el,b=cEl2(c);return b?0.7*mult(a,d)+0.3*mult(b,d):mult(a,d)}
+function effMult(c,d){if(sp(c).all)return 1.5;var a=sp(c).el,b=cEl2(c);return b?0.7*mult(a,d)+0.3*mult(b,d):mult(a,d)}
 function dmg(atk,m,def){return Math.max(1,Math.round(atk*m-def*0.5))}
 function worldOpen(w){return w!=='psiquic'||G.psiquic}
 function ownsSp(s){return allCr().some(function(c){return c.sp===s})}

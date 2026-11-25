@@ -47,7 +47,7 @@ var KIND_DESC={hit:'Un cop molt fort.',multi:'3 cops seguits.',burn:'Cop i crema
   soak:'Cop i l’enemic queda mullat: té menys defensa i els llamps li fan molt més mal.',weaken:'Cop i l’enemic queda debilitat: fa menys mal 3 torns.',
   shield:'Escut per a tot l’equip: els 3 cops següents fan la meitat de mal.',reflect:'Mirall: 2 torns tornant a l’enemic la meitat del mal que rep.',
   heal:'Cura molt la bestiola més ferida.',regen:'Tot l’equip es cura una mica cada torn, 3 torns.',healAll:'Cura tothom i desperta les que estan KO.',buff:'Tot l’equip fa +30% de mal, 3 torns.'};
-var OFFENSIVE=['hit','multi','burn','poison','stun','soak','weaken'];
+var OFFENSIVE=['hit','multi','prism','burn','poison','stun','soak','weaken'];
 function abilities(c){var l=ABIL[c.sp]||[],n=c.stage>=1?3:2,p=1+0.25*c.stage;
   return l.slice(0,n).map(function(a,i){return {i:i,n:a[0],cd:a[1],kind:a[2],pow:a[3]*(a[2]==='shield'||a[2]==='reflect'||a[2]==='buff'?1:p)}})}
 function comboKey(a,b){return [a,b].sort().join('+')}

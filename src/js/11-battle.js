@@ -35,7 +35,7 @@ function makeBattle(o){
 function alive(r){return r.team.map(byUid).filter(function(c){return c&&r.hp[c.uid]>0})}
 function lowest(r){return alive(r).sort(function(a,z){return r.hp[a.uid]/stats(a).hp-r.hp[z.uid]/stats(z).hp})[0]}
 function sameEl(r,el){return alive(r).filter(function(c){return sp(c).el===el}).length}
-function resistF(b,c){return b.enemy.resist&&sp(c).el===b.enemy.resist?0.5:1}
+function resistF(b,c){if(sp(c).all)return 1;return b.enemy.resist&&sp(c).el===b.enemy.resist?0.5:1}
 /* damage of critter c hitting the enemy with power pow: {n: damage, m: element multiplier, zap: lightning on a soaked enemy} */
 function outDmg(c,pow,b,r){
   var s=stats(c),atk=s.atk*pow*auraF(b,c)*(b.tm.buff>0?1.3:1)*(b.syn.germans&&sameEl(r,sp(c).el)>=2?1.15:1);
@@ -54,12 +54,12 @@ function outDmg(c,pow,b,r){
 }
 /* damage of the enemy hitting critter t (x: strength of the move). Enemies grow stronger every turn (growF); thorns on the gear hurt back */
 function inDmg(b,t,x){x=(x||1)*growF(b);var s=stats(t),def=s.def*auraF(b,t)*(b.syn.complet?1.1:1),atk=b.enemy.atk*(b.st.weak>0?0.7:1)*(b.enemy.enraged?1.3:1)*(x||1);
-  var d=Math.max(1,Math.round(atk*mult(b.enemy.el,sp(t).el)-def*0.5));if(b.P&&b.P.thorns)b._thorn=(b._thorn||0)+d*b.P.thorns/100;return d}
+  var d=Math.max(1,Math.round(atk*mult(b.enemy.el,sp(t).all?'':sp(t).el)-def*0.5));if(b.P&&b.P.thorns)b._thorn=(b._thorn||0)+d*b.P.thorns/100;return d}
 function danger(enemy){
   var r=run(),team=alive(r);if(!team.length)return {cls:'bad',t:'Perillós'};
   var out=0,hp=0,tank=team.filter(function(c){return sp(c).role==='Defensa'})[0];
   team.forEach(function(c){var s=stats(c);out+=Math.max(1,Math.round(s.atk*1.35*effMult(c,enemy.el)*(enemy.resist===sp(c).el?0.5:1)-enemy.def*0.5));hp+=r.hp[c.uid]});
-  var tg=tank||team[0],inc=Math.max(1,Math.round(enemy.atk*mult(enemy.el,sp(tg).el)-stats(tg).def*0.5))*1.4;
+  var tg=tank||team[0],inc=Math.max(1,Math.round(enemy.atk*mult(enemy.el,sp(tg).all?'':sp(tg).el)-stats(tg).def*0.5))*1.4;
   var ratio=(hp/inc)/(enemy.hp/out);
   return ratio>=3.2?{cls:'good',t:'Fàcil per al teu equip'}:ratio>=1.8?{cls:'mid',t:'Ajustat'}:{cls:'bad',t:'Perillós per al teu equip'};
 }
@@ -85,13 +85,14 @@ function doAbility(c,a,b,r){
   b.ch[c.uid][a.i]=a.cd;
   var e={t:'special',uid:c.uid,el:sp(c).el,el2:cEl2(c),kind:a.kind,name:a.n+(c.stage?' '+'★'.repeat(c.stage):''),heals:[]},k=a.kind;
   if(OFFENSIVE.indexOf(k)>=0){
-    var times=k==='multi'?3:1,total=0;for(var t=0;t<times;t++){var o=outDmg(c,a.pow,b,r);total+=o.n;b.enemy.hp=Math.max(0,b.enemy.hp-o.n)}
+    var times=k==='multi'?3:k==='prism'?5:1,total=0;for(var t=0;t<times;t++){var o=outDmg(c,a.pow,b,r);total+=o.n;b.enemy.hp=Math.max(0,b.enemy.hp-o.n)}
     e.n=total;e.after=b.enemy.hp;var extra='';
     if(k==='burn'){b.st.burn={t:3+(b.syn.incendi?2:0),n:Math.max(2,Math.round(stats(c).atk*0.45))};extra=' i el crema'}
     if(k==='poison'){b.st.poison={t:4,n:Math.max(2,Math.round(stats(c).atk*0.4))};extra=' i l’enverina'}
     if(k==='stun'){b.st.stun=1;extra=' i l’atordeix'}
     if(k==='soak'){b.st.soak=3;extra=' i el deixa mullat'}
     if(k==='weaken'){b.st.weak=3;extra=' i el debilita'}
+    if(k==='prism'){b.ch[c.uid][a.i]=999;extra=': cinc cops, un de cada element'}
     e.txt=cName(c)+' fa '+e.name+': -'+total+extra+'.';
   }else if(k==='shield'){b.shield=Math.min(4,b.shield+3);e.txt=cName(c)+' fa '+e.name+': escut per a tot l’equip.'}
   else if(k==='reflect'){b.tm.reflect[c.uid]=2;e.txt=cName(c)+' fa '+e.name+': tornarà la meitat del mal que rebi.'}
@@ -279,7 +280,8 @@ function finishRun(ok,keepAll){
   if(G.built.tennis){var home=G.owned.filter(function(c){return r.team.indexOf(c.uid)<0&&!busyWorld(c)&&canXp(c)});if(home.length){var t=pickOne(home);if(addXp(t,BAL.XP_TENNIS))levels.push(cName(t)+' puja al nivell '+lvl(t)+'!');tennis=cName(t)}}
   var unlocked=false,before=maxTeam();
   if(ok){G.completed++;G.done[r.world+':z'+z]=true;if(G.completed>=3&&!G.psiquic){G.psiquic=true;unlocked=true}}
-  G.summary={ok:ok,keepAll:!!keepAll,coins:coins,bonus:bonus,world:r.world,zone:z,tired:tired,unlocked:unlocked,tennis:tennis,pct:0,bigger:maxTeam()>before?maxTeam():0,xp:xp,levels:levels};
+  var qwake=ok&&quimeraWake();if(qwake)setTimeout(function(){quimeraComic()},400);
+  G.summary={ok:ok,keepAll:!!keepAll,coins:coins,bonus:bonus,world:r.world,zone:z,tired:tired,unlocked:unlocked,tennis:tennis,pct:0,bigger:maxTeam()>before?maxTeam():0,xp:xp,levels:levels,quimera:qwake};
   /* a won expedition gives a chest (an older chest that was never opened opens now by itself) */
   if(G.chest&&!G.chest.open)openChest();
   G.chest=ok?{tier:0,world:r.world,taps:0,open:false,got:null}:null;

@@ -1,0 +1,14 @@
+ok   not ready with nothing finished
+ok   locked box on Bestioles (0 de 5)
+ok   not ready with 4 of 5 worlds
+ok   wakes once after the 5th world
+ok   summary shows it
+ok   never twice
+ok   tile on Bestioles
+ok   detail sheet, no adopt
+ok   name
+ok   hits every element x1.5
+solo quimera vs Boscúria zone-1 guardian, 40 battles: {"wins":40,"prism":40,"maxPrism":1}
+ok   Prisma dels Cinc at most once per battle
+
+[exit 0]

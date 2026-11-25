@@ -9,7 +9,7 @@ var INTRO=[
    art:function(){return '<span class="sfx stay r" style="position:relative;left:auto;top:auto;font-size:52px">CRAC!</span><div class="st-els">'+['foc','aigua','planta','llamp'].map(function(e){return elIcon(e,58,ELS[e].c)}).join('')+'<span class="st-q">?</span></div>'}},
   {bg:'linear-gradient(#A8E6B0,#EAF8EC)',t:'Tu vius a la casa del mig, on els trossos encara es toquen. Quatre bestioles t’han triat.',
    art:function(){return '<svg width="150" height="120" viewBox="0 0 180 150" aria-hidden="true"><ellipse cx="90" cy="120" rx="86" ry="26" fill="#7CC46B"/><rect x="60" y="62" width="62" height="50" rx="4" fill="#FFF4E0" stroke="#8A5A3C" stroke-width="3"/><rect x="82" y="84" width="18" height="28" fill="#8A5A3C"/><path d="M52 66 L91 32 L130 66 Z" fill="#E2574C" stroke="#A23A31" stroke-width="3"/></svg><div class="st-row">'+spArt(STARTERS[0],'',66)+spArt(STARTERS[1],'',66)+hero(72)+spArt(STARTERS[2],'',66)+spArt(STARTERS[3],'',66)+'</div>'}},
-  {bg:'linear-gradient(#FFE9DC,#FFB38A)',t:'Explora els mons amb la teva colla. Troba bestioles noves i arriba fins al final de cada món.',
+  {bg:'linear-gradient(#FFE9DC,#FFB38A)',t:'Explora els mons amb la teva colla. Acaba’ls tots i despertaràs la Quimera, la bestiola de tots els elements.',
    art:function(){return '<div class="st-row">'+spArt(STARTERS[0],'',120)+spArt(STARTERS[1],'',120)+'</div><span class="sfx stay r" style="position:relative;left:auto;top:auto;font-size:46px">VS</span><div style="line-height:0">'+monster('foc',150,true)+'</div>'}}
 ];
 function storyLayer(cls){var ph=$('phone');if(!ph)return null;var old=ph.querySelector('.st-layer');if(old)old.remove();
@@ -26,7 +26,7 @@ function showTitle(){
     (fresh?'':'<button type="button" class="st-link" data-st="intro">Torna a veure la història</button>')+
     '<p class="st-foot">Joc per al mòbil, en català. La partida es guarda sola.</p>';
   d.addEventListener('click',function(ev){var b=ev.target.closest('[data-st]');if(!b)return;var k=b.dataset.st;
-    if(k==='go'){if(fresh)showIntro(0);else closeStory()}
+    if(k==='go'){if(fresh)showIntro(0);else{closeStory();if(quimeraWake()){persist();render();quimeraComic()}}}
     else if(k==='help')showHelp(true);
     else if(k==='intro')showIntro(0)});
 }
@@ -50,6 +50,7 @@ function showHelp(fromTitle){
     '<p><b>Bestioles noves.</b> Quan en trobes una de salvatge, guanya-la en una batalla o dona-li el seu menjar.</p>'+
     '<p><b>Fer-les créixer.</b> Amb menjar i expedicions pugen de nivell. Amb prou nivell i còpies (bestioles repetides de la mateixa espècie) evolucionen.</p>'+
     '<p><b>Elements.</b> Cada bestiola fa més mal als elements que guanya:</p>'+beats+
+    '<p><b>La Quimera.</b> Quan guanyis el guardià de la zona 3 dels cinc mons, es despertarà la Quimera: la bestiola llegendària de tots els elements.</p>'+
     '<p><b>La casa.</b> Amb les monedes hi construeixes coses que ajuden les bestioles.</p>'+
     '<div class="st-btns"><button type="button" class="btn light" data-st="tips">Torna a veure els consells</button><button type="button" class="btn light" data-st="intro">Torna a veure la història</button><button type="button" class="btn gold" data-st="close">Tanca</button></div></div>';
   d.addEventListener('click',function(ev){var b=ev.target.closest('[data-st]');if(!b)return;var k=b.dataset.st;

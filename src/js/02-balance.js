@@ -3,6 +3,8 @@
 /* Words in the game: "nivell" = level (1-20), "forma" = form (1-4). In the code a critter has
    lvl (1-20), xp (experience towards the next level) and stage (0-3, so forma = stage+1). */
 var BAL={
+  /* ---- the legendary Quimera (js/28-quimera.js): life, attack and defence x this ---- */
+  LEGEND_MULT:1.6,
   /* ---- levels and experience ---- */
   LEVEL_MAX:20,
   FORM_CAP:[5,10,15,20],        /* highest level for forma 1, 2, 3, 4 */

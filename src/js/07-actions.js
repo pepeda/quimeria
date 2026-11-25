@@ -51,7 +51,7 @@ function act(a,d){
     case 'build':if(buildArm!==d.k){buildArm=d.k;break}buildArm=null;var bd=BUILD.filter(function(x){return x.k===d.k})[0];if(bd&&G.coins>=bd.price&&(G.built[bd.k]||0)<bd.max){G.coins-=bd.price;G.built[bd.k]=(G.built[bd.k]||0)+1;toast(bd.n+': fet!')}break;
     case 'detail':G.detail=d.s;break;
     case 'close':G.detail=null;break;
-    case 'adopt':var Sp=SPECIES[d.s];if(G.coins>=Sp.price&&G.owned.length<cap()&&worldOpen(Sp.el)){G.coins-=Sp.price;G.owned.push(mk(d.s));toast(Sp.n+' viu ara a casa teva!')}break;
+    case 'adopt':var Sp=SPECIES[d.s];if(!Sp.legend&&G.coins>=Sp.price&&G.owned.length<cap()&&worldOpen(Sp.el)){G.coins-=Sp.price;G.owned.push(mk(d.s));toast(Sp.n+' viu ara a casa teva!')}break;
     case 'feed':var c=anyByUid(d.u);if(c&&G.food[d.el]>0&&canXp(c)){G.food[d.el]--;var fx=d.el===sp(c).el?BAL.XP_FOOD_OWN:BAL.XP_FOOD,fup=addXp(c,fx);toast(cName(c)+' ha menjat: +'+fx+' XP'+(fup?'. Puja al nivell '+lvl(c)+'!':'.'))}break;
     /* evolve: needs the level and the copies (evoCheck); the copies are used up. Forma 3 chooses a branch, forma 4 keeps it */
     case 'evolve':var c2=anyByUid(d.u),ei=+d.i,chk=c2&&evoCheck(c2);if(chk&&chk.ok&&((c2.stage===0&&ei===0)||(c2.stage===1&&ei>0)||(c2.stage===2&&ei===c2.evo))){

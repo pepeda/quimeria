@@ -393,6 +393,7 @@ dormilega:function(p){var s=p.st,o='';
 };
 var ART_N=0;
 function artDraw(sp,st,el2,locked,px){
+  if(sp==='quimera')return quimeraArt(px,locked);
   var S=SPECIES[sp]||SPECIES.espurnet,A=ELS[S.el]||ELS.foc,f=ART[sp]||ART.espurnet,f4=(st||0)>=3;st=Math.max(0,Math.min(2,st||0));
   var r=f({c:A.c,L:A.belly,D:ART_DK[S.el],H:ART_AC[S.el],st:st,role:S.role}),o=r.b;
   if(r.ce)o+=r.ce;else if(r.e)o+=aEye(r.e[0],r.e[2],r.e[3],S.role,-1,A.c)+aEye(r.e[1],r.e[2],r.e[3],S.role,1,A.c);
