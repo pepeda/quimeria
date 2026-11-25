@@ -286,6 +286,10 @@ nav.nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;paddi
 .goal{display:flex;align-items:center;gap:10px;background:#2A1F4A;color:#fff;border-radius:16px;padding:10px 12px;margin-bottom:10px;font-weight:800;font-size:15px;line-height:1.3}
 .goal span{flex:1}
 .has-coach #screen{padding-bottom:130px}
+/* The Quimera (js/28-quimera.js) */
+.quimera-tile{display:flex;flex-direction:row;align-items:center;gap:12px;width:100%;text-align:left;margin:10px 0;padding:10px 12px;border-radius:18px;border:3px solid transparent;
+  background:linear-gradient(var(--paper),var(--paper)) padding-box,conic-gradient(#F26B3A,#F2B90F,#3DAA5C,#2E8BE6,#9B59E0,#F26B3A) border-box}
+.quimera-tile.off{background:#ECE9F2;border:2px dashed #B9B2CC}
 @media (max-width:840px){
   .app{padding:0;display:block}
   .phone{width:100%;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));border-radius:0}
@@ -432,6 +436,8 @@ var BUILD=[
 /* Words in the game: "nivell" = level (1-20), "forma" = form (1-4). In the code a critter has
    lvl (1-20), xp (experience towards the next level) and stage (0-3, so forma = stage+1). */
 var BAL={
+  /* ---- the legendary Quimera (js/28-quimera.js): life, attack and defence x this ---- */
+  LEGEND_MULT:1.6,
   /* ---- levels and experience ---- */
   LEVEL_MAX:20,
   FORM_CAP:[5,10,15,20],        /* highest level for forma 1, 2, 3, 4 */
@@ -681,7 +687,7 @@ function addXp(c,n){var up=0;c.xp=(c.xp||0)+n;
   if(c.lvl>=levelCap(c))c.xp=Math.min(c.xp,xpNeed(c.lvl));return up}
 function maxFat(c){return BAL.FATIGUE[c.stage]}
 /* evolving: the rule for this critter's next form, and the copies it would use (lowest form and level first) */
-function evoRule(c){return BAL.EVOLVE[c.stage]||null}
+function evoRule(c){return sp(c).legend?null:BAL.EVOLVE[c.stage]||null}
 function copyPool(c){var R=evoRule(c);if(!R)return [];
   return allCr().filter(function(x){return x!==c&&x.sp===c.sp&&x.stage>=R.copyForm-1&&!busyWorld(x)&&G.pick.indexOf(x.uid)<0})
     .sort(function(a,b){return a.stage-b.stage||a.lvl-b.lvl||(a.xp||0)-(b.xp||0)})}
@@ -693,11 +699,11 @@ function evoCheck(c){var R=evoRule(c);if(!R)return {ok:false,final:true,missing:
   return {ok:!miss.length&&!busyWorld(c),rule:R,copies:pool.slice(0,R.copies),missing:miss}}
 function cap(){var n=6;BUILD.forEach(function(b){n+=(G.built[b.k]||0)*b.cap});return n}
 function bonusPct(eq){var b={atk:0,def:0,hp:0};Object.keys(eq).forEach(function(s){var it=IT(eq[s]);if(it){b.atk+=it.atk*3;b.def+=it.def*3;b.hp+=it.hp*2}});var P=powerOf(eq);return {atk:Math.round(b.atk+P.atk),def:Math.round(b.def+P.def),hp:Math.round(b.hp+P.hp)}}
-function stats(c,eq){var b=ROLE[sp(c).role],k=(1+BAL.STAT_PER_LEVEL*(lvl(c)-1))*BAL.FORM_MULT[c.stage],q=bonusPct(eq||G.equip);
+function stats(c,eq){var b=ROLE[sp(c).role],k=(1+BAL.STAT_PER_LEVEL*(lvl(c)-1))*BAL.FORM_MULT[c.stage]*(sp(c).legend?BAL.LEGEND_MULT:1),q=bonusPct(eq||G.equip);
   return {hp:Math.round(b.hp*k*(1+q.hp/100)),atk:Math.round(b.atk*k*(1+q.atk/100)),def:Math.round(b.def*k*(1+q.def/100)),heal:Math.round(b.heal*k)}}
 function busyWorld(c){for(var w in G.runs)if(G.runs[w].team.indexOf(c.uid)>=0)return w;return null}
 function run(){return G.active?G.runs[G.active]:null}
-function effMult(c,d){var a=sp(c).el,b=cEl2(c);return b?0.7*mult(a,d)+0.3*mult(b,d):mult(a,d)}
+function effMult(c,d){if(sp(c).all)return 1.5;var a=sp(c).el,b=cEl2(c);return b?0.7*mult(a,d)+0.3*mult(b,d):mult(a,d)}
 function dmg(atk,m,def){return Math.max(1,Math.round(atk*m-def*0.5))}
 function worldOpen(w){return w!=='psiquic'||G.psiquic}
 function ownsSp(s){return allCr().some(function(c){return c.sp===s})}
@@ -854,7 +860,7 @@ function act(a,d){
     case 'build':if(buildArm!==d.k){buildArm=d.k;break}buildArm=null;var bd=BUILD.filter(function(x){return x.k===d.k})[0];if(bd&&G.coins>=bd.price&&(G.built[bd.k]||0)<bd.max){G.coins-=bd.price;G.built[bd.k]=(G.built[bd.k]||0)+1;toast(bd.n+': fet!')}break;
     case 'detail':G.detail=d.s;break;
     case 'close':G.detail=null;break;
-    case 'adopt':var Sp=SPECIES[d.s];if(G.coins>=Sp.price&&G.owned.length<cap()&&worldOpen(Sp.el)){G.coins-=Sp.price;G.owned.push(mk(d.s));toast(Sp.n+' viu ara a casa teva!')}break;
+    case 'adopt':var Sp=SPECIES[d.s];if(!Sp.legend&&G.coins>=Sp.price&&G.owned.length<cap()&&worldOpen(Sp.el)){G.coins-=Sp.price;G.owned.push(mk(d.s));toast(Sp.n+' viu ara a casa teva!')}break;
     case 'feed':var c=anyByUid(d.u);if(c&&G.food[d.el]>0&&canXp(c)){G.food[d.el]--;var fx=d.el===sp(c).el?BAL.XP_FOOD_OWN:BAL.XP_FOOD,fup=addXp(c,fx);toast(cName(c)+' ha menjat: +'+fx+' XP'+(fup?'. Puja al nivell '+lvl(c)+'!':'.'))}break;
     /* evolve: needs the level and the copies (evoCheck); the copies are used up. Forma 3 chooses a branch, forma 4 keeps it */
     case 'evolve':var c2=anyByUid(d.u),ei=+d.i,chk=c2&&evoCheck(c2);if(chk&&chk.ok&&((c2.stage===0&&ei===0)||(c2.stage===1&&ei>0)||(c2.stage===2&&ei===c2.evo))){
@@ -927,7 +933,7 @@ var KIND_DESC={hit:'Un cop molt fort.',multi:'3 cops seguits.',burn:'Cop i crema
   soak:'Cop i l’enemic queda mullat: té menys defensa i els llamps li fan molt més mal.',weaken:'Cop i l’enemic queda debilitat: fa menys mal 3 torns.',
   shield:'Escut per a tot l’equip: els 3 cops següents fan la meitat de mal.',reflect:'Mirall: 2 torns tornant a l’enemic la meitat del mal que rep.',
   heal:'Cura molt la bestiola més ferida.',regen:'Tot l’equip es cura una mica cada torn, 3 torns.',healAll:'Cura tothom i desperta les que estan KO.',buff:'Tot l’equip fa +30% de mal, 3 torns.'};
-var OFFENSIVE=['hit','multi','burn','poison','stun','soak','weaken'];
+var OFFENSIVE=['hit','multi','prism','burn','poison','stun','soak','weaken'];
 function abilities(c){var l=ABIL[c.sp]||[],n=c.stage>=1?3:2,p=1+0.25*c.stage;
   return l.slice(0,n).map(function(a,i){return {i:i,n:a[0],cd:a[1],kind:a[2],pow:a[3]*(a[2]==='shield'||a[2]==='reflect'||a[2]==='buff'?1:p)}})}
 function comboKey(a,b){return [a,b].sort().join('+')}
@@ -1133,7 +1139,7 @@ function makeBattle(o){
 function alive(r){return r.team.map(byUid).filter(function(c){return c&&r.hp[c.uid]>0})}
 function lowest(r){return alive(r).sort(function(a,z){return r.hp[a.uid]/stats(a).hp-r.hp[z.uid]/stats(z).hp})[0]}
 function sameEl(r,el){return alive(r).filter(function(c){return sp(c).el===el}).length}
-function resistF(b,c){return b.enemy.resist&&sp(c).el===b.enemy.resist?0.5:1}
+function resistF(b,c){if(sp(c).all)return 1;return b.enemy.resist&&sp(c).el===b.enemy.resist?0.5:1}
 /* damage of critter c hitting the enemy with power pow: {n: damage, m: element multiplier, zap: lightning on a soaked enemy} */
 function outDmg(c,pow,b,r){
   var s=stats(c),atk=s.atk*pow*auraF(b,c)*(b.tm.buff>0?1.3:1)*(b.syn.germans&&sameEl(r,sp(c).el)>=2?1.15:1);
@@ -1152,12 +1158,12 @@ function outDmg(c,pow,b,r){
 }
 /* damage of the enemy hitting critter t (x: strength of the move). Enemies grow stronger every turn (growF); thorns on the gear hurt back */
 function inDmg(b,t,x){x=(x||1)*growF(b);var s=stats(t),def=s.def*auraF(b,t)*(b.syn.complet?1.1:1),atk=b.enemy.atk*(b.st.weak>0?0.7:1)*(b.enemy.enraged?1.3:1)*(x||1);
-  var d=Math.max(1,Math.round(atk*mult(b.enemy.el,sp(t).el)-def*0.5));if(b.P&&b.P.thorns)b._thorn=(b._thorn||0)+d*b.P.thorns/100;return d}
+  var d=Math.max(1,Math.round(atk*mult(b.enemy.el,sp(t).all?'':sp(t).el)-def*0.5));if(b.P&&b.P.thorns)b._thorn=(b._thorn||0)+d*b.P.thorns/100;return d}
 function danger(enemy){
   var r=run(),team=alive(r);if(!team.length)return {cls:'bad',t:'Perillós'};
   var out=0,hp=0,tank=team.filter(function(c){return sp(c).role==='Defensa'})[0];
   team.forEach(function(c){var s=stats(c);out+=Math.max(1,Math.round(s.atk*1.35*effMult(c,enemy.el)*(enemy.resist===sp(c).el?0.5:1)-enemy.def*0.5));hp+=r.hp[c.uid]});
-  var tg=tank||team[0],inc=Math.max(1,Math.round(enemy.atk*mult(enemy.el,sp(tg).el)-stats(tg).def*0.5))*1.4;
+  var tg=tank||team[0],inc=Math.max(1,Math.round(enemy.atk*mult(enemy.el,sp(tg).all?'':sp(tg).el)-stats(tg).def*0.5))*1.4;
   var ratio=(hp/inc)/(enemy.hp/out);
   return ratio>=3.2?{cls:'good',t:'Fàcil per al teu equip'}:ratio>=1.8?{cls:'mid',t:'Ajustat'}:{cls:'bad',t:'Perillós per al teu equip'};
 }
@@ -1183,13 +1189,14 @@ function doAbility(c,a,b,r){
   b.ch[c.uid][a.i]=a.cd;
   var e={t:'special',uid:c.uid,el:sp(c).el,el2:cEl2(c),kind:a.kind,name:a.n+(c.stage?' '+'★'.repeat(c.stage):''),heals:[]},k=a.kind;
   if(OFFENSIVE.indexOf(k)>=0){
-    var times=k==='multi'?3:1,total=0;for(var t=0;t<times;t++){var o=outDmg(c,a.pow,b,r);total+=o.n;b.enemy.hp=Math.max(0,b.enemy.hp-o.n)}
+    var times=k==='multi'?3:k==='prism'?5:1,total=0;for(var t=0;t<times;t++){var o=outDmg(c,a.pow,b,r);total+=o.n;b.enemy.hp=Math.max(0,b.enemy.hp-o.n)}
     e.n=total;e.after=b.enemy.hp;var extra='';
     if(k==='burn'){b.st.burn={t:3+(b.syn.incendi?2:0),n:Math.max(2,Math.round(stats(c).atk*0.45))};extra=' i el crema'}
     if(k==='poison'){b.st.poison={t:4,n:Math.max(2,Math.round(stats(c).atk*0.4))};extra=' i l’enverina'}
     if(k==='stun'){b.st.stun=1;extra=' i l’atordeix'}
     if(k==='soak'){b.st.soak=3;extra=' i el deixa mullat'}
     if(k==='weaken'){b.st.weak=3;extra=' i el debilita'}
+    if(k==='prism'){b.ch[c.uid][a.i]=999;extra=': cinc cops, un de cada element'}
     e.txt=cName(c)+' fa '+e.name+': -'+total+extra+'.';
   }else if(k==='shield'){b.shield=Math.min(4,b.shield+3);e.txt=cName(c)+' fa '+e.name+': escut per a tot l’equip.'}
   else if(k==='reflect'){b.tm.reflect[c.uid]=2;e.txt=cName(c)+' fa '+e.name+': tornarà la meitat del mal que rebi.'}
@@ -1377,7 +1384,8 @@ function finishRun(ok,keepAll){
   if(G.built.tennis){var home=G.owned.filter(function(c){return r.team.indexOf(c.uid)<0&&!busyWorld(c)&&canXp(c)});if(home.length){var t=pickOne(home);if(addXp(t,BAL.XP_TENNIS))levels.push(cName(t)+' puja al nivell '+lvl(t)+'!');tennis=cName(t)}}
   var unlocked=false,before=maxTeam();
   if(ok){G.completed++;G.done[r.world+':z'+z]=true;if(G.completed>=3&&!G.psiquic){G.psiquic=true;unlocked=true}}
-  G.summary={ok:ok,keepAll:!!keepAll,coins:coins,bonus:bonus,world:r.world,zone:z,tired:tired,unlocked:unlocked,tennis:tennis,pct:0,bigger:maxTeam()>before?maxTeam():0,xp:xp,levels:levels};
+  var qwake=ok&&quimeraWake();if(qwake)setTimeout(function(){quimeraComic()},400);
+  G.summary={ok:ok,keepAll:!!keepAll,coins:coins,bonus:bonus,world:r.world,zone:z,tired:tired,unlocked:unlocked,tennis:tennis,pct:0,bigger:maxTeam()>before?maxTeam():0,xp:xp,levels:levels,quimera:qwake};
   /* a won expedition gives a chest (an older chest that was never opened opens now by itself) */
   if(G.chest&&!G.chest.open)openChest();
   G.chest=ok?{tier:0,world:r.world,taps:0,open:false,got:null}:null;
@@ -2409,6 +2417,7 @@ dormilega:function(p){var s=p.st,o='';
 };
 var ART_N=0;
 function artDraw(sp,st,el2,locked,px){
+  if(sp==='quimera')return quimeraArt(px,locked);
   var S=SPECIES[sp]||SPECIES.espurnet,A=ELS[S.el]||ELS.foc,f=ART[sp]||ART.espurnet,f4=(st||0)>=3;st=Math.max(0,Math.min(2,st||0));
   var r=f({c:A.c,L:A.belly,D:ART_DK[S.el],H:ART_AC[S.el],st:st,role:S.role}),o=r.b;
   if(r.ce)o+=r.ce;else if(r.e)o+=aEye(r.e[0],r.e[2],r.e[3],S.role,-1,A.c)+aEye(r.e[1],r.e[2],r.e[3],S.role,1,A.c);
@@ -2802,7 +2811,8 @@ function scResum(){
     (s.tired&&s.tired.length?'<p>Molt cansades, han de descansar a casa: <b>'+esc(s.tired.join(', '))+'</b></p>':'')+
     (s.xp?'<p>L’equip guanya <b>'+s.xp+' XP</b> d’experiència.</p>':'')+(s.levels&&s.levels.length?'<p class="tag good" style="font-size:15px;padding:6px 12px">'+esc(s.levels.join(' '))+'</p>':'')+
     (s.tennis?'<p>'+esc(s.tennis)+' ha jugat a tennis i ha guanyat '+BAL.XP_TENNIS+' XP.</p>':'')+
-    (s.bigger?'<p class="tag good" style="font-size:15px;padding:6px 12px">Ara pots portar '+s.bigger+' bestioles a les aventures!</p>':'')+(s.unlocked?'<p class="tag good" style="font-size:15px;padding:6px 12px">Has descobert el Món Psíquic!</p>':'')+
+    (s.bigger?'<p class="tag good" style="font-size:15px;padding:6px 12px">Ara pots portar '+s.bigger+' bestioles a les aventures!</p>':'')+(s.unlocked?'<p class="tag good" style="font-size:15px;padding:6px 12px">Has descobert '+esc(ELS.psiquic.mon)+', el món desconegut!</p>':'')+
+    (s.quimera?'<div class="quimera-tile">'+quimeraArt(90,false)+'<span><b>La Quimera s’ha despertat!</b><span class="small" style="display:block">La bestiola de tots els elements ja és teva. Mira-la a Bestioles.</span></span></div>':'')+
     (s.house&&s.house.length?'<div class="small" style="background:#FFF4D6;border-radius:12px;padding:8px 12px;text-align:left"><b>La casa ajuda:</b> '+esc(s.house.join(' '))+'</div>':'')+
     chestBlock()+
     '<div class="row" style="justify-content:center"><button type="button" class="btn" data-act="nav" data-to="explorar">Explora més</button><button type="button" class="btn light" data-act="nav" data-to="casa">Torna a casa</button></div></div>';
@@ -2817,7 +2827,7 @@ function scBestioles(){
   return '<h1>Bestioles</h1>'+tip('bestioles','Les ombres grises són bestioles que encara no tens. Toca una bestiola per veure-la, donar-li menjar i fer-la evolucionar. Per evolucionar calen nivell i còpies (altres bestioles de la mateixa espècie).')+
     '<div class="row between"><span>Bestioles <b>'+owned+' de '+SP_ORDER.length+'</b></span><span>Formes <b>'+formsOwned()+' de '+SP_ORDER.length*5+'</b></span></div><div class="row between"><span>Combos secrets descoberts <b>'+megaCount()+' de '+MEGA.length+'</b></span></div>'+
     (function(){var n=roleCounts(allCr());return '<div class="row" style="gap:6px"><span class="small">En tens:</span>'+['Atac','Defensa','Curador'].map(function(r){return roleTag(r)+'<b>'+n[r]+'</b>'}).join(' ')+'</div>'})()+bar(owned*100/SP_ORDER.length,'#9B59E0')+
-    (ready.length?'<p class="tag mid" style="font-size:14px;padding:6px 10px">'+esc(ready.map(cName).join(', '))+' ja pot evolucionar!</p>':'')+sortBar()+tiles+niuBlock();
+    (ready.length?'<p class="tag mid" style="font-size:14px;padding:6px 10px">'+esc(ready.map(cName).join(', '))+' ja pot evolucionar!</p>':'')+sortBar()+quimeraTile()+tiles+niuBlock();
 }
 /* --- collection sort: normal order, by category (role) or by element --- */
 function sortBar(){var m=G.sortB||'num';return '<div class="row" style="gap:6px;flex-wrap:wrap;margin:6px 0"><span class="small">Ordena per:</span>'+[['num','Número'],['role','Categoria'],['el','Element']].map(function(x){return '<button type="button" class="btn sm'+(m===x[0]?' green':'')+'" data-act="sortB" data-k="'+x[0]+'" aria-pressed="'+(m===x[0])+'">'+x[1]+'</button>'}).join('')+'</div>'}
@@ -2909,7 +2919,7 @@ function betterGear(){try{var b=bestEquipSet().equip;return SLOTS.some(function(
 function xpBar(c,col){var L=lvl(c),need=xpNeed(L),cap=L>=levelCap(c),x=Math.min(c.xp||0,need);
   return '<div class="row between small" style="font-weight:800"><span>Forma '+form(c)+' · nivell '+L+'</span><span>'+(cap?(L>=BAL.LEVEL_MAX?'Nivell màxim':'Màxim de la forma '+form(c)):x+' / '+need+' XP')+'</span></div>'+bar(x*100/need,col||'#F2B90F')}
 /* the evolve buttons of one critter, or what is missing: level and copies */
-function evoBlock(c,S){var R=evoRule(c);if(!R)return '<p class="muted small">Forma 4: és la forma final. Té una aura que fa més forts els companys del seu element.</p>';
+function evoBlock(c,S){var R=evoRule(c);if(!R&&S.legend)return '<p class="muted small">És llegendària: no evoluciona més. Només n’hi ha una.</p>';if(!R)return '<p class="muted small">Forma 4: és la forma final. Té una aura que fa més forts els companys del seu element.</p>';
   var chk=evoCheck(c),opts=c.stage===1?[1,2]:[c.stage===0?0:c.evo],to=c.stage+2;
   var head='<p class="small"><b>Per evolucionar a forma '+to+'</b>: nivell '+R.level+' i '+R.copies+(R.copies>1?' còpies':' còpia')+' (una altra '+esc(S.n)+(R.copyForm>1?' de forma '+R.copyForm+' o més':'')+'). Les còpies desapareixen.</p>';
   var miss=chk.missing.length?'<p class="small" style="color:#9E2B1F;font-weight:800">'+chk.missing.map(esc).join('<br>')+'</p>':busyWorld(c)?'<p class="muted small">Ara és d’aventura.</p>':'';
@@ -2941,9 +2951,9 @@ function detailSheet(){
   var adopt='';
   if(!own){var open=worldOpen(S.el);
     adopt=open?'<button type="button" class="btn gold" data-act="adopt" data-s="'+s+'"'+(G.coins<S.price||G.owned.length>=cap()?' disabled':'')+'>Adopta-la · '+S.price+' monedes</button>'+(G.owned.length>=cap()?'<p class="muted">La casa és plena.</p>':G.coins<S.price?'<p class="muted">No tens prou monedes (en tens '+G.coins+').</p>':''):'<p class="flat" style="background:var(--soft)">Primer has de descobrir aquest món.</p>';}
-  return '<div class="modal" data-act="closeBg"><div class="sheet" role="dialog" aria-label="Fitxa de la bestiola" data-s="'+s+'"><div class="row" style="gap:12px;align-items:flex-start"><div style="background:'+(own?ELS[S.el].soft:'#E9E5F0')+';border-radius:20px;padding:6px">'+spArt(s,'',90,!own)+'</div><div style="flex:1;min-width:0"><h1>'+(own?esc(S.n):'???')+'</h1><div class="muted">'+(own?esc(ELS[S.el].n):'Encara no l’has trobada')+'</div><div class="muted">'+esc(worldOpen(S.el)?'Viu a '+ELS[S.el].mon:'Viu en un món desconegut')+'</div></div><button type="button" class="btn sm light" data-act="close">Tanca</button></div>'+
-    '<div class="row" style="gap:8px;align-items:flex-start">'+roleTag(S.role)+'<p class="small" style="flex:1;min-width:0">'+esc(ROLE_DESC[S.role])+'</p></div>'+'<div class="row" style="gap:8px;align-items:flex-start">'+talentTag(S.talent)+'<p class="small" style="flex:1;min-width:0">'+esc(TALENT[S.talent].d)+'</p></div>'+
-    copies+inst+adopt+abil+'<h3>Arbre d’evolucions</h3>'+evos+megaBlock(s)+'</div></div>';
+  return '<div class="modal" data-act="closeBg"><div class="sheet" role="dialog" aria-label="Fitxa de la bestiola" data-s="'+s+'"><div class="row" style="gap:12px;align-items:flex-start"><div style="background:'+(own?ELS[S.el].soft:'#E9E5F0')+';border-radius:20px;padding:6px">'+spArt(s,'',90,!own)+'</div><div style="flex:1;min-width:0"><h1>'+(own?esc(S.n):'???')+'</h1><div class="muted">'+(own?esc(S.all?'Tots els elements':ELS[S.el].n):'Encara no l’has trobada')+'</div><div class="muted">'+esc(worldOpen(S.el)?''+(S.all?'Ve de tots els mons':'Viu a '+ELS[S.el].mon):'Viu en un món desconegut')+'</div></div><button type="button" class="btn sm light" data-act="close">Tanca</button></div>'+
+    '<div class="row" style="gap:8px;align-items:flex-start">'+roleTag(S.role)+'<p class="small" style="flex:1;min-width:0">'+esc(S.legend?'La bestiola més forta del joc: fa molt de mal i aguanta més que les altres.':ROLE_DESC[S.role])+'</p></div>'+'<div class="row" style="gap:8px;align-items:flex-start">'+talentTag(S.talent)+'<p class="small" style="flex:1;min-width:0">'+esc(TALENT[S.talent].d)+'</p></div>'+
+    copies+inst+adopt+abil+(S.legend?'':'<h3>Arbre d’evolucions</h3>'+evos)+megaBlock(s)+'</div></div>';
 }
 function megaBlock(s){var mine=MEGA.filter(function(m){return m.sp.indexOf(s)>=0});if(!mine.length)return '';var found=G.megas||{},nf=mine.filter(function(m){return found[m.id]}).length;
   return '<h3>Combos secrets ('+nf+' de '+mine.length+')</h3><div class="flat" style="background:var(--soft);gap:8px">'+mine.map(function(m){
@@ -3014,7 +3024,7 @@ var INTRO=[
    art:function(){return '<span class="sfx stay r" style="position:relative;left:auto;top:auto;font-size:52px">CRAC!</span><div class="st-els">'+['foc','aigua','planta','llamp'].map(function(e){return elIcon(e,58,ELS[e].c)}).join('')+'<span class="st-q">?</span></div>'}},
   {bg:'linear-gradient(#A8E6B0,#EAF8EC)',t:'Tu vius a la casa del mig, on els trossos encara es toquen. Quatre bestioles t’han triat.',
    art:function(){return '<svg width="150" height="120" viewBox="0 0 180 150" aria-hidden="true"><ellipse cx="90" cy="120" rx="86" ry="26" fill="#7CC46B"/><rect x="60" y="62" width="62" height="50" rx="4" fill="#FFF4E0" stroke="#8A5A3C" stroke-width="3"/><rect x="82" y="84" width="18" height="28" fill="#8A5A3C"/><path d="M52 66 L91 32 L130 66 Z" fill="#E2574C" stroke="#A23A31" stroke-width="3"/></svg><div class="st-row">'+spArt(STARTERS[0],'',66)+spArt(STARTERS[1],'',66)+hero(72)+spArt(STARTERS[2],'',66)+spArt(STARTERS[3],'',66)+'</div>'}},
-  {bg:'linear-gradient(#FFE9DC,#FFB38A)',t:'Explora els mons amb la teva colla. Troba bestioles noves i arriba fins al final de cada món.',
+  {bg:'linear-gradient(#FFE9DC,#FFB38A)',t:'Explora els mons amb la teva colla. Acaba’ls tots i despertaràs la Quimera, la bestiola de tots els elements.',
    art:function(){return '<div class="st-row">'+spArt(STARTERS[0],'',120)+spArt(STARTERS[1],'',120)+'</div><span class="sfx stay r" style="position:relative;left:auto;top:auto;font-size:46px">VS</span><div style="line-height:0">'+monster('foc',150,true)+'</div>'}}
 ];
 function storyLayer(cls){var ph=$('phone');if(!ph)return null;var old=ph.querySelector('.st-layer');if(old)old.remove();
@@ -3031,7 +3041,7 @@ function showTitle(){
     (fresh?'':'<button type="button" class="st-link" data-st="intro">Torna a veure la història</button>')+
     '<p class="st-foot">Joc per al mòbil, en català. La partida es guarda sola.</p>';
   d.addEventListener('click',function(ev){var b=ev.target.closest('[data-st]');if(!b)return;var k=b.dataset.st;
-    if(k==='go'){if(fresh)showIntro(0);else closeStory()}
+    if(k==='go'){if(fresh)showIntro(0);else{closeStory();if(quimeraWake()){persist();render();quimeraComic()}}}
     else if(k==='help')showHelp(true);
     else if(k==='intro')showIntro(0)});
 }
@@ -3055,6 +3065,7 @@ function showHelp(fromTitle){
     '<p><b>Bestioles noves.</b> Quan en trobes una de salvatge, guanya-la en una batalla o dona-li el seu menjar.</p>'+
     '<p><b>Fer-les créixer.</b> Amb menjar i expedicions pugen de nivell. Amb prou nivell i còpies (bestioles repetides de la mateixa espècie) evolucionen.</p>'+
     '<p><b>Elements.</b> Cada bestiola fa més mal als elements que guanya:</p>'+beats+
+    '<p><b>La Quimera.</b> Quan guanyis el guardià de la zona 3 dels cinc mons, es despertarà la Quimera: la bestiola llegendària de tots els elements.</p>'+
     '<p><b>La casa.</b> Amb les monedes hi construeixes coses que ajuden les bestioles.</p>'+
     '<div class="st-btns"><button type="button" class="btn light" data-st="tips">Torna a veure els consells</button><button type="button" class="btn light" data-st="intro">Torna a veure la història</button><button type="button" class="btn gold" data-st="close">Tanca</button></div></div>';
   d.addEventListener('click',function(ev){var b=ev.target.closest('[data-st]');if(!b)return;var k=b.dataset.st;
@@ -3131,6 +3142,74 @@ function nextGoal(){
 function goalCard(){var g=nextGoal();if(!g)return '';
   var attr=g.a==='nav'?'data-to="'+g.d+'"':g.a==='detail'?'data-s="'+g.d+'"':'data-w="'+g.d+'"';
   return '<div class="goal"><span>'+esc(g.t)+'</span><button type="button" class="btn sm gold" data-act="'+g.a+'" '+attr+'>'+esc(g.b)+'</button></div>'}
+/* ================= THE QUIMERA: the legendary critter of all five elements =================
+   Idea of Alba: when you finish every world, a legendary critter wakes up: a chimera of all the elements.
+   - It wakes up when the zone 3 guardian of all five worlds is beaten (the game already calls a world
+     "finished" then). It comes once, at forma 3 and level 15, and cannot evolve further.
+   - In battle it always hits with the element that beats the monster (x1.5), no element hurts it extra,
+     and once per battle it does "Prisma dels Cinc": five hits, one of each element.
+   - It is not one of the 40 species of the collection (it does not appear in the wild); Bestioles shows
+     it in its own box, as a grey shape until it wakes up. */
+TALENT.cincEls={n:'Cinc elements',d:'Ataca sempre amb l’element que guanya el monstre, i cap element li fa mal de més.'};
+SPECIES.quimera={n:'Quimera',el:'psiquic',all:true,role:'Atac',price:0,legend:true,talent:'cincEls',
+  evos:[E('Quimera Jove'),E('Quimera dels Cinc'),E('Quimera dels Cinc')]};
+KIND_DESC.prism='Cinc cops, un de cada element. Només una vegada per batalla.';
+SPECIAL.quimera='Prisma dels Cinc';
+ABIL.quimera=[['Urpa de cinc colors',2,'hit',1.4],['Escut dels cinc elements',4,'shield',1],['Prisma dels Cinc',4,'prism',0.8]];
+var QUIMERA_LVL=15;
+/* all five worlds finished (zone 3 guardian beaten) */
+function quimeraReady(){return ORDER.every(function(w){return !!G.done[w+':z2']})}
+/* give it once; returns true when it woke up now */
+function quimeraWake(){
+  if(G.quimera||!quimeraReady())return false;
+  var c=mk('quimera');c.stage=2;c.evo=1;c.lvl=QUIMERA_LVL;c.xp=0;
+  if(G.owned.length<cap())G.owned.push(c);else{G.niu=G.niu||[];G.niu.push(c)}
+  G.quimera=1;return true;
+}
+/* the drawing: leaf wings (Planta), water body (Aigua), fire mane (Foc), lightning tail (Llamp),
+   purple eyes and gem (Psíquic), and a ring of the five colours */
+function quimeraArt(px,locked){
+  var spin=RM||locked?'':'<animateTransform attributeName="transform" type="rotate" from="0 32 34" to="360 32 34" dur="9s" repeatCount="indefinite"/>';
+  var ring=locked?'':'<g opacity=".55">'+spin+['#F26B3A','#2E8BE6','#3DAA5C','#F2B90F','#9B59E0'].map(function(c,i){var a=i*72*Math.PI/180,b=(i*72+60)*Math.PI/180;
+    return '<path d="M'+(32+29*Math.cos(a)).toFixed(1)+' '+(34+29*Math.sin(a)).toFixed(1)+' A29 29 0 0 1 '+(32+29*Math.cos(b)).toFixed(1)+' '+(34+29*Math.sin(b)).toFixed(1)+'" stroke="'+c+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'}).join('')+'</g>';
+  var o=ring+'<g stroke="#2A1F3D" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">'+
+    /* wings */
+    '<path d="M24 34 C10 22 4 26 6 36 C9 33 13 33 16 36 C12 38 12 43 16 44 C19 41 22 39 24 38 Z" fill="#3DAA5C"/>'+
+    '<path d="M40 34 C54 22 60 26 58 36 C55 33 51 33 48 36 C52 38 52 43 48 44 C45 41 42 39 40 38 Z" fill="#3DAA5C"/>'+
+    '<path d="M9 33 L20 37 M55 33 L44 37" stroke="#1F6E37" stroke-width="1.2" fill="none"/>'+
+    /* tail */
+    '<path d="M42 50 L50 46 L47 52 L56 49 L49 57 L51 52 L43 54 Z" fill="#F2B90F"/>'+
+    /* body */
+    '<ellipse cx="32" cy="47" rx="13" ry="10.5" fill="#2E8BE6"/><ellipse cx="32" cy="50" rx="7.5" ry="5.5" fill="#CFE6FF" stroke="none"/>'+
+    '<path d="M24 55 L23 60 M29 57 L29 61 M35 57 L35 61 M40 55 L41 60" stroke-width="2.6" fill="none"/>'+
+    /* mane */
+    '<path d="M32 9 L36 15 L43 12 L42 19 L49 20 L45 26 L51 30 L44 33 L46 39 L39 37 L32 42 L25 37 L18 39 L20 33 L13 30 L19 26 L15 20 L22 19 L21 12 L28 15 Z" fill="#F26B3A"/>'+
+    /* face */
+    '<circle cx="32" cy="27" r="9.5" fill="#FFD3B8"/>'+
+    '<ellipse cx="28.3" cy="26" rx="2.3" ry="2.9" fill="#9B59E0" stroke="none"/><ellipse cx="35.7" cy="26" rx="2.3" ry="2.9" fill="#9B59E0" stroke="none"/>'+
+    '<circle cx="27.6" cy="25" r=".9" fill="#fff" stroke="none"/><circle cx="35" cy="25" r=".9" fill="#fff" stroke="none"/>'+
+    '<path d="M29.5 31.5 Q32 33.5 34.5 31.5" fill="none" stroke-width="1.4"/>'+
+    /* gem */
+    '<path d="M32 13.5 L34.5 17 L32 20.5 L29.5 17 Z" fill="#C9A6F2"/>'+
+    '</g>';
+  return '<svg class="cr" width="'+px+'" height="'+px+'" viewBox="0 0 64 64" aria-hidden="true"'+(locked?' style="filter:brightness(0) opacity(.22)"':'')+'>'+o+'</svg>';
+}
+/* its box on the Bestioles screen */
+function quimeraTile(){
+  var q=allCr().filter(function(c){return c.sp==='quimera'})[0];
+  if(q)return '<button type="button" class="tap quimera-tile" data-act="detail" data-s="quimera">'+quimeraArt(70,false)+'<span><b>'+esc(cName(q))+'</b><span class="small" style="display:block">Llegendària · de tots els elements</span></span></button>';
+  var n=ORDER.filter(function(w){return G.done[w+':z2']}).length;
+  return '<div class="flat quimera-tile off">'+quimeraArt(60,true)+'<span><b>???</b><span class="small" style="display:block">Una bestiola llegendària dorm. Acaba la zona 3 dels cinc mons per despertar-la ('+n+' de 5).</span></span></div>';
+}
+/* the moment it wakes up: three comic panels, then the summary shows it */
+function quimeraComic(done){
+  var bg='conic-gradient(from 0deg,#F26B3A,#F2B90F,#3DAA5C,#2E8BE6,#9B59E0,#F26B3A)';
+  comicPage([
+    {wide:1,at:0,bg:'#111',html:'<div class="mbox">Els cinc mons s’han obert…</div><div style="display:flex;gap:8px">'+ORDER.map(function(e){return elIcon(e,40,ELS[e].c)}).join('')+'</div>'},
+    {wide:1,at:900,bg:bg,html:'<div style="line-height:0">'+quimeraArt(190,false)+'</div>'},
+    {wide:1,at:1800,bg:'#fff',html:'<div class="mname">LA QUIMERA S’HA DESPERTAT!</div><div class="mdesc">La bestiola de tots els elements vol venir amb tu.</div>'}
+  ],RM?900:5200,done||function(){});
+}
 /* drop critters of unknown species only now, after every species file has run (doing it at load lost the later species).
    Keep this here, at the very end: the save is read in 04-state.js, before 13-more-critters-and-talents.js adds species. */
 G.owned=G.owned.filter(function(c){return SPECIES[c.sp]});G.niu=G.niu.filter(function(c){return SPECIES[c.sp]});if(!G.owned.length)G.owned=newGame().owned;
